@@ -1,0 +1,13 @@
+{
+  "name": "@paychex/core",
+  "version": "0.1.6",
+  "description": "Common components for Paychex Flex.",
+  "main": "dist/index.js",
+  "author": "Dan Barnes",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.10",
+    "query-string": "^6.0.0",
+    "rxjs": "^6.0.0"
+  }
+}
