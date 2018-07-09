@@ -9,5 +9,10 @@
     "lodash": "^4.17.10",
     "query-string": "^6.0.0",
     "rxjs": "^6.0.0"
-  }
+  },
+  "bundledDependencies": [
+    "lodash",
+    "query-string",
+    "rxjs"
+  ]
 }
