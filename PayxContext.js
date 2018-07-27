@@ -38,10 +38,11 @@ function retrieve(node, key, options) {
 /**
  * Retrieves a value associated with the specified node or its ancestors.
  * 
+ * @ignore
  * @param {Node} node The node to start the search at.
  * @param {String} [key] The optional key to retrieve. If not specified, returns all associated values.
  * @param {any} [options={}] Options. Default is {inherit: false, sync: false, combine: false, default: undefined}
- * @returns {any|Obsevable<any>} The value associated with the specified node, if {sync:true} was passed. Otherwise,
+ * @returns {any|Observable<any>} The value associated with the specified node, if {sync:true} was passed. Otherwise,
  *  an Observable instance that will notify observers whenever a value changes.
  */
 function get(node, key, options = {}) {

@@ -14,5 +14,12 @@
     "lodash",
     "query-string",
     "rxjs"
-  ]
+  ],
+  "devDependencies": {
+    "docdash": "^0.4.0",
+    "jsdoc": "^3.5.5"
+  },
+  "scripts": {
+    "docs": "jsdoc -c jsdoc.json -R README.md"
+  }
 }
