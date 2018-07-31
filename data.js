@@ -24,10 +24,10 @@ export {
     createProxy,
 
     /**
-     * Constructs a new DataLayer instance using the specified Configuration.
+     * Constructs a new DataLayer instance using the specified configuration object.
      * 
      * @function
-     * @param {Configuration} config The configuration to use.
+     * @param {DataLayerConfiguration} config The configuration to use.
      * @returns {DataLayer}
      * @example
      * import {createDataLayer} from '@paychex/core/data'
@@ -59,8 +59,11 @@ export {
      *  - {key: undefined} => ''
      *
      * @function
-     * @param {string} [url='']
-     * @param {Object} [params={}]
+     * @param {string} [url=''] A URL that may contain tokens in the `:name` format. Any
+     * tokens found in this format will be replaced with corresponding named values in
+     * the `params` argument.
+     * @param {Object} [params={}] Values to use to replace named tokens in the URL. Any
+     * unmatched values will be appended to the URL as a properly encoded querystring.
      * @returns {string} A tokenized string with additional URL-encoded values
      * appened to the querystring.
      * @example

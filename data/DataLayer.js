@@ -30,8 +30,11 @@ function verifyResponse(response) {
  * map (e.g. by adding or deleting values) prior to the request being sent.
  * 
  * @callback RequestTransform
- * @param {*} data
- * @param {Object.<string, string>} headers
+ * @param {*} data The payload passed to {@link DataLayer.createRequest}. Whatever
+ * you return from this function will be used as the new request payload.
+ * @param {Object.<string, string>} headers A key-value collection of header names
+ * to header values. You can modify this object directly (e.g. by adding or
+ * deleting values) prior to the request being sent.
  * @returns {?*} The new body to send with the request.
  */
 
@@ -40,40 +43,35 @@ function verifyResponse(response) {
  * to callers.
  * 
  * @callback ResponseTransform
- * @param {*} data
+ * @param {*} data The response payload returned from the server. Whatever value
+ * you return from this function will be sent to callers instead.
  * @returns {?*} The data to return to callers.
  */
-
- /**
-  * Tells the data layer how to cache GET Responses. Subsequent fetches with the
-  * same cache key will be returned from cache while the caching period is valid,
-  * preventing unnecessary data calls. If not specified on a DDO, the default
-  * cache key will be the full request URL (including the querystring).
-  * 
-  * @typedef {Object} CacheMap
-  * @property {string} key The key used to store the Response.
-  * @property {string} method Either 'store' or 'session'.
-  * @property {boolean} encrypt Whether to encrypt the cached Response.
-  * @property {(number|Date)} expires Only applies when method=store. The number
-  * of minutes the Response should be considered valid, or the date on which the
-  * Response should be expired.
-  */
 
 /**
  * Encapsulates the information used by Adapters to complete a data call.
  * 
  * @typedef {Object} Request
- * @property {string} adapter
- * @property {string} url
- * @property {string} version
- * @property {string} method
- * @property {boolean} withCredentials
- * @property {*} body
- * @property {RequestTransform} transformRequest
- * @property {ResponseTransform} transformResponse
- * @property {CacheMap} cache
- * @property {Object.<string, *>} ignore
- * @property {Object.<string, string>} headers
+ * @property {string|Adapter} adapter The name of the adapter to use to complete this data
+ * call, or a direct Adapter instance. If a name is provided, it should match the name passed
+ * to {@link DataLayer.setAdapter}.
+ * @property {string} url The endpoint to hit, constructed using the {@link Proxy} instance
+ * passed to {@link module:data.createDataLayer}.
+ * @property {string} version The version of the endpoint to invoke, constructed using the
+ * {@link Proxy} instance passed to {@link module:data/createDataLayer}.
+ * @property {string} method The HTTP method for the operation (e.g. 'GET', 'POST', or 'PATCH').
+ * @property {boolean} withCredentials Whether to include cookies with the request.
+ * @property {*} body An optional payload to send with the request.
+ * @property {RequestTransform} transformRequest Enables optional transformation of the request
+ * payload and/or the request headers prior to sending.
+ * @property {ResponseTransform} transformResponse Enables optional transformation of the
+ * response payload before passing it back to callers.
+ * @property {Cache} cache An optional Cache instance with logic for if and/or when to cache
+ * the adapter Response.
+ * @property {Object.<string, *>} ignore A map of values that adapters may use to skip or
+ * configure specific steps in the data pipeline.
+ * @property {Object.<string, string>} headers A map of header names and values to send with
+ * the request. This object may be modified by adapters.
  */
 
 /**
@@ -96,9 +94,9 @@ function verifyResponse(response) {
  * Additional Response information.
  * 
  * @typedef {Object} MetaData
- * @property {boolean} error
- * @property {boolean} cached
- * @property {Message[]} messages
+ * @property {boolean} error Whether the response should be considered a failure.
+ * @property {boolean} cached Whether the response contains cached data.
+ * @property {Message[]} messages Collection of {@link Message} instances; may be empty.
  */
 
 /**
@@ -110,10 +108,14 @@ function verifyResponse(response) {
  * objects) so the caching layer can retrieve the full Response on subsequent calls.
  * 
  * @typedef {Object} Response
- * @property {*} data
- * @property {string} status
- * @property {string} statusText
- * @property {MetaData} meta
+ * @property {*} data The server payload; may be `undefined`.
+ * @property {number} status A standard status code the {@link DataLayer.fetch} method will
+ * examine to determine how to proceed. For example, a status code of 0 indicates an aborted
+ * request and may prompt network diagnostics or a dialog prompting the user to restore their
+ * network connection.
+ * @property {string} statusText A message that will be used to generated an Error message,
+ * if [`meta.error`]{@link MetaData.error} is `true`.
+ * @property {MetaData} meta Additional information about the response.
  */
 
 /**
@@ -137,33 +139,83 @@ function verifyResponse(response) {
  * Stores and retrieves Response objects.
  * 
  * @interface Cache
+ * @example
+ * import { indexedDB } from '@paychex/core/stores'
+ * 
+ * const store = indexedDB({store: 'my-objects'});
+ * const ignore = () => {};
+ * 
+ * export const cache = {
+ *   async get(request, proxy) {
+ *     const version = request.version && `@${request.version}` || '';
+ *     const key = `${request.url}${version}`;
+ *     await store.get(key).catch(ignore);
+ *   },
+ *   async set(request, response, proxy) {
+ *     const version = request.version && `@${request.version}` || '';
+ *     const key = `${request.url}${version}`;
+ *     await store.set(key, response).catch(ignore);
+ *   }
+ * }
  */
 
 /**
- * Retrieves a Response object from the cache. You should return
- * undefined if the specified request does not specify to use the
- * cache or if the cached value is expired or invalid. Do NOT
- * reject the returned Promise.
+ * Retrieves a Response object from the cache. You should resolve
+ * with `undefined` if the cached value is not found, expired, or
+ * invalid. Do NOT reject the returned Promise.
  * 
  * @async
  * @method Cache#get
- * @param {Request} request
- * @param {Proxy} proxy
- * @returns {Promise<?Response>}
+ * @param {Request} request Contains information you can use to create
+ * a cache key. Typical cache keys combine the `url` and `version`
+ * properties. See the example code.
+ * @param {Proxy} proxy The Proxy used to construct the request `url`
+ * and `version`.
+ * @returns {Promise<?Response>} Promise resolved with `undefined` if
+ * the key could not be found in the cache or is invalid; otherwise,
+ * resolved with the {@link Response} object passed to {@link Cache.set}.
+ * @example
+ * import { indexedDB } from '@paychex/core/stores'
+ * 
+ * const store = indexedDB({store: 'my-objects'});
+ * const ignore = () => {};
+ * 
+ * export const cache = {
+ *   async get(request, proxy) {
+ *     const version = request.version && `@${request.version}` || '';
+ *     const key = `${request.url}${version}`;
+ *     await store.get(key).catch(ignore);
+ *   }
+ * }
  */
 
 /**
- * Stores a Response object in the cache. You should not cache
- * the specified response if the request does not specify to use
- * the cache or if the response does not want to be cached. Do
+ * Stores a Response object in the cache. Resolve the returned promise
+ * when the object has been cached OR if the caching operation fails. Do
  * NOT reject the returned Promise.
  * 
  * @async
  * @method Cache#set
- * @param {Request} request
- * @param {Response} response
- * @param {Proxy} proxy
- * @returns {Promise}
+ * @param {Request} request Contains information you can use to create
+ * a cache key. Typical cache keys combine the `url` and `version`
+ * properties. See the example code.
+ * @param {Response} response The Response to cache. This is the value
+ * that should be returned from {@link Cache.get}.
+ * @param {Proxy} proxy The Proxy used to handle the request.
+ * @returns {Promise} A promise resolved when the value is cached.
+ * @example
+ * import { indexedDB } from '@paychex/core/stores'
+ * 
+ * const store = indexedDB({store: 'my-objects'});
+ * const ignore = () => {};
+ * 
+ * export const cache = {
+ *   async set(request, response, proxy) {
+ *     const version = request.version && `@${request.version}` || '';
+ *     const key = `${request.url}${version}`;
+ *     await store.set(key, response).catch(ignore);
+ *   }
+ * }
  */
 
 /**
@@ -174,7 +226,8 @@ function verifyResponse(response) {
  * 
  * @async
  * @callback Reconnect
- * @returns {Promise}
+ * @returns {Promise} A promise that will be resolved when the user's
+ * network connection is restored.
  */
 
 /**
@@ -185,7 +238,9 @@ function verifyResponse(response) {
  * results if a connection to Paychex could not be established).
  * 
  * @callback Diagnostics
- * @param {Request} request
+ * @param {Request} request The request that failed without receiving
+ * a response. The user still has a network connection, so we need to
+ * determine why the connection to Paychex may have failed.
  */
 
 /**
@@ -196,8 +251,8 @@ function verifyResponse(response) {
  * once per session vs. once per endpoint) should be implemented.
  * 
  * @callback Upgrade
- * @param {Request} request
- * @param {Response} response
+ * @param {Request} request The Request that returned a 505 error response.
+ * @param {Response} response The Response whose status code is 505.
  */
 
 /**
@@ -205,11 +260,11 @@ function verifyResponse(response) {
  * of the creator/consumer of the DataLayer to provide the necessary
  * functionality.
  * 
- * @typedef {Object} Configuration
- * @property {Proxy} proxy
- * @property {Upgrade} upgrade
- * @property {Reconnect} reconnect
- * @property {Diagnostics} diagnostics
+ * @typedef {Object} DataLayerConfiguration
+ * @property {Proxy} proxy The proxy to use to construct {@link Request} objects.
+ * @property {Upgrade} upgrade Method to invoke when a 505 Version Mismatch is returned from an {@link Adapter}.
+ * @property {Reconnect} reconnect Method to invoke when the user's network connection fails.
+ * @property {Diagnostics} diagnostics Method to invoke when a request is aborted but the user has a network connection.
  */
 
 export default function createDataLayer({
@@ -241,7 +296,7 @@ export default function createDataLayer({
      * inspect specific response values other than the data (e.g. headers).
      * @memberof DataLayer.prototype
      * @example
-     * import { fetch, createRequest } from '@paychex/core/data'
+     * import { fetch, createRequest } from '@paychex/landing/data'
      * import { myDDO } from './data'
      * 
      * function getData(params, data) {
@@ -252,11 +307,12 @@ export default function createDataLayer({
      *   });
      * }
      * @example
-     * import { fetch, createRequest } from '@paychex/core/data'
+     * import { fetch, createRequest } from '@paychex/landing/data'
      * import { ddoSaveWorker } from './data/workers'
      * 
      * async function saveWorker(worker) {
-     *   const request = createRequest(ddoSaveWorker, {id: worker.id}, worker);
+     *   const params = {id: worker.id};
+     *   const request = createRequest(ddoSaveWorker, params, worker);
      *   try {
      *     await fetch(request);
      *   } catch (e) {
@@ -273,8 +329,9 @@ export default function createDataLayer({
                 return response.data;
         }
 
-        const adapter = adapters.get(request.adapter);
-        if (!adapter) throw getError('Requested adapter type not found.', {adapter: request.adapter});
+        const adapter = adapters.get(request.adapter) || request.adapter;
+        if (typeof adapter !== 'function')
+            throw getError('Adapter not found.');
 
         await connected();
 
@@ -333,14 +390,14 @@ export default function createDataLayer({
      * @returns {Request} A Request instance.
      * @memberof DataLayer.prototype
      * @example
-     * import { createRequest } from '@paychex/core/data'
+     * import { createRequest } from '@paychex/landing/data'
      * // ...import ddo, create params and data...
      * const request = createRequest(ddo, params, data);
      * @example
-     * import { createRequest } from '@paychex/core/data'
+     * import { createRequest } from '@paychex/landing/data'
      * const request = createRequest(ddo, {id: '001235'});
      * @example
-     * import { createRequest } from '@paychex/core/data'
+     * import { createRequest } from '@paychex/landing/data'
      * const payload = { ... };
      * const request = createRequest(ddo, null, payload);
      */
@@ -370,7 +427,7 @@ export default function createDataLayer({
      * @param {Adapter} adapter The adapter to assign to the given type.
      * @memberof DataLayer.prototype
      * @example
-     * import { setAdapter } from '@paychex/core/data'
+     * import { setAdapter } from '@paychex/landing/data'
      * setAdapter('@paychex/myproject', function MyAPIAdapter(request, proxy) {
      *   return new Promise(function RestEndpointPromise(resolve) {
      *     // do data call
@@ -384,7 +441,7 @@ export default function createDataLayer({
      *   url: 'path/to/endpoint'
      * });
      * @example
-     * import { setAdapter } from '@paychex/core/data'
+     * import { setAdapter } from '@paychex/landing/data'
      * setAdapter('@paychex/myproject', async function MyAPIAdapter(request, proxy) {
      *   try {
      *     const response = await someXHRMethod(request);

@@ -79,7 +79,6 @@ export function ifResponseSuccess(status, setter) {
     return async function set(request, response, proxy) {
         if (response.status === status)
             return await setter(request, response, proxy);
-        return Promise.reject();
     };
 }
 
@@ -106,6 +105,5 @@ export function ifRequestMethod(method, getter) {
     return async function get(request, proxy) {
         if (request.method === method)
             return await method(request, proxy);
-        return Promise.reject();
     };
 }

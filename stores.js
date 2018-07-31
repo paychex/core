@@ -64,8 +64,10 @@ import indexedDB from './stores/indexedDB';
  * Wraps a {@link Store} instance so values are encrypted and
  * decrypted transparently when get and set.
  *
- * @param {Store} store
- * @param {EncryptionConfiguration} config
+ * @param {Store} store Underlying Store instance whose values will
+ * be encrypted during `set` calls and decrypted during `get` calls.
+ * @param {EncryptionConfiguration} config Indicates which encryption
+ * method and encryption key to use.
  * @returns {Store} A Store instance that will encrypt and decrypt
  * values in the underlying store transparently.
  * @example
