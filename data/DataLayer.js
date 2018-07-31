@@ -5,6 +5,9 @@ const AUTH_ERROR = 401;
 const VALIDATION_ERROR = 422;
 const VERSION_MISMATCH = 505;
 
+const no = () => false;
+const ignore = () => {};
+
 function getError(message, props = {}) {
     const error = new Error(message);
     return Object.assign(error, props);
@@ -204,7 +207,6 @@ function verifyResponse(response) {
  * 
  * @typedef {Object} Configuration
  * @property {Proxy} proxy
- * @property {Cache} cache
  * @property {Upgrade} upgrade
  * @property {Reconnect} reconnect
  * @property {Diagnostics} diagnostics
@@ -212,14 +214,12 @@ function verifyResponse(response) {
 
 export default function createDataLayer({
     proxy,
-    cache,
     upgrade,
     reconnect,
     diagnostics
 }) {
 
     if (!proxy) throw getError('Creating a new data layer requires a proxy.');
-    if (!cache) throw getError('Creating a new data layer requires a cache.');
     if (!upgrade) throw getError('Creating a new data layer requires an upgrade method.');
     if (!reconnect) throw getError('Creating a new data layer requires a reconnect method.');
     if (!diagnostics) throw getError('Creating a new data layer requires a diagnostics method.');
@@ -268,7 +268,7 @@ export default function createDataLayer({
     async function fetch(request) {
 
         let response;
-        if (response = await cache.get(request, proxy))
+        if (request.cache && response = await cache.get(request, proxy).catch(ignore))
             return response.data;
 
         const adapter = adapters.get(request.adapter);
@@ -276,23 +276,22 @@ export default function createDataLayer({
 
         await connected();
 
-        let attemptCount = 0,
+        let retry = true,
             authCount = 0;
 
-        while (++attemptCount) {
+        while (retry) {
 
             response = await adapter(request, proxy);
             if (verifyResponse(response))
                 request.response = response;
 
-            if (response.status >= 200 && response.status < 300) {
-                if (request.method === 'GET' && !response.meta.error)
-                    await cache.set(request, response, proxy);
+            if (!response.meta.error) {
+                if (request.cache)
+                    await request.cache.set(request, response, proxy).catch(ignore);
                 return response.data;
             } else if (response.status === AUTH_ERROR) {
                 if (++authCount > 1) break;
                 await proxy.auth(true);
-                continue;
             } else if (response.status === VALIDATION_ERROR) {
                 break;
             } else if (response.status === VERSION_MISMATCH) {
@@ -300,12 +299,11 @@ export default function createDataLayer({
                 break;
             } else if (response.status <= ABORTED && window.navigator.onLine) {
                 diagnostics(request);
-                continue;
+                break; // should we try again automatically? use retry logic?
             } else if (response.status <= ABORTED && !window.navigator.onLine) {
                 await connected();
-                continue;
-            } else if (request.retry && attemptCount <= request.retry) {
-                continue;
+            } else if (request.retry) {
+                retry = await request.retry(request, response, proxy).catch(no);
             } else {
                 break;
             }
