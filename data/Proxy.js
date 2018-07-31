@@ -21,8 +21,7 @@ const LEADING_SLASHES = /^\/+/;
  * easier local development, impersonation, dynamic endpoints, static data redirects, and user-
  * and environment-specific versioning.
  * 
- * @class Proxy
- * @hideconstructor
+ * @interface Proxy
  */
 
 export default function createProxy() {

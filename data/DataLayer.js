@@ -127,15 +127,13 @@ function verifyResponse(response) {
 /**
  * Provides end-to-end data operations for Paychex applications.
  * 
- * @class DataLayer
- * @hideconstructor
+ * @interface DataLayer
  */
 
 /**
  * Stores and retrieves Response objects.
  * 
- * @class Cache
- * @hideconstructor
+ * @interface Cache
  */
 
 /**
