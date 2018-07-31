@@ -25,17 +25,6 @@ const LEADING_SLASHES = /^\/+/;
  * @hideconstructor
  */
 
- /**
- * Creates a new proxy instance.
- *
- * @exports data/Proxy
- * @returns {Proxy}
- * @example
- * import {createProxy} from '@paychex/data'
- * import rules from '~/config/proxy'
- * export const proxy = createProxy();
- * proxy.use(rules);
- */
 export default function createProxy() {
 
     const config = [];

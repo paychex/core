@@ -84,7 +84,7 @@ function verifyResponse(response) {
  * @property {string} code A unique code to identify this message. May be used during
  * translation to present recovery information to the end user.
  * @property {string} [severity=NONE] The message severity. Possible values are ERROR,
- * CRITICAL_ERROR, and NONE.
+ * FATAL, and NONE.
  * @property {Array.<*>} data Any additional information the server believes may be useful
  * when triaging the error later.
  */
@@ -94,7 +94,7 @@ function verifyResponse(response) {
  * 
  * @typedef {Object} MetaData
  * @property {boolean} error
- * @property {cached} boolean
+ * @property {boolean} cached
  * @property {Message[]} messages
  */
 
@@ -212,23 +212,6 @@ function verifyResponse(response) {
  * @property {Diagnostics} diagnostics
  */
 
-/**
- * Constructs a new DataLayer instance using the specified Configuration.
- * 
- * @exports data/DataLayer
- * @param {Configuration} config The configuration to use.
- * @returns {DataLayer}
- * @example
- * import {createDataLayer} from '@paychex/core/data'
- * import {proxy, cache, upgrade, reconnect, diagnostics} from '~/config/data'
- * const dataLayer = createDataLayer({
- *   proxy,
- *   cache,
- *   upgrade,
- *   reconnect,
- *   diagnostics
- *  });
- */
 export default function createDataLayer({
     proxy,
     cache,
