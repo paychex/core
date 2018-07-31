@@ -15,7 +15,6 @@ export {
      *
      * @function
      * @returns {Proxy}
-     * @constructs Proxy
      * @example
      * import {createProxy} from '@paychex/data'
      * import rules from '~/config/proxy'
@@ -29,14 +28,12 @@ export {
      * 
      * @function
      * @param {Configuration} config The configuration to use.
-     * @constructs DataLayer
      * @returns {DataLayer}
      * @example
      * import {createDataLayer} from '@paychex/core/data'
-     * import {proxy, cache, upgrade, reconnect, diagnostics} from '~/config/data'
+     * import {proxy, upgrade, reconnect, diagnostics} from '~/config/data'
      * const dataLayer = createDataLayer({
      *   proxy,
-     *   cache,
      *   upgrade,
      *   reconnect,
      *   diagnostics

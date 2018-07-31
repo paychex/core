@@ -88,6 +88,7 @@ import indexedDB from './stores/indexedDB';
  */
 export function withEncryption(store, { key, method='AES-CBC' }) {
 
+    // TODO:
     async function encrypt(value) {/* encrypt using method and key */}
     async function decrypt(value) {/* decrypt using method and key*/}
      

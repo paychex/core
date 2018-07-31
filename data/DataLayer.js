@@ -268,8 +268,10 @@ export default function createDataLayer({
     async function fetch(request) {
 
         let response;
-        if (request.cache && response = await cache.get(request, proxy).catch(ignore))
-            return response.data;
+        if (request.cache) {
+            if (response = await cache.get(request, proxy).catch(ignore))
+                return response.data;
+        }
 
         const adapter = adapters.get(request.adapter);
         if (!adapter) throw getError('Requested adapter type not found.', {adapter: request.adapter});
