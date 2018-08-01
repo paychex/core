@@ -70,6 +70,7 @@ path | string | yes | | Combined with the base path to construct a full URL.
 method | string | no | GET | The HTTP verb to use.
 withCredentials | boolean | no | false | Whether to send Cookies with the request.
 compression | boolean | no | false | Whether to gzip the request payload. The server will need to decompress the payload.
+timeout | number | no | | The number of milliseconds to wait before aborting the data call.
 headers | object | no | `{accept: 'application/json'}` | The HTTP headers to use on the request.
 ignore | object | no | | Can be used to skip certain adapter behaviors. See your adapter's documentation for details.
 retry | function | no | | Determines whether a failed request should be retried.

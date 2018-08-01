@@ -96,6 +96,8 @@ function verifyResponse(response) {
  * @typedef {Object} MetaData
  * @property {boolean} error Whether the response should be considered a failure.
  * @property {boolean} cached Whether the response contains cached data.
+ * @property {boolean} timeout Whether the response timed out. When this is true,
+ * [Response.status]{@link Response} should be 0 and `meta.error` should be true.
  * @property {Message[]} messages Collection of {@link Message} instances; may be empty.
  */
 
@@ -335,10 +337,10 @@ export default function createDataLayer({
 
         await connected();
 
-        let retry = true,
+        let retry = false,
             authCount = 0;
 
-        while (retry) {
+        do {
 
             response = await adapter(request, proxy);
             if (verifyResponse(response))
@@ -349,25 +351,29 @@ export default function createDataLayer({
                     await request.cache.set(request, response, proxy).catch(ignore);
                 return response.data;
             } else if (response.status === AUTH_ERROR) {
-                if (++authCount > 1) break;
+                if (++authCount > 1)
+                    break;
                 await proxy.auth(true);
             } else if (response.status === VALIDATION_ERROR) {
                 break;
             } else if (response.status === VERSION_MISMATCH) {
                 upgrade(request, response);
                 break;
-            } else if (response.status <= ABORTED && window.navigator.onLine) {
-                diagnostics(request);
-                break; // should we try again automatically? use retry logic?
-            } else if (response.status <= ABORTED && !window.navigator.onLine) {
-                await connected();
-            } else if (request.retry) {
-                retry = await request.retry(request, response, proxy).catch(no);
-            } else {
-                break;
+            } else if (response.status <= ABORTED) {
+                if (response.meta.timeout) {
+                    // rely on retry logic
+                } else if (window.navigator.onLine) {
+                    diagnostics(request);
+                    break; // should we try again automatically? use retry logic?
+                } else if (!window.navigator.onLine) {
+                    await connected();
+                }
             }
 
-        }
+            if (request.retry)
+                retry = await request.retry(request, response, proxy).catch(no);
+
+        } while (retry);
 
         const error = response.error = getError(response.statusText, {
             status: response.status,
