@@ -1,6 +1,7 @@
 import QS from 'query-string';
 
 const rxToken = /:([^\/]+)/g;
+const rxTrailing = /\?$/;
 
 const replacer = params => (_, key) => {
     const value = params[key];
@@ -9,6 +10,7 @@ const replacer = params => (_, key) => {
 
 export default function tokenize(url = '', params = {}) {
     const out = url.replace(rxToken, replacer(params));
-    const sep = out.includes('?') ? '' : '?'
-    return out + sep + QS.stringify(params);
+    const qs = QS.stringify(params);
+    const sep = out.includes('?') ? '' : '?';
+    return (out + sep + qs).replace(rxTrailing, '');
 }

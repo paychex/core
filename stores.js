@@ -99,7 +99,7 @@ export function withEncryption(store, { key, method='AES-CBC' }) {
             return await store.get(key).then(decrypt);
         },
         async set(key, value) {
-            return await encrypt(value).then(store.set);
+            return await encrypt(value).then(enc => store.set(key, enc));
         },
         async delete(key) {
             return await store.delete(key);

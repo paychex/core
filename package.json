@@ -5,21 +5,43 @@
   "main": "dist/index.js",
   "author": "Dan Barnes",
   "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.17.10",
-    "query-string": "^6.0.0",
-    "rxjs": "^6.0.0"
-  },
-  "bundledDependencies": [
-    "lodash",
-    "query-string",
-    "rxjs"
-  ],
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0",
     "docdash": "^0.4.0",
-    "jsdoc": "^3.5.5"
+    "expect": "^23.5.0",
+    "jsdoc": "^3.5.5",
+    "mocha": "^5.2.0"
   },
   "scripts": {
+    "test": "mocha --require babel-register --recursive",
     "docs": "jsdoc -c jsdoc.json -R README.md"
-  }
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "7.6.0"
+          },
+          "modules": "commonjs"
+        }
+      ],
+      "stage-3"
+    ],
+    "plugins": [
+      "transform-es2015-modules-commonjs"
+    ]
+  },
+  "dependencies": {
+    "query-string": "^6.1.0"
+  },
+  "bundledDependencies": [
+    "query-string"
+  ]
 }

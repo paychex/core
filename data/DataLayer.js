@@ -14,13 +14,12 @@ function getError(message, props = {}) {
 }
 
 function verifyResponse(response) {
-    // TODO: decide whether to bring in a validation library
-    //  - only useful if we need runtime validation in multiple places
     if (!response) throw getError('A Response object is expected.');
     const reqResp = ['status', 'statusText', 'meta', 'data'].find(prop => !(prop in response));
     if (reqResp) throw getError('Response object is missing a required field.', {field: reqResp});
     const reqMeta = ['error', 'cached', 'messages'].find(prop => !(prop in response.meta));
     if (reqMeta) throw getError('Response meta object is missing a required field.', {field: reqMeta});
+    return true;
 }
 
 /**
@@ -274,7 +273,7 @@ export default function createDataLayer({
     upgrade,
     reconnect,
     diagnostics
-}) {
+} = {}) {
 
     if (!proxy) throw getError('Creating a new data layer requires a proxy.');
     if (!upgrade) throw getError('Creating a new data layer requires an upgrade method.');
@@ -327,20 +326,22 @@ export default function createDataLayer({
 
         let response;
         if (request.cache) {
-            if (response = await cache.get(request, proxy).catch(ignore))
+            if (response = await request.cache.get(request, proxy).catch(ignore))
                 return response.data;
         }
 
         const adapter = adapters.get(request.adapter) || request.adapter;
         if (typeof adapter !== 'function')
-            throw getError('Adapter not found.');
+            throw getError('Adapter not found.', { adapter: request.adapter });
 
         await connected();
 
-        let retry = false,
+        let retry,
             authCount = 0;
 
         do {
+
+            retry = false;
 
             response = await adapter(request, proxy);
             if (verifyResponse(response))
@@ -354,6 +355,8 @@ export default function createDataLayer({
                 if (++authCount > 1)
                     break;
                 await proxy.auth(true);
+                retry = true;
+                continue;
             } else if (response.status === VALIDATION_ERROR) {
                 break;
             } else if (response.status === VERSION_MISMATCH) {
@@ -364,7 +367,7 @@ export default function createDataLayer({
                     // rely on retry logic
                 } else if (window.navigator.onLine) {
                     diagnostics(request);
-                    break; // should we try again automatically? use retry logic?
+                    break;
                 } else if (!window.navigator.onLine) {
                     await connected();
                 }

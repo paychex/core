@@ -47,6 +47,7 @@ export default function createProxy() {
                 .filter(({match: {
                     base: targetBase = '',
                     path: targetPath = ''
+                    // FIXME: empty match or base or path should pass through
                 }}) => targetBase && new RegExp(targetBase, 'i').test(base)
                     && targetPath && new RegExp(targetPath, 'i').test(path))
                 .reduce((out, rule) => Object.assign(out, rule), {});
@@ -65,6 +66,7 @@ export default function createProxy() {
          */
         version(request) {
             return config
+                // FIXME: what about empty match?
                 .filter(({match}) =>
                     Object.entries(match).every((key, pattern) =>
                         new RegExp(pattern, 'i').test(request[key])))
