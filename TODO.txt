@@ -1,8 +1,4 @@
 unit tests
-  [-] data
-    [x] DataLayer
-    [x] Proxy
-    [x] Tokenizer
-    [ ] utils
   [ ] stores
+    [ ] withEncryption
     [ ] indexedDB

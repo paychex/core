@@ -45,14 +45,14 @@
  *   retry: withFalloff(3)
  * };
  */
-export function withFalloff(times = 3, base = 200) {
+export function withFalloff(times = 3, base = 200, scheduler = setTimeout) {
     const invokes = new WeakMap();
     return function retry(request, response, proxy) {
         const count = invokes.get(request) || 0;
         invokes.set(request, count + 1);
         if (count >= times) return Promise.reject();
         return new Promise((resolve) =>
-            setTimeout(resolve, Math.pow(2, count) * base));
+            scheduler(resolve, Math.pow(2, count) * base));
     };
 }
 
@@ -67,15 +67,15 @@ export function withFalloff(times = 3, base = 200) {
  * invoke if the Response status matches.
  * @returns {function} A {@link Cache#set} wrapper method.
  * @example
- * import { isResponseSuccess } from '@paychex/core/data/utils'
+ * import { isResponseStatus } from '@paychex/core/data/utils'
  * 
  * export default class MyCache {
- *   set: ifResponseSuccess(200, async function set(request, response, proxy) {
+ *   set: ifResponseStatus(200, async function set(request, response, proxy) {
  *     // do caching logic here
  *   })
  * }
  */
-export function ifResponseSuccess(status, setter) {
+export function ifResponseStatus(status, setter) {
     return async function set(request, response, proxy) {
         if (response.status === status)
             return await setter(request, response, proxy);
@@ -104,6 +104,6 @@ export function ifResponseSuccess(status, setter) {
 export function ifRequestMethod(method, getter) {
     return async function get(request, proxy) {
         if (request.method === method)
-            return await method(request, proxy);
+            return await getter(request, proxy);
     };
 }

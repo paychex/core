@@ -90,7 +90,7 @@ import { call, put } from 'redux-saga/effects';
 import { withFalloff } from '@paychex/core/data/utils';
 import { createRequest, fetch } from '@paychex/landing/data';
 import { indexedDB, withEncryption } from '@paychex/core/stores';
-import { ifRequestMethod, ifResponseSuccess } from '@paychex/core/data/utils';
+import { ifRequestMethod, ifResponseStatus } from '@paychex/core/data/utils';
  
 import { User } from '~/data/schemas';
 import { setLoading, cue } from '~/data/actions';
