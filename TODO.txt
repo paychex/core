@@ -1,4 +1,4 @@
 unit tests
-  [ ] stores
-    [ ] withEncryption
+  [-] stores
+    [x] withEncryption
     [ ] indexedDB

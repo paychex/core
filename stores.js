@@ -1,3 +1,6 @@
+import aesjs from 'aes-js'
+import indexedDB from './stores/indexedDB';
+
 /**
  * Provides methods for storing information on the client's
  * machine. The persistence period will vary based on the
@@ -48,16 +51,25 @@
  * This promise should only be rejected if the delete operation fails.
  */
 
-import indexedDB from './stores/indexedDB';
-
 /**
  * @global
  * @typedef {Object} EncryptionConfiguration
- * @property {string} key The private key to use to encrypt
- * values in the store.
- * @property {string} [method='AES-CBC'] The encryption
+ * @property {string|number[]} key The private key to use to encrypt
+ * values in the store. The same key will need to be provided
+ * on subsequent encrypted store instantiations, so a value
+ * that is unique to the user (and unguessable by other users)
+ * is recommended. The string should be base64-encoded; otherwise,
+ * a byte array of length 32 can be provided directly.
+ * @property {string|number[]} [salt] A fairly unique value that can
+ * be used to generate an initialization vector. The same value
+ * will need to be provided on subsequent store insantiations,
+ * so a value that is unique to the user (such as a GUID) is
+ * recommended. A normal UTF8 string is expected, but you can also
+ * specify a byte array of length 16. Note: the salt is only
+ * needed when the encryption method is 'cbc'.
+ * @property {string} [method='cbc'] The encryption
  * method to use to encrypt values in the store. Currently,
- * only AES-CBC is supported.
+ * only 'cbc' or 'ctr' is recommended.
  */
 
 /**
@@ -71,10 +83,12 @@ import indexedDB from './stores/indexedDB';
  * @returns {Store} A Store instance that will encrypt and decrypt
  * values in the underlying store transparently.
  * @example
+ * import { proxy } from 'path/to/proxy';
  * import { indexedDB, withEncryption } from '@paychex/core/stores'
  * 
+ * const key = await proxy.key(); // user's private key
  * const database = indexedDB({store: 'my-store'});
- * const encrypted = withEncryption(database);
+ * const encrypted = withEncryption(database, {key});
  * 
  * export async function loadData(id) {
  *   try {
@@ -88,22 +102,56 @@ import indexedDB from './stores/indexedDB';
  *   }
  * }
  */
-export function withEncryption(store, { key, method='AES-CBC' }) {
+export function withEncryption(store, { key, salt = undefined, method = 'cbc' }) {
 
-    // TODO:
-    async function encrypt(value) {/* encrypt using method and key */}
-    async function decrypt(value) {/* decrypt using method and key*/}
+    function byteArrayFromBase64(b64) {
+        const chars = Array.from(b64).map(c => c.charCodeAt(0)).slice(-32);
+        const array = new Uint8Array(chars.length);
+        array.set(chars);
+        return array;
+    }
+
+    const k = typeof key === 'string'
+        ? byteArrayFromBase64(key)
+        : key;
+
+    const iv = method === 'cbc'
+        ? typeof salt === 'string'
+            ? aesjs.utils.utf8.toBytes(new Array(16).join(salt)).slice(-16)
+            : salt
+        : new aesjs.Counter(5);
+
+    async function encrypt(value) {
+        const aes = new aesjs.ModeOfOperation[method](k, iv);
+        const json = JSON.stringify(value);
+        const bytes = aesjs.utils.utf8.toBytes(json);
+        const final = aesjs.padding.pkcs7.pad(bytes);
+        return aesjs.utils.hex.fromBytes(aes.encrypt(final));
+    }
+
+    async function decrypt(value) {
+        const aes = new aesjs.ModeOfOperation[method](k, iv);
+        const bytes = aes.decrypt(aesjs.utils.hex.toBytes(value));
+        const unpadded = aesjs.padding.pkcs7.strip(bytes);
+        const json = aesjs.utils.utf8.fromBytes(unpadded);
+        return JSON.parse(json);
+    }
      
     return {
+
         async get(key) {
             return await store.get(key).then(decrypt);
         },
+
         async set(key, value) {
-            return await encrypt(value).then(enc => store.set(key, enc));
+            const setInStore = data => store.set(key, data);
+            return await encrypt(value).then(setInStore);
         },
+
         async delete(key) {
             return await store.delete(key);
         }
+
     };
 
 }
