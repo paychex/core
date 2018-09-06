@@ -1,4 +1,0 @@
-unit tests
-  [-] stores
-    [x] withEncryption
-    [ ] indexedDB
