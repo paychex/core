@@ -412,7 +412,7 @@ export default function createDataLayer({
      */
     function createRequest(ddo, params = {}, body = undefined) {
         const version = proxy.version(ddo);
-        const url = tokenize(proxy.url(ddo.base, ddo.path), {...params});
+        const url = tokenize(proxy.url(ddo.base, ddo.path), params);
         const key = `${url}@${version || 'latest'}`;
         return {
             method: 'GET',
