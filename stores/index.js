@@ -1,5 +1,5 @@
 import aesjs from 'aes-js'
-import indexedDB from './stores/indexedDB';
+import indexedDB from './indexedDB';
 
 /**
  * Provides methods for storing information on the client's
@@ -86,11 +86,11 @@ import indexedDB from './stores/indexedDB';
  * import { proxy } from 'path/to/proxy';
  * import { indexedDB, withEncryption } from '@paychex/core/stores'
  * 
- * const key = await proxy.key(); // user's private key
- * const database = indexedDB({store: 'my-store'});
- * const encrypted = withEncryption(database, {key});
- * 
  * export async function loadData(id) {
+ *   const iv = String(id);
+ *   const key = await proxy.key(); // user private key
+ *   const database = indexedDB({ store: 'my-store' });
+ *   const encrypted = withEncryption(database, { key, iv });
  *   try {
  *     return await encrypted.get(id);
  *   } catch (e) {

@@ -4,9 +4,9 @@
  * @module data
  */
 
-import createProxy from './data/Proxy';
-import createDataLayer from './data/DataLayer';
-import tokenize from './data/Tokenizer'
+import createProxy from './Proxy';
+import createDataLayer from './DataLayer';
+import tokenize from './Tokenizer'
 
 export {
 
