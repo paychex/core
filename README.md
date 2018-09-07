@@ -90,15 +90,15 @@ import { call, put } from 'redux-saga/effects';
 import { withFalloff } from '@paychex/core/data/utils';
 import { createRequest, fetch } from '@paychex/landing/data';
 import { indexedDB, withEncryption } from '@paychex/core/stores';
-import { ifRequestMethod, ifResponseSuccess } from '@paychex/core/data/utils';
+import { ifRequestMethod, ifResponseStatus } from '@paychex/core/data/utils';
  
 import { User } from '~/data/schemas';
 import { setLoading, cue } from '~/data/actions';
 
-const userInfoCache = ((key, hash) => {
+const userInfoCache = ((key, hash, iv) => {
  
     const store = indexedDB({store: 'userInfo'});
-    const encrypted = withEncryption(store, {key});
+    const encrypted = withEncryption(store, {key, iv});
      
     return {
  
@@ -112,7 +112,7 @@ const userInfoCache = ((key, hash) => {
  
     };
  
-})(window.userKey, window.userHash);
+})(window.userKey, window.userHash, window.smGuid);
 
 const setUserInfo = (user) => ({
     type: 'set-user-info',

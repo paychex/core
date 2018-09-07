@@ -10,23 +10,106 @@
  * created if it doesn't exist in the database.
  */
 
+const dbs = new Map();
+
 export default function indexedDB({
     database = '@paychex',
     version = 1,
     store
-}) {
+}, databases = dbs) {
 
-    // TODO:
-    // if the store doesn't exist, create a new version of
-    // the database, copy existing stores and values as-is,
-    // and then delete the old database; if the store exists
-    // at an earlier version, delete the older version and
-    // start with an empty new version of the store
-     
+    let dbVersion = 1;
+    const prefix = `${store}@`;
+    const table = `${prefix}${version}`;
+
+    function closePreviousVersion(e) {
+        e.currentTarget.close()
+    }
+
+    function isLowerVersion(storeName) {
+        return storeName.startsWith(prefix) &&
+            Number(storeName.replace(prefix, '')) < version;
+    }
+
+    function increment() {
+        dbVersion++;
+        return openDatabase();
+    }
+
+    function openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = window.indexedDB.open(database, dbVersion);
+            request.onupgradeneeded = createStore;
+            request.onsuccess = (e) => {
+                const db = e.target.result;
+                db.onversionchange = closePreviousVersion;
+                resolve(db);
+            };
+            request.onerror = (e) => {
+                if (e.target.error.name === 'VersionError') {
+                    increment().then(resolve, reject);
+                } else {
+                    reject(e.target.error);
+                }
+            };
+        });
+    }
+
+    function createStore(e) {
+        const db = e.target.result;
+        db.createObjectStore(table);
+        const stores = db.objectStoreNames;
+        Array.prototype.filter.call(stores, isLowerVersion)
+            .forEach(db.deleteObjectStore, db);
+    }
+
+    function upgradeIfStoreNotFound(db) {
+        const stores = db.objectStoreNames;
+        if (Array.prototype.includes.call(stores, table)) {
+            databases.set(database, db);
+        } else {
+            return increment().then(upgradeIfStoreNotFound);
+        }
+    }
+
+    const ready = openDatabase()
+        .then(upgradeIfStoreNotFound);
+
     return {
-        async get(key) {},
-        async set(key, value) {},
-        async delete(key) {}
+
+        async get(key) {
+            await ready;
+            const db = databases.get(database);
+            const tx = db.transaction(table);
+            const req = tx.objectStore(table).get(key);
+            return new Promise((resolve, reject) => {
+                tx.onerror = () => reject(tx.error);
+                req.onsuccess = () => resolve(req.result);
+            });
+        },
+
+        async set(key, value) {
+            await ready;
+            const db = databases.get(database);
+            const tx = db.transaction(table, 'readwrite');
+            const req = tx.objectStore(table).put(value, key);
+            return new Promise((resolve) => {
+                tx.onerror = () => resolve();
+                req.onsuccess = () => resolve();
+            });
+        },
+
+        async delete(key) {
+            await ready;
+            const db = databases.get(database);
+            const tx = db.transaction(table, 'readwrite');
+            const req = tx.objectStore(table).delete(key);
+            return new Promise((resolve, reject) => {
+                tx.onerror = () => reject(tx.error);
+                req.onsuccess = () => resolve();
+            });
+        }
+
     };
 
 }

@@ -43,14 +43,15 @@ export default function createProxy() {
                 .join('/')
                 .replace(DOUBLE_SLASH, '/')
                 .replace(LEADING_SLASHES, '');
-            const { protocol = '', host = 'localhost', port = 8080 } = config
+            const { protocol = '', host = base, port = 80 } = config
                 .filter(({match: {
                     base: targetBase = '',
                     path: targetPath = ''
-                }}) => targetBase && new RegExp(targetBase, 'i').test(base)
-                    && targetPath && new RegExp(targetPath, 'i').test(path))
+                } = {}} = {}) =>
+                    (!targetBase || new RegExp(targetBase, 'i').test(base))
+                    && (!targetPath || new RegExp(targetPath, 'i').test(path)))
                 .reduce((out, rule) => Object.assign(out, rule), {});
-            return `${protocol}${protocol ? ':' : ''}//${protocol === 'file' ? '/' : ''}${host}${port === 80 ? '' : `:${port}`}/${path}`;
+            return `${protocol}${protocol ? ':' : ''}//${protocol === 'file' ? '/' : ''}${host}${port === 80 ? '' : `:${port}`}${path ? `/${path}` : ''}`;
         },
 
         /**
@@ -60,13 +61,13 @@ export default function createProxy() {
          *
          * @param {Request} request The request object whose key/value pairs will be used
          * to determine which proxy rules should be used to determine the version.
-         * @returns {string} A version string, e.g. 'v2', 'application/json+v1', or
+         * @returns {string?} A version string, e.g. 'v2', 'application/json+v1', or
          * 'http://api.paychex.com/my-endpoint/v3'
          */
         version(request) {
             return config
-                .filter(({match}) =>
-                    Object.entries(match).every((key, pattern) =>
+                .filter(({match = {}} = {}) =>
+                    Object.entries(match).every(([key, pattern]) =>
                         new RegExp(pattern, 'i').test(request[key])))
                 .reduce((v, {version}) => version || v, undefined);
         },
