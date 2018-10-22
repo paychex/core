@@ -150,12 +150,12 @@ function verifyResponse(response) {
  *   async get(request, proxy) {
  *     const version = request.version && `@${request.version}` || '';
  *     const key = `${request.url}${version}`;
- *     await store.get(key).catch(ignore);
+ *     return await store.get(key).catch(ignore);
  *   },
  *   async set(request, response, proxy) {
  *     const version = request.version && `@${request.version}` || '';
  *     const key = `${request.url}${version}`;
- *     await store.set(key, response).catch(ignore);
+ *     return await store.set(key, response).catch(ignore);
  *   }
  * }
  */
@@ -185,7 +185,7 @@ function verifyResponse(response) {
  *   async get(request, proxy) {
  *     const version = request.version && `@${request.version}` || '';
  *     const key = `${request.url}${version}`;
- *     await store.get(key).catch(ignore);
+ *     return await store.get(key).catch(ignore);
  *   }
  * }
  */
@@ -214,7 +214,7 @@ function verifyResponse(response) {
  *   async set(request, response, proxy) {
  *     const version = request.version && `@${request.version}` || '';
  *     const key = `${request.url}${version}`;
- *     await store.set(key, response).catch(ignore);
+ *     return await store.set(key, response).catch(ignore);
  *   }
  * }
  */
@@ -326,8 +326,10 @@ export default function createDataLayer({
 
         let response;
         if (request.cache) {
-            if (response = await request.cache.get(request, proxy).catch(ignore))
+            if (response = await request.cache.get(request, proxy).catch(ignore)) {
+                response.meta.cached = true;
                 return response.data;
+            }
         }
 
         const adapter = adapters.get(request.adapter) || request.adapter;
