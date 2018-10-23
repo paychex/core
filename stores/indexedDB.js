@@ -93,8 +93,8 @@ export default function indexedDB({
             const db = databases.get(database);
             const tx = db.transaction(table, 'readwrite');
             const req = tx.objectStore(table).put(value, key);
-            return new Promise((resolve) => {
-                tx.onerror = () => resolve();
+            return new Promise((resolve, reject) => {
+                tx.onerror = () => reject(tx.error);
                 req.onsuccess = () => resolve();
             });
         },

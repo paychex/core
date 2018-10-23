@@ -203,15 +203,20 @@ describe('indexedDB', () => {
             setTimeout(() => request.onsuccess());
         });
 
-        it('resolves with nothing on failure', (done) => {
+        it('rejects if transaction fails', (done) => {
             const e = { target: { result: db } };
             const store = indexedDB({ store: 'test' });
-            const request = {};
-            os.put.returns(request);
+            os.put.returns({});
             db.objectStoreNames = ['test@1'];
             openRequest.onsuccess(e);
-            store.set('key', 'value').then(done);
-            setTimeout(() => txn.onerror());
+            store.set('key', 'value').catch(e => {
+                expect(e).toBe(txn.error);
+                done();
+            });
+            setTimeout(() => {
+                txn.error = new Error();
+                txn.onerror();
+            });
         });
 
     });
