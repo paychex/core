@@ -88,11 +88,12 @@ describe('indexedDB', () => {
             expect(window.indexedDB.open.args).toEqual(['@paychex', 2]);
         });
 
-        it('closes v1 if new store version needed', () => {
+        it('closes v1 if new store version needed', async () => {
             const e1 = { target: { result: db } };
             const e2 = { currentTarget: db };
             indexedDB({ store: 'test' });
             openRequest.onsuccess(e1);
+            await new Promise(setTimeout);
             db.onversionchange(e2);
             expect(db.close.called).toBe(true);
         });
@@ -107,11 +108,12 @@ describe('indexedDB', () => {
             expect(db.deleteObjectStore.args[0]).toEqual('test@9');
         });
 
-        it('opens most recent version', () => {
+        it('opens most recent version', async () => {
             const e = { target: { error: {name: 'VersionError'} } };
             indexedDB({ store: 'test' });
             expect(window.indexedDB.open.args[1]).toBe(1);
             openRequest.onerror(e);
+            await new Promise(setTimeout);
             expect(window.indexedDB.open.args[1]).toBe(2);
         });
 
@@ -189,15 +191,15 @@ describe('indexedDB', () => {
             expect(os.put.args).toEqual(['value', 'key']);
         });
 
-        it('resolves with nothing on success', (done) => {
+        it('resolves with result on success', (done) => {
             const e = { target: { result: db } };
             const store = indexedDB({ store: 'test' });
-            const request = {};
+            const request = { result: 'key' };
             os.put.returns(request);
             db.objectStoreNames = ['test@1'];
             openRequest.onsuccess(e);
             store.set('key', 'value').then((result) => {
-                expect(result).toBeUndefined();
+                expect(result).toBe('key');
                 done();
             });
             setTimeout(() => request.onsuccess());
@@ -245,7 +247,7 @@ describe('indexedDB', () => {
             expect(os.delete.args).toEqual(['key']);
         });
 
-        it('resolves with nothing on success', (done) => {
+        it('resolves with undefined on success', (done) => {
             const e = { target: { result: db } };
             const store = indexedDB({ store: 'test' });
             const request = {};

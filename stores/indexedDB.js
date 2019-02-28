@@ -10,6 +10,13 @@
  * created if it doesn't exist in the database.
  */
 
+function promisify(object, success, error) {
+    return new Promise((resolve, reject) => {
+        object[error] = reject;
+        object[success] = resolve;
+    });
+}
+
 const dbs = new Map();
 
 export default function indexedDB({
@@ -36,22 +43,26 @@ export default function indexedDB({
         return openDatabase();
     }
 
+    function handleVersionChange(e) {
+        const db = e.target.result;
+        db.onversionchange = closePreviousVersion;
+        return db;
+    }
+
+    function handleOpenError(e) {
+        if (e.target.error.name === 'VersionError') {
+            return increment();
+        }
+        throw e.target.error;
+    }
+
     function openDatabase() {
         return new Promise((resolve, reject) => {
             const request = window.indexedDB.open(database, dbVersion);
             request.onupgradeneeded = createStore;
-            request.onsuccess = (e) => {
-                const db = e.target.result;
-                db.onversionchange = closePreviousVersion;
-                resolve(db);
-            };
-            request.onerror = (e) => {
-                if (e.target.error.name === 'VersionError') {
-                    increment().then(resolve, reject);
-                } else {
-                    reject(e.target.error);
-                }
-            };
+            promisify(request, 'onsuccess', 'onerror')
+                .then(handleVersionChange, handleOpenError)
+                .then(resolve, reject);
         });
     }
 
@@ -72,42 +83,33 @@ export default function indexedDB({
         }
     }
 
+    async function performOperation(operation, args, mode = 'readonly') {
+        await ready;
+        const db = databases.get(database);
+        const tx = db.transaction(table, mode);
+        const os = tx.objectStore(table);
+        const req = os[operation].apply(os, args);
+        return new Promise((resolve, reject) => {
+            tx.onerror = () => reject(tx.error);
+            req.onsuccess = () => resolve(req.result);
+        });
+    }
+
     const ready = openDatabase()
         .then(upgradeIfStoreNotFound);
 
     return {
 
         async get(key) {
-            await ready;
-            const db = databases.get(database);
-            const tx = db.transaction(table);
-            const req = tx.objectStore(table).get(key);
-            return new Promise((resolve, reject) => {
-                tx.onerror = () => reject(tx.error);
-                req.onsuccess = () => resolve(req.result);
-            });
+            return performOperation('get', [key]);
         },
 
         async set(key, value) {
-            await ready;
-            const db = databases.get(database);
-            const tx = db.transaction(table, 'readwrite');
-            const req = tx.objectStore(table).put(value, key);
-            return new Promise((resolve, reject) => {
-                tx.onerror = () => reject(tx.error);
-                req.onsuccess = () => resolve();
-            });
+            return performOperation('put', [value, key], 'readwrite');
         },
 
         async delete(key) {
-            await ready;
-            const db = databases.get(database);
-            const tx = db.transaction(table, 'readwrite');
-            const req = tx.objectStore(table).delete(key);
-            return new Promise((resolve, reject) => {
-                tx.onerror = () => reject(tx.error);
-                req.onsuccess = () => resolve();
-            });
+            return performOperation('delete', [key], 'readwrite');
         }
 
     };
