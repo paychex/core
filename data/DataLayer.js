@@ -27,7 +27,7 @@ function verifyResponse(response) {
  * current body data and headers map will be passed to this method, and the return
  * value will be used as the new request body data. You can also mutate the headers
  * map (e.g. by adding or deleting values) prior to the request being sent.
- * 
+ *
  * @callback RequestTransform
  * @param {*} data The payload passed to {@link DataLayer.createRequest}. Whatever
  * you return from this function will be used as the new request payload.
@@ -40,7 +40,7 @@ function verifyResponse(response) {
 /**
  * Enables developers to modify the data of a response before it is returned
  * to callers.
- * 
+ *
  * @callback ResponseTransform
  * @param {*} data The response payload returned from the server. Whatever value
  * you return from this function will be sent to callers instead.
@@ -49,7 +49,7 @@ function verifyResponse(response) {
 
 /**
  * Encapsulates the information used by Adapters to complete a data call.
- * 
+ *
  * @typedef {Object} Request
  * @property {string|Adapter} adapter The name of the adapter to use to complete this data
  * call, or a direct Adapter instance. If a name is provided, it should match the name passed
@@ -79,7 +79,7 @@ function verifyResponse(response) {
  * translated and presented if they provide useful guidance on how to recover from an
  * error). A `messages` collection will be added to the Error instance the fetch Promise
  * is rejected with.
- * 
+ *
  * @typedef {Object} Message
  * @property {string} code A unique code to identify this message. May be used during
  * translation to present recovery information to the end user.
@@ -91,7 +91,7 @@ function verifyResponse(response) {
 
 /**
  * Additional Response information.
- * 
+ *
  * @typedef {Object} MetaData
  * @property {boolean} error Whether the response should be considered a failure.
  * @property {boolean} cached Whether the response contains cached data.
@@ -104,10 +104,10 @@ function verifyResponse(response) {
  * Represents the results of an Adapter's data operation. Ensures each adapter returns
  * a consistent format to the data layer for further processing (caching, error handling,
  * etc.).
- * 
+ *
  * NOTE: This entire object should be serializable (i.e. no functions or complex built-in
  * objects) so the caching layer can retrieve the full Response on subsequent calls.
- * 
+ *
  * @typedef {Object} Response
  * @property {*} data The server payload; may be `undefined`.
  * @property {number} status A standard status code the {@link DataLayer.fetch} method will
@@ -122,7 +122,7 @@ function verifyResponse(response) {
 /**
  * Processes a Request and returns a Promise resolving to a Response object.
  * Responsible for all data calls to endpoints of a specific type.
- * 
+ *
  * @async
  * @callback Adapter
  * @param {Request} request The data operation request to fulfill.
@@ -132,20 +132,20 @@ function verifyResponse(response) {
 
 /**
  * Provides end-to-end data operations for Paychex applications.
- * 
+ *
  * @interface DataLayer
  */
 
 /**
  * Stores and retrieves Response objects.
- * 
+ *
  * @interface Cache
  * @example
  * import { indexedDB } from '@paychex/core/stores'
- * 
+ *
  * const store = indexedDB({store: 'my-objects'});
  * const ignore = () => {};
- * 
+ *
  * export const cache = {
  *   async get(request, proxy) {
  *     const version = request.version && `@${request.version}` || '';
@@ -164,7 +164,7 @@ function verifyResponse(response) {
  * Retrieves a Response object from the cache. You should resolve
  * with `undefined` if the cached value is not found, expired, or
  * invalid. Do NOT reject the returned Promise.
- * 
+ *
  * @async
  * @method Cache#get
  * @param {Request} request Contains information you can use to create
@@ -177,10 +177,10 @@ function verifyResponse(response) {
  * resolved with the {@link Response} object passed to {@link Cache.set}.
  * @example
  * import { indexedDB } from '@paychex/core/stores'
- * 
+ *
  * const store = indexedDB({store: 'my-objects'});
  * const ignore = () => {};
- * 
+ *
  * export const cache = {
  *   async get(request, proxy) {
  *     const version = request.version && `@${request.version}` || '';
@@ -194,7 +194,7 @@ function verifyResponse(response) {
  * Stores a Response object in the cache. Resolve the returned promise
  * when the object has been cached OR if the caching operation fails. Do
  * NOT reject the returned Promise.
- * 
+ *
  * @async
  * @method Cache#set
  * @param {Request} request Contains information you can use to create
@@ -206,10 +206,10 @@ function verifyResponse(response) {
  * @returns {Promise} A promise resolved when the value is cached.
  * @example
  * import { indexedDB } from '@paychex/core/stores'
- * 
+ *
  * const store = indexedDB({store: 'my-objects'});
  * const ignore = () => {};
- * 
+ *
  * export const cache = {
  *   async set(request, response, proxy) {
  *     const version = request.version && `@${request.version}` || '';
@@ -224,7 +224,7 @@ function verifyResponse(response) {
  * network connection is re-established. NOTE: This method may be called
  * multiple times while the connection is down; its logic should handle
  * this scenario (e.g. only showing a dialog to the user once per outage).
- * 
+ *
  * @async
  * @callback Reconnect
  * @returns {Promise} A promise that will be resolved when the user's
@@ -237,7 +237,7 @@ function verifyResponse(response) {
  * times; its logic should ensure it only runs diagnostics once. Also,
  * this method is responsible for logging results (or for caching the
  * results if a connection to Paychex could not be established).
- * 
+ *
  * @callback Diagnostics
  * @param {Request} request The request that failed without receiving
  * a response. The user still has a network connection, so we need to
@@ -250,7 +250,7 @@ function verifyResponse(response) {
  * and the actual endpoint version. NOTE: This method may be called
  * multiple times, so logic for how frequently to notify the user (e.g.
  * once per session vs. once per endpoint) should be implemented.
- * 
+ *
  * @callback Upgrade
  * @param {Request} request The Request that returned a 505 error response.
  * @param {Response} response The Response whose status code is 505.
@@ -260,7 +260,7 @@ function verifyResponse(response) {
  * A map of dependencies used by the DataLayer. It is the responsibility
  * of the creator/consumer of the DataLayer to provide the necessary
  * functionality.
- * 
+ *
  * @typedef {Object} DataLayerConfiguration
  * @property {Proxy} proxy The proxy to use to construct {@link Request} objects.
  * @property {Upgrade} upgrade Method to invoke when a 505 Version Mismatch is returned from an {@link Adapter}.
@@ -281,7 +281,7 @@ export default function createDataLayer({
     if (!diagnostics) throw getError('Creating a new data layer requires a diagnostics method.');
 
     const adapters = new Map();
-    
+
     async function connected() {
         if (!window.navigator.onLine)
             await reconnect();
@@ -289,7 +289,7 @@ export default function createDataLayer({
 
     /**
      * Performs a data operation for the given Request instance.
-     * 
+     *
      * @async
      * @param {Request} request The request to send to a associated adapter.
      * @returns {Promise<*>} A Promise resolved with data from the response.
@@ -299,7 +299,7 @@ export default function createDataLayer({
      * @example
      * import { fetch, createRequest } from '@paychex/landing/data'
      * import { myDDO } from './data'
-     * 
+     *
      * function getData(params, data) {
      *   const request = createRequest(myDDO, params, data);
      *   return fetch(request).then(data => {
@@ -310,7 +310,7 @@ export default function createDataLayer({
      * @example
      * import { fetch, createRequest } from '@paychex/landing/data'
      * import { ddoSaveWorker } from './data/workers'
-     * 
+     *
      * async function saveWorker(worker) {
      *   const params = {id: worker.id};
      *   const request = createRequest(ddoSaveWorker, params, worker);
@@ -392,7 +392,7 @@ export default function createDataLayer({
     /**
      * Converts the Data Definition Object into a Request instance. You can
      * pass the returned Request instance directly to the `fetch` method.
-     * 
+     *
      * @param {Object} ddo The data definition object to transform.
      * @param {Object} [params] Optional parameters. Parameter values will be
      * used to tokenize the URL; any untokenized values will be appended to
@@ -433,7 +433,7 @@ export default function createDataLayer({
      * Assigns an Adapter instance for the specified type. Any Request objects
      * whose `adapter` value matches the specified type will be routed through
      * this Adapter instance.
-     * 
+     *
      * @param {string} type The adapter type to register, e.g. '@paychex/rest'
      * @param {Adapter} adapter The adapter to assign to the given type.
      * @memberof DataLayer.prototype

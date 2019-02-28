@@ -5,7 +5,7 @@ import indexedDB from './indexedDB';
  * Provides methods for storing information on the client's
  * machine. The persistence period will vary based on the
  * storage type and configuration.
- * 
+ *
  * @module stores
  */
 
@@ -13,14 +13,14 @@ import indexedDB from './indexedDB';
  * Provides asynchronous storage on the client's machine.
  * Stores are created indirectly through methods such as
  * {@link module:stores.indexedDB}.
- * 
+ *
  * @global
  * @interface Store
  */
 
 /**
  * Retrieves data stored on the client's machine.
- * 
+ *
  * @async
  * @function Store#get
  * @param {string} key The item to retrieve from storage.
@@ -31,7 +31,7 @@ import indexedDB from './indexedDB';
 
 /**
  * Stores data on the client's machine.
- * 
+ *
  * @async
  * @function Store#set
  * @param {string} key The key that uniquely identifies the item to store.
@@ -42,7 +42,7 @@ import indexedDB from './indexedDB';
 
 /**
  * Removes an item from storage.
- * 
+ *
  * @async
  * @function Store#delete
  * @param {string} key The item to remove.
@@ -85,12 +85,12 @@ import indexedDB from './indexedDB';
  * @example
  * import { proxy } from 'path/to/proxy';
  * import { indexedDB, withEncryption } from '@paychex/core/stores'
- * 
+ *
  * export async function loadData(id) {
- *   const iv = String(id);
+ *   const salt = String(id);
  *   const key = await proxy.key(); // user private key
  *   const database = indexedDB({ store: 'my-store' });
- *   const encrypted = withEncryption(database, { key, iv });
+ *   const encrypted = withEncryption(database, { key, salt });
  *   try {
  *     return await encrypted.get(id);
  *   } catch (e) {
@@ -136,7 +136,7 @@ export function withEncryption(store, { key, salt = undefined, method = 'cbc' })
         const json = aesjs.utils.utf8.fromBytes(unpadded);
         return JSON.parse(json);
     }
-     
+
     return {
 
         async get(key) {
@@ -165,9 +165,9 @@ export {
      * @returns {Store} A Store backed by IndexedDB.
      * @example
      * import { indexedDB } from '@paychex/core/stores'
-     * 
+     *
      * const reports = indexedDB({store: 'reports'});
-     * 
+     *
      * export async function loadReport(id) {
      *   const result = await someDataCall(id);
      *   await reports.set(id, result);
@@ -175,5 +175,5 @@ export {
      * }
      */
     indexedDB
-    
+
 }

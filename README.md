@@ -18,12 +18,12 @@ $ npm run docs
 
 The @paychex/core library contains functionality separated into various modules:
 
- - data  
+ - data
  Provides methods for creating and configuring a data layer, providing applications the ability to
  invoke data operations for various endpoints.
- - data/utils  
+ - data/utils
  Provides utility methods for working with data operations.
- - stores  
+ - stores
  Provides client-side storage. How long data is persisted for depends on the store type and configuration options.
 
 ### Data Module
@@ -91,27 +91,27 @@ import { withFalloff } from '@paychex/core/data/utils';
 import { createRequest, fetch } from '@paychex/landing/data';
 import { indexedDB, withEncryption } from '@paychex/core/stores';
 import { ifRequestMethod, ifResponseStatus } from '@paychex/core/data/utils';
- 
+
 import { User } from '~/data/schemas';
 import { setLoading, cue } from '~/data/actions';
 
-const userInfoCache = ((key, hash, iv) => {
- 
+const userInfoCache = ((key, hash, salt) => {
+
     const store = indexedDB({store: 'userInfo'});
-    const encrypted = withEncryption(store, {key, iv});
-     
+    const encrypted = withEncryption(store, {key, salt});
+
     return {
- 
+
         get: ifRequestMethod('GET', async function get(request, proxy) {
             return await encrypted.get(hash);
         }),
- 
+
         set: ifResponseStatus(200, async function set(request, response, proxy) {
             return await encrypted.set(hash, response);
         })
- 
+
     };
- 
+
 })(window.userKey, window.userHash, window.smGuid);
 
 const setUserInfo = (user) => ({
