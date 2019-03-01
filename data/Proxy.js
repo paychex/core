@@ -1,9 +1,22 @@
 const DOUBLE_SLASH = /\/\//g;
 const LEADING_SLASHES = /^\/+/;
 
+function patternMatches([key, pattern]) {
+    return new RegExp(pattern, 'i').test(this[key]);
+}
+
+function ruleMatches(rule) {
+    const { match = {} } = rule;
+    return Object.entries(match).every(patternMatches, this);
+}
+
+function getVersion(v, { version }) {
+    return version || v;
+}
+
 /**
  * Represents a single rule in a proxy instance.
- * 
+ *
  * @typedef {Object} ProxyRule
  * @alias ProxyRule
  * @property {string} [protocol] 'http', 'https', 'file', etc.
@@ -20,7 +33,7 @@ const LEADING_SLASHES = /^\/+/;
  * The Proxy provides an intercept layer based on build- and run-time configurations to enable
  * easier local development, impersonation, dynamic endpoints, static data redirects, and user-
  * and environment-specific versioning.
- * 
+ *
  * @interface Proxy
  */
 
@@ -44,13 +57,8 @@ export default function createProxy() {
                 .replace(DOUBLE_SLASH, '/')
                 .replace(LEADING_SLASHES, '');
             const { protocol = '', host = base, port = 80 } = config
-                .filter(({match: {
-                    base: targetBase = '',
-                    path: targetPath = ''
-                } = {}} = {}) =>
-                    (!targetBase || new RegExp(targetBase, 'i').test(base))
-                    && (!targetPath || new RegExp(targetPath, 'i').test(path)))
-                .reduce((out, rule) => Object.assign(out, rule), {});
+                .filter(ruleMatches, { base, path })
+                .reduce(Object.assign, {});
             return `${protocol}${protocol ? ':' : ''}//${protocol === 'file' ? '/' : ''}${host}${port === 80 ? '' : `:${port}`}${path ? `/${path}` : ''}`;
         },
 
@@ -66,10 +74,8 @@ export default function createProxy() {
          */
         version(request) {
             return config
-                .filter(({match = {}} = {}) =>
-                    Object.entries(match).every(([key, pattern]) =>
-                        new RegExp(pattern, 'i').test(request[key])))
-                .reduce((v, {version}) => version || v, undefined);
+                .filter(ruleMatches, request)
+                .reduce(getVersion, undefined);
         },
 
         /**
