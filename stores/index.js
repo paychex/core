@@ -179,7 +179,7 @@ export {
 
     /**
      * @function
-     * @param {SessionStorageConfiguration} [config] Optional
+     * @param {HTMLStorageConfiguration} [config] Optional
      * configuration for the session storage instance.
      * @returns {Store} A Store backed by the browser's
      * sessionStorage Storage provider.
@@ -193,6 +193,25 @@ export {
      *   return await sessionData.get('some.key');
      * }
      */
-    sessionStore
+    sessionStore,
+
+    /**
+     * @function
+     * @param {HTMLStorageConfiguration} [config] Optional
+     * configuration for the session storage instance.
+     * @returns {Store} A Store backed by the browser's
+     * localStorage Storage provider.
+     * @example
+     * import { localStore } from '@paychex/core/stores';
+     * import { user } from '@paychex/landing';
+     *
+     * const persistentData = localStore({ prefix: user.guid });
+     *
+     * export async function loadSomeData() {
+     *   return await persistentData.get('some.key');
+     * }
+     */
+    localStore
+
 
 }
