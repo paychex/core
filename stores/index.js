@@ -1,5 +1,6 @@
 import aesjs from 'aes-js'
 import indexedDB from './indexedDB';
+import localStore from './localStore';
 import sessionStore from './sessionStore';
 
 /**
