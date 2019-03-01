@@ -1,4 +1,5 @@
 import expect from 'expect'
+import { spy } from '../utils';
 import indexedDB from '../../stores/indexedDB'
 
 describe('indexedDB', () => {
@@ -7,24 +8,6 @@ describe('indexedDB', () => {
         txn,
         os,
         openRequest;
-
-    function spy() {
-        let value;
-        const fn = (...args) => {
-            fn.args = args;
-            fn.callCount++;
-            fn.called = true;
-            return value;
-        };
-        fn.args = [];
-        fn.callCount = 0;
-        fn.called = false;
-        fn.returns = (v) => {
-            value = v;
-            return fn;
-        };
-        return fn;
-    }
 
     beforeEach(() => {
         openRequest = {};
@@ -165,6 +148,19 @@ describe('indexedDB', () => {
             setTimeout(() => request.onsuccess());
         });
 
+        it('resolves with undefined if key does not exist', done => {
+            const store = indexedDB({ store: 'test' });
+            const request = { result: undefined };
+            os.get.returns(request);
+            db.objectStoreNames = ['test@1'];
+            openRequest.onsuccess({ target: { result: db }});
+            store.get('key').then(value => {
+                expect(value).toBeUndefined();
+                done();
+            });
+            setTimeout(() => request.onsuccess());
+        });
+
     });
 
     describe('set', () => {
@@ -191,7 +187,7 @@ describe('indexedDB', () => {
             expect(os.put.args).toEqual(['value', 'key']);
         });
 
-        it('resolves with result on success', (done) => {
+        it('resolves with key on success', (done) => {
             const e = { target: { result: db } };
             const store = indexedDB({ store: 'test' });
             const request = { result: 'key' };

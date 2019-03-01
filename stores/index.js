@@ -1,5 +1,6 @@
 import aesjs from 'aes-js'
 import indexedDB from './indexedDB';
+import sessionStore from './sessionStore';
 
 /**
  * Provides methods for storing information on the client's
@@ -12,7 +13,7 @@ import indexedDB from './indexedDB';
 /**
  * Provides asynchronous storage on the client's machine.
  * Stores are created indirectly through methods such as
- * {@link module:stores.indexedDB}.
+ * {@link module:stores.indexedDB} and {@link module:stores.sessionStore}.
  *
  * @global
  * @interface Store
@@ -25,8 +26,8 @@ import indexedDB from './indexedDB';
  * @function Store#get
  * @param {string} key The item to retrieve from storage.
  * @returns {Promise<*>} A promise that will be resolved
- * with the value of the item in storage, or rejected if
- * the item could not be found.
+ * with the value of the item in storage (or undefined, if
+ * the item does not exist), or rejected if an error occurs.
  */
 
 /**
@@ -36,8 +37,8 @@ import indexedDB from './indexedDB';
  * @function Store#set
  * @param {string} key The key that uniquely identifies the item to store.
  * @param {*} value The value to store under the associated key.
- * @returns {Promise} A Promise that will be resolved when the item
- * is stored, or rejected if the storage operation fails.
+ * @returns {Promise} A Promise that will be resolved with the key when the
+ * item is stored, or rejected if the storage operation fails.
  */
 
 /**
@@ -174,6 +175,24 @@ export {
      *   return result;
      * }
      */
-    indexedDB
+    indexedDB,
+
+    /**
+     * @function
+     * @param {SessionStorageConfiguration} [config] Optional
+     * configuration for the session storage instance.
+     * @returns {Store} A Store backed by the browser's
+     * sessionStorage Storage provider.
+     * @example
+     * import { sessionStore } from '@paychex/core/stores';
+     * import { user } from '@paychex/landing';
+     *
+     * const sessionData = sessionStore({ prefix: user.guid });
+     *
+     * export async function loadSomeData() {
+     *   return await sessionData.get('some.key');
+     * }
+     */
+    sessionStore
 
 }

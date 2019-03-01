@@ -1,4 +1,5 @@
 import expect from 'expect'
+import { spy } from '../utils';
 import createDataLayer from '../../data/DataLayer'
 
 describe('DataLayer', () => {
@@ -74,7 +75,7 @@ describe('DataLayer', () => {
             });
 
         });
-        
+
         describe('createRequest', () => {
 
             let proxy,
@@ -165,24 +166,6 @@ describe('DataLayer', () => {
                 response,
                 dataOptions;
 
-            function spy() {
-                let retVal;
-                const fn = function() {
-                    fn.callCount++;
-                    fn.called = true;
-                    fn.args = Array.from(arguments);
-                    return retVal;
-                };
-                fn.args = [];
-                fn.callCount = 0;
-                fn.called = false;
-                fn.andReturn = (value) => {
-                    retVal = value;
-                    return fn;
-                };
-                return fn;
-            }
-
             beforeEach(() => {
                 proxy = {
                     auth: spy()
@@ -205,7 +188,7 @@ describe('DataLayer', () => {
                     }
                 };
                 request = {
-                    adapter: spy().andReturn(Promise.resolve(response))
+                    adapter: spy().returns(Promise.resolve(response))
                 };
             });
 
@@ -221,8 +204,8 @@ describe('DataLayer', () => {
 
             it('invokes cache.get if specified', async () => {
                 request.cache = {
-                    set: spy().andReturn(Promise.resolve()),
-                    get: spy().andReturn(Promise.resolve())
+                    set: spy().returns(Promise.resolve()),
+                    get: spy().returns(Promise.resolve())
                 };
                 await fetch(request);
                 expect(request.cache.get.called).toBe(true);
@@ -230,7 +213,7 @@ describe('DataLayer', () => {
 
             it('returns cached response if exists', async () => {
                 request.cache = {
-                    set: spy().andReturn(Promise.resolve()),
+                    set: spy().returns(Promise.resolve()),
                     get: async () => response
                 };
                 await fetch(request);
@@ -239,8 +222,8 @@ describe('DataLayer', () => {
 
             it('calls adapter if cached value not found', async () => {
                 request.cache = {
-                    set: spy().andReturn(Promise.resolve()),
-                    get: spy().andReturn(Promise.resolve())
+                    set: spy().returns(Promise.resolve()),
+                    get: spy().returns(Promise.resolve())
                 }
                 await fetch(request);
                 expect(request.adapter.called).toBe(true);
@@ -264,7 +247,7 @@ describe('DataLayer', () => {
 
                 it(`throws if adapter returns ${String(value)} response`, async () => {
                     try {
-                        request.adapter.andReturn(Promise.resolve(value));
+                        request.adapter.returns(Promise.resolve(value));
                         await fetch(request);
                     } catch (e) {
                         expect(/response object is expected/i.test(e.message)).toBe(true);
@@ -312,8 +295,8 @@ describe('DataLayer', () => {
 
             it('caches response if request.cache provided', async () => {
                 request.cache = {
-                    set: spy().andReturn(Promise.resolve()),
-                    get: spy().andReturn(Promise.resolve())
+                    set: spy().returns(Promise.resolve()),
+                    get: spy().returns(Promise.resolve())
                 };
                 await fetch(request);
                 expect(request.cache.set.called).toBe(true);
@@ -358,7 +341,7 @@ describe('DataLayer', () => {
                     expect(response.error instanceof Error).toBe(true);
                 }
             });
-            
+
             it('invokes upgrade if version mismatch error occurs', async () => {
                 response.status = 505;
                 response.meta.error = true;
