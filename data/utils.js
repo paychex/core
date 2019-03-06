@@ -9,7 +9,7 @@
  * retried. Returning a resolved promise means to retry
  * the data operation. A rejected promise means not to
  * retry the data operation.
- * 
+ *
  * @global
  * @callback RetryFunction
  * @param {Request} request The Request object.
@@ -57,8 +57,8 @@ export function withFalloff(times = 3, base = 200, scheduler = setTimeout) {
 }
 
 /**
- * Wrapper method for a @see [Cache#set]{@link Cache} method.
- * Only invokes the wrapped getter if the @see {@link Response}
+ * Wrapper method for a [Cache#set]{@link Cache} method.
+ * Only invokes the wrapped getter if the {@link Response}
  * object's status code matches the specified value.
  *
  * @param {number} status The status code the {@link Response}
@@ -68,7 +68,7 @@ export function withFalloff(times = 3, base = 200, scheduler = setTimeout) {
  * @returns {function} A {@link Cache#set} wrapper method.
  * @example
  * import { isResponseStatus } from '@paychex/core/data/utils'
- * 
+ *
  * export default class MyCache {
  *   set: ifResponseStatus(200, async function set(request, response, proxy) {
  *     // do caching logic here
@@ -83,8 +83,8 @@ export function ifResponseStatus(status, setter) {
 }
 
 /**
- * Wrapper method for a @see [Cache#get]{@link Cache} method.
- * Only invokes the wrapped getter if the @see {@link Request}
+ * Wrapper method for a [Cache#get]{@link Cache} method.
+ * Only invokes the wrapped getter if the {@link Request}
  * object's status code matches the specified value.
  *
  * @param {string} method The method the {@link Request}
@@ -94,7 +94,7 @@ export function ifResponseStatus(status, setter) {
  * @returns {function} A {@link Cache#get} wrapper method.
  * @example
  * import { ifRequestMethod } from '@paychex/core/data/utils'
- * 
+ *
  * export default class MyCache {
  *   get: ifRequestMethod('POST', async function get(request, proxy) {
  *     // retrieve from cache here

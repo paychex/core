@@ -1,6 +1,6 @@
 /**
  * Connects Paychex applications to data sources.
- * 
+ *
  * @module data
  */
 
@@ -25,7 +25,7 @@ export {
 
     /**
      * Constructs a new DataLayer instance using the specified configuration object.
-     * 
+     *
      * @function
      * @param {DataLayerConfiguration} config The configuration to use.
      * @returns {DataLayer}
@@ -45,15 +45,15 @@ export {
      * Replaces tokens in a string with values from the provided lookup,
      * and then appends any unmatched key-value pairs in the lookup as
      * a querystring.
-     * 
+     *
      * IMPORTANT: Nested objects will not be serialized; if you need to
      * pass complex objects to your endpoint, you should be doing it
      * through the request body; alternatively, use JSON.stringify on
      * the object yourself before passing it to serialize.
-     * 
+     *
      * IMPORTANT: different falsy values are treated differently when
      * appending to the querystring:
-     * 
+     *
      *  - {key: false} => 'key=false'
      *  - {key: null} => 'key'
      *  - {key: undefined} => ''
@@ -80,4 +80,5 @@ export {
      * assert.equals(url, '/users/00123456789123456789/clients?order=displayName&order=branch');
      */
     tokenize
+
 }

@@ -1,6 +1,6 @@
 import expect from 'expect'
 import { spy } from '../utils';
-import { withEncryption } from '../../stores'
+import { withEncryption, asResponseCache } from '../../stores'
 
 describe('stores', () => {
 
@@ -152,6 +152,55 @@ describe('stores', () => {
             const result = await wrapper.get('key');
             expect(store.get.called).toBe(true);
             expect(result).toMatchObject(value);
+        });
+
+    });
+
+    describe('asResponseCache', () => {
+
+        let store;
+
+        beforeEach(() => {
+            store = {
+                get: spy(),
+                set: spy()
+            };
+        });
+
+        it('ignores non-GET requests', async () => {
+            return asResponseCache(store).get({method: 'POST'})
+                .then(() => expect(store.get.called).toBe(false));
+        });
+
+        it('uses request url as key', async () => {
+            const request = {
+                method: 'GET',
+                url: 'http://url.com/path'
+            };
+            return asResponseCache(store).get(request)
+                .then(() => {
+                    expect(store.get.called).toBe(true);
+                    expect(store.get.args[0]).toBe(request.url);
+                });
+        });
+
+        it('appends version to key', async () => {
+            const request = {
+                method: 'GET',
+                url: 'http://url.com/path',
+                version: 'application/json+v1'
+            };
+            return asResponseCache(store).get(request)
+                .then(() => {
+                    const key = `${request.url}@${request.version}`;
+                    expect(store.get.called).toBe(true);
+                    expect(store.get.args[0]).toBe(key);
+                });
+        });
+
+        it('ignores non-200 responses', async () => {
+            return asResponseCache(store).set({}, { status: 401 })
+                .then(() => expect(store.set.called).toBe(false));
         });
 
     });
