@@ -89,30 +89,16 @@ import { normalize } from 'normalizr';
 import { call, put } from 'redux-saga/effects';
 import { withFalloff } from '@paychex/core/data/utils';
 import { createRequest, fetch } from '@paychex/landing/data';
-import { indexedDB, withEncryption } from '@paychex/core/stores';
-import { ifRequestMethod, ifResponseStatus } from '@paychex/core/data/utils';
+import { indexedDB, withEncryption, asResponseCache } from '@paychex/core/stores';
 
 import { User } from '~/data/schemas';
 import { setLoading, cue } from '~/data/actions';
 
-const userInfoCache = ((key, hash, salt) => {
-
+const userInfoCache = ((key, salt) => {
     const store = indexedDB({store: 'userInfo'});
     const encrypted = withEncryption(store, {key, salt});
-
-    return {
-
-        get: ifRequestMethod('GET', async function get(request, proxy) {
-            return await encrypted.get(hash);
-        }),
-
-        set: ifResponseStatus(200, async function set(request, response, proxy) {
-            return await encrypted.set(hash, response);
-        })
-
-    };
-
-})(window.userKey, window.userHash, window.smGuid);
+    return asResponseCache(encrypted);
+})(window.userKey, window.userHash);
 
 const setUserInfo = (user) => ({
     type: 'set-user-info',
