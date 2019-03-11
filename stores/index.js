@@ -1,10 +1,10 @@
 import aesjs from 'aes-js'
+import { merge } from 'lodash';
+
 import indexedDB from './indexedDB';
 import localStore from './localStore';
 import sessionStore from './sessionStore';
-
 import { ifRequestMethod, ifResponseStatus } from '../data/utils';
-import { merge } from 'lodash';
 
 /**
  * Provides methods for storing information on the client's
@@ -176,6 +176,10 @@ export function withEncryption(store, { key, salt = undefined, method = 'cbc' })
  * import { indexedDB, asResponseCache } from '@paychex/core/stores';
  *
  * const store = indexedDB({ store: 'myDataValues' });
+ * // NOTE: you should wrap your store using withEncryption(store, options)
+ * // if the response might contain sensitive or personally identifying
+ * // information (PII)
+ *
  * const dataCall = {
  *     method: 'GET',
  *     base: 'server',
