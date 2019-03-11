@@ -4,6 +4,7 @@ import localStore from './localStore';
 import sessionStore from './sessionStore';
 
 import { ifRequestMethod, ifResponseStatus } from '../data/utils';
+import { merge } from 'lodash';
 
 /**
  * Provides methods for storing information on the client's
@@ -197,7 +198,9 @@ export function asResponseCache(store) {
     return {
 
         get: ifRequestMethod('GET', async function get(request, proxy) {
-            return await store.get(key(request));
+            const response = await store.get(key(request));
+            merge(response, { meta: { cached: true } });
+            return response;
         }),
 
         set: ifResponseStatus(200, async function set(request, response, proxy) {

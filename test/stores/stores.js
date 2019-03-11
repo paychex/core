@@ -198,6 +198,22 @@ describe('stores', () => {
                 });
         });
 
+        it('sets meta.cached to true if value was cached', async () => {
+            const cached = { meta: { cached: true } };
+            store.get.returns({ meta: {} });
+            return asResponseCache(store).get({
+                method: 'GET',
+                url: 'http://url.com/path'
+            }).then(response => expect(response).toMatchObject(cached));
+        });
+
+        it('does not set meta.cached if value not cached', async () => {
+            return asResponseCache(store).get({
+                method: 'GET',
+                url: 'http://url.com/path'
+            }).then(response => expect(response).toBeUndefined());
+        });
+
         it('ignores non-200 responses', async () => {
             return asResponseCache(store).set({}, { status: 401 })
                 .then(() => expect(store.set.called).toBe(false));
