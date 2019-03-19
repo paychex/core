@@ -381,6 +381,16 @@ describe('DataLayer', () => {
                 }
             });
 
+            it('unknown errors pass through', async () => {
+                response.status = 418;
+                response.meta.error = true;
+                try {
+                    await fetch(request);
+                } catch (e) {
+                    expect(response.error).toBeDefined();
+                }
+            });
+
             describe('abort response', () => {
 
                 it('checks retry logic if timeout occurs', async () => {

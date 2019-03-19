@@ -81,6 +81,14 @@ describe('Proxy', () => {
                 expect(proxy.url('test')).toBe('ftp://files.paychex.com:21');
             });
 
+            it('adds 3rd slash for file protocol', async () => {
+                proxy.use({
+                    protocol: 'file',
+                    host: 'C:\\Users\\Documents'
+                });
+                expect(proxy.url('test')).toBe('file:///C:\\Users\\Documents');
+            });
+
             it('returns correct url if multiple rules match', async () => {
                 proxy.use({
                     protocol: 'ftp',

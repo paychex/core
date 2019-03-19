@@ -1,4 +1,5 @@
-import expect from 'expect'
+import expect from 'expect';
+import { spy } from '../utils';
 
 import {
     withFalloff,
@@ -47,6 +48,17 @@ describe('data/utils', () => {
             await retry(request2);
             await retry(request1);
             await retry(request2);
+        });
+
+        it('uses default arguments when necessary', async () => {
+            const original = setTimeout;
+            const timeout = global.setTimeout = spy();
+            const retry = withFalloff();
+            retry({});
+            expect(timeout.called).toBe(true);
+            expect(timeout.args[1]).toBe(200);
+            timeout.args[0]();
+            global.setTimeout = original.bind(global);
         });
 
     });

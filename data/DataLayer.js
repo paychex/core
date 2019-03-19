@@ -19,7 +19,6 @@ function verifyResponse(response) {
     if (reqResp) throw getError('Response object is missing a required field.', {field: reqResp});
     const reqMeta = ['error', 'cached', 'messages'].find(prop => !(prop in response.meta));
     if (reqMeta) throw getError('Response meta object is missing a required field.', {field: reqMeta});
-    return true;
 }
 
 /**
@@ -346,8 +345,8 @@ export default function createDataLayer({
             retry = false;
 
             response = await adapter(request, proxy);
-            if (verifyResponse(response))
-                request.response = response;
+            verifyResponse(response);
+            request.response = response;
 
             if (!response.meta.error) {
                 if (request.cache)
@@ -370,7 +369,7 @@ export default function createDataLayer({
                 } else if (window.navigator.onLine) {
                     diagnostics(request);
                     break;
-                } else if (!window.navigator.onLine) {
+                } else {
                     await connected();
                 }
             }
