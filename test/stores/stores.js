@@ -219,6 +219,11 @@ describe('stores', () => {
                 .then(() => expect(store.set.called).toBe(false));
         });
 
+        it('stores 200 responses in cache', async () => {
+            return asResponseCache(store).set({}, { status: 200 })
+                .then(() => expect(store.set.called).toBe(true));
+        });
+
     });
 
 });

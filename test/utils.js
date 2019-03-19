@@ -2,20 +2,27 @@ export function spy(name = 'spy') {
 
     let value, err,
         args = [],
-        callCount = 0,
-        called = false;
+        callCount = 0;
 
     return Object.defineProperties((...params) => {
         args = params;
         callCount++;
-        called = true;
         if (err) throw err;
         return value;
     }, {
         name: { get: () => name },
         args: { get: () => args },
-        called: { get: () => called },
+        called: { get: () => callCount > 0 },
         callCount: { get: () => callCount },
+        reset: {
+            configurable: false,
+            writable: false,
+            value() {
+                value = err = undefined;
+                args = [];
+                callCount = 0;
+            }
+        },
         throws: {
             configurable: false,
             writable: false,
