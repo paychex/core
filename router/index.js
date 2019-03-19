@@ -1,4 +1,7 @@
 import QS from 'query-string';
+import spread from 'lodash/spread';
+import isEqual from 'lodash/isEqual';
+import defaults from 'lodash/defaults';
 
 /**
  * Connects URL behaviors with component lifecycles.
@@ -7,8 +10,9 @@ import QS from 'query-string';
  */
 
 const promise = Promise.resolve();
+const rxParseRoute = /(.+?)\:\/\/([^\?]*)\??(.*)/;
 
-function debounce(fn) {
+function atEndOfFrame(fn) {
     let called = false;
     const wrapper = () => {
         called = false;
@@ -22,31 +26,9 @@ function debounce(fn) {
     };
 }
 
-function equals(key) {
-    return key in this.rhs && deep_equals(this.lhs[key], this.rhs[key]);
-}
-
-function deep_equals(lhs, rhs) {
-    if (lhs === rhs)
-        return true;
-    else if (typeof lhs !== 'object' || typeof rhs !== 'object')
-        return lhs === rhs;
-    else {
-        const context = { lhs, rhs };
-        const lhsKeys = Object.keys(lhs);
-        return lhsKeys.every(equals, context);
-    }
-}
-
 function hasChanged(params) {
     return params && params[1].changed;
 }
-
-function spread(fn) {
-    return (args) => fn(...args);
-}
-
-const rxParseRoute = /(.+?)\:\/\/([^\?]*)\??(.*)/;
 
 /**
  * Provides URL-based navigation and component creation.
@@ -84,10 +66,10 @@ const rxParseRoute = /(.+?)\:\/\/([^\?]*)\??(.*)/;
  */
 export function createRouter(options, globals = window) {
 
-    options = Object.assign({
+    options = defaults(options, {
         prefix: '#!',
         separator: '||'
-    }, options);
+    });
 
     if (typeof options.dispatch !== 'function')
         throw new Error('createRouter options must include a `dispatch` method.');
@@ -97,7 +79,7 @@ export function createRouter(options, globals = window) {
     const routeData = {};
     const rxValidHash = /./; // TODO: use options prefix and separator in regex
     const spreadSync = spread(synchronize);
-    const debouncedUpdateHashString = debounce(updateHashString);
+    const updateHashAtEndOfFrame = atEndOfFrame(updateHashString);
 
     function onHashChanged() {
         const hash = globals.document.location.hash.substring(options.prefix.length);
@@ -122,7 +104,7 @@ export function createRouter(options, globals = window) {
             enumerable: false,
             configurable: false,
             writable: false,
-            value: !existing || !deep_equals(existing, proposed)
+            value: !existing || !isEqual(existing, proposed)
         });
         routeData[id] = proposed;
     }
@@ -196,7 +178,7 @@ export function createRouter(options, globals = window) {
             const proposed = { path, params };
             const existing = routeData[container] || {};
             routeData[container] = Object.assign(existing, proposed);
-            debouncedUpdateHashString();
+            updateHashAtEndOfFrame();
         }
 
     };
