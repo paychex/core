@@ -1,20 +1,22 @@
-## @paychex/core
+# @paychex/core
 
 Provides framework-agnostic functionality for use in all Paychex FLEX applications.
 
-### Commands
+## Commands
 
 To install the necessary dependencies:
+
 ```bash
-$ npm run install
+npm run install
 ```
 
 To generate documentation files:
+
 ```bash
-$ npm run docs
+npm run docs
 ```
 
-### Modules
+## Modules
 
 The @paychex/core library contains functionality separated into various modules:
 
