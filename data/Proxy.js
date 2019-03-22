@@ -74,7 +74,7 @@ export default function createProxy() {
          * @returns {Request} The input Request object, with properties modified according
          * to the matching Proxy rules.
          * @example
-         * import { throwIfSeverity } from '@paychex/landing/data/utils';
+         * import { throwIfSeverity } from '@paychex/core/data/utils';
          * import { proxy, createRequest, fetch } from '@paychex/landing/data';
          * import switches from '../config/features';
          *

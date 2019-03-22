@@ -4,7 +4,8 @@ import { spy } from '../utils';
 import {
     withFalloff,
     ifResponseStatus,
-    ifRequestMethod
+    ifRequestMethod,
+    throwIfSeverity
 } from '../../data/utils'
 
 describe('data/utils', () => {
@@ -99,6 +100,38 @@ describe('data/utils', () => {
             const wrapper = ifResponseStatus(200, setter);
             wrapper({}, { status: 404 });
             expect(called).toBe(false);
+        });
+
+    });
+
+    describe('throwIfSeverity', () => {
+
+        const NONE = { severity: 'NONE' };
+        const ERROR = { severity: 'ERROR' };
+        const FATAL = { severity: 'FATAL' };
+
+        it('returns Response if no messages', async () => {
+            const response = {};
+            return Promise.resolve(response)
+                .then(throwIfSeverity('ERROR'))
+                .then(result => expect(result).toBe(response));
+        });
+
+        it('returns Response if no matching messages', async () => {
+            const response = { meta: { messages: [NONE] } };
+            return Promise.resolve(response)
+                .then(throwIfSeverity('ERROR'))
+                .then(result => expect(result).toBe(response));
+        });
+
+        it('throws if matching message exists', async () => {
+            const response = { meta: { messages: [ERROR, FATAL] } };
+            return Promise.resolve(response)
+                .then(throwIfSeverity('ERROR'))
+                .catch(err => {
+                    expect(err.message).toContain('ERROR');
+                    expect(err.messages).toEqual([ERROR]);
+                });
         });
 
     });

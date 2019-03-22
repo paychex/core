@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 /**
  * Contains utility methods for use with data operations.
  *
@@ -105,5 +107,30 @@ export function ifRequestMethod(method, getter) {
     return async function get(request) {
         if (request.method === method)
             return await getter(request);
+    };
+}
+
+function hasSeverity(message) {
+    return message.severity === String(this);
+}
+
+/**
+ * Creates a callback suitable for passing to Promise.then. The callback will
+ * examine the {@link Response} messages for any that match the specified
+ * severity level. If any are found, the Promise will be rejected with an
+ * Error that provides more information. See the example for details.
+ *
+ * @param {'FATAL'|'ERROR'|'NONE'} severity The message severity to look for.
+ * @returns {Function} A function that can be used as a Promise.then callback.
+ * @example
+ *
+ */
+export function throwIfSeverity(severity) {
+    return function handler(response) {
+        const err = new Error(`One or more ${severity} messages returned in Response.`);
+        err.severity = severity;
+        err.messages = get(response, 'meta.messages', []).filter(hasSeverity, severity);
+        if (err.messages.length) throw err;
+        return response;
     };
 }
