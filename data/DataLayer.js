@@ -86,8 +86,7 @@ function verifyResponse(response) {
  * Contains information returned from endpoints (typically only when an error occurs).
  * Messages should NOT be presented to end users directly (although message codes could
  * translated and presented if they provide useful guidance on how to recover from an
- * error). A `messages` collection will be added to the Error instance the fetch Promise
- * is rejected with.
+ * error).
  *
  * @typedef {Object} Message
  * @property {string} code A unique code to identify this message. May be used during
@@ -123,7 +122,7 @@ function verifyResponse(response) {
  * examine to determine how to proceed. For example, a status code of 0 indicates an aborted
  * request and may prompt network diagnostics or a dialog prompting the user to restore their
  * network connection.
- * @property {string} statusText A message that will be used to generated an Error message,
+ * @property {string} statusText A message that will be used to generate an Error message,
  * if [`meta.error`]{@link MetaData.error} is `true`.
  * @property {MetaData} meta Additional information about the response.
  */

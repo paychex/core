@@ -16,7 +16,6 @@ import get from 'lodash/get';
  * @callback RetryFunction
  * @param {Request} request The Request object.
  * @param {Response} response The Response object.
- * @param {Proxy} proxy The current Proxy.
  * @returns {Promise} Resolving the promise means to
  * retry the data operation. Rejecting the promise means
  * not to retry the data operation.
