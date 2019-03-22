@@ -1,4 +1,5 @@
 import tokenize from './Tokenizer';
+import identity from 'lodash/identity';
 
 const ABORTED = 0;
 const AUTH_ERROR = 401;
@@ -63,8 +64,8 @@ function verifyResponse(response) {
  * @property {object} [ignore={}] Can be used to skip certain adapter behaviors. See your adapter's documentation for details.
  * @property {RetryFunction} [retry] Determines whether a failed request should be retried.
  * @property {Cache} [cache] Controls caching logic for requests.
- * @property {RequestTransform} [transformRequest] Transforms the payload and/or headers sent with a request.
- * @property {ResponseTransform} [transformResponse] Transforms the response payload before sending it back to callers.
+ * @property {RequestTransform} [transformRequest=identity] Transforms the payload and/or headers sent with a request.
+ * @property {ResponseTransform} [transformResponse=identity] Transforms the response payload before sending it back to callers.
  */
 
 /**
@@ -412,6 +413,8 @@ export default function createDataLayer({
         const request = proxy.apply({
             method: 'GET',
             withCredentials: false,
+            transformRequest: identity,
+            transformResponse: identity,
             ...ddo,
             ignore: { ...ddo.ignore },
             headers: { ...ddo.headers },
