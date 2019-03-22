@@ -90,10 +90,11 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  * @example
  * import { proxy } from 'path/to/proxy';
  * import { indexedDB, withEncryption } from '@paychex/core/stores'
+ * import { getUserPrivateKey } from '../data/user';
  *
  * export async function loadData(id) {
  *   const salt = String(id);
- *   const key = await proxy.key(); // user private key
+ *   const key = await getUserPrivateKey();
  *   const database = indexedDB({ store: 'my-store' });
  *   const encrypted = withEncryption(database, { key, salt });
  *   try {
@@ -194,21 +195,16 @@ export function withEncryption(store, { key, salt = undefined, method = 'cbc' })
  */
 export function asResponseCache(store) {
 
-    function key(request) {
-        const version = request.version && `@${request.version}` || '';
-        return `${request.url}${version}`;
-    }
-
     return {
 
-        get: ifRequestMethod('GET', async function get(request, proxy) {
-            const response = await store.get(key(request));
+        get: ifRequestMethod('GET', async function get(request) {
+            const response = await store.get(request.url);
             merge(response, { meta: { cached: true } });
             return response;
         }),
 
-        set: ifResponseStatus(200, async function set(request, response, proxy) {
-            return await store.set(key(request), response);
+        set: ifResponseStatus(200, async function set(request, response) {
+            return await store.set(request.url, response);
         })
 
     };

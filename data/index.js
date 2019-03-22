@@ -27,30 +27,6 @@
  * dataLayer.setAdapter('@paychex/rest', PaychexRestAdapter);
  * ```
  *
- * #### Data Definition Objects
- *
- * Every single data operation is represented by a unique Data Definition Object (DDO) that provides the details necessary for the data layer's adapters to invoke the data call.
- *
- * Here are all the properties you can specify on a DDO:
- *
- * Property | Type | Required | Default | Description
- * --- | --- | --- | --- | ---
- * adapter | string | yes | | The adapter to use to complete the request.
- * base | string | yes | | Used by the Proxy to determine a base path.
- * path | string | yes | | Combined with the base path to construct a full URL.
- * method | string | no | GET | The HTTP verb to use.
- * withCredentials | boolean | no | false | Whether to send Cookies with the request.
- * compression | boolean | no | false | Whether to gzip the request payload. The server will need to decompress the payload.
- * timeout | number | no | | The number of milliseconds to wait before aborting the data call.
- * headers | object | no | `{accept: 'application/json'}` | The HTTP headers to use on the request.
- * ignore | object | no | | Can be used to skip certain adapter behaviors. See your adapter's documentation for details.
- * retry | function | no | | Determines whether a failed request should be retried.
- * cache | Cache | no | | Controls caching logic for requests.
- * transformRequest | function | no | | Transforms the payload and/or headers sent with a request.
- * transformResponse | function | no | | Transforms the response payload before sending it back to callers.
- *
- * __NOTE:__ Certain adapters may require additional properties on your DDO. For example, an adapter to handle Paychex remote calls may require an `operation` property.
- *
  * #### Invoking a Data Operation
  *
  * Here is how you might invoke a complex data operation that includes encryption, caching, automatic retry, and data transformations. For more information on any of these methods, view this package's documentation.
@@ -132,10 +108,10 @@ export {
      * @returns {DataLayer}
      * @example
      * import {createDataLayer} from '@paychex/core/data'
-     * import {proxy, upgrade, reconnect, diagnostics} from '~/config/data'
+     * import {proxy, reauth, reconnect, diagnostics} from '~/config/data'
      * const dataLayer = createDataLayer({
      *   proxy,
-     *   upgrade,
+     *   reauth,
      *   reconnect,
      *   diagnostics
      *  });

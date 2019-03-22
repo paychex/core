@@ -3,7 +3,6 @@ import tokenize from './Tokenizer';
 const ABORTED = 0;
 const AUTH_ERROR = 401;
 const VALIDATION_ERROR = 422;
-const VERSION_MISMATCH = 505;
 
 const no = () => false;
 const ignore = () => {};
@@ -47,29 +46,39 @@ function verifyResponse(response) {
  */
 
 /**
+ * Metadata used to construct a {@link Request} instance. Although different adapters
+ * may expect different properties, all DataDefinition objects have certain required
+ * fields and a few optional fields.
+ *
+ * @typedef {Object} DataDefinition
+ * @mixin
+ * @property {string} adapter The adapter to use to complete the request.
+ * @property {string} base Used by the Proxy to determine a base path.
+ * @property {string} path Combined with the base path to construct a full URL.
+ * @property {string} [method='GET'] The HTTP verb to use.
+ * @property {boolean} [withCredentials=false] Whether to send Cookies with the request.
+ * @property {boolean} [compression=false] Whether to gzip the request payload. The server will need to decompress the payload.
+ * @property {number} [timeout=0] The number of milliseconds to wait before aborting the data call.
+ * @property {object} [headers={accept: 'application/json'}] accept: 'application/json'}` | The HTTP headers to use on the request.
+ * @property {object} [ignore={}] Can be used to skip certain adapter behaviors. See your adapter's documentation for details.
+ * @property {RetryFunction} [retry] Determines whether a failed request should be retried.
+ * @property {Cache} [cache] Controls caching logic for requests.
+ * @property {RequestTransform} [transformRequest] Transforms the payload and/or headers sent with a request.
+ * @property {ResponseTransform} [transformResponse] Transforms the response payload before sending it back to callers.
+ */
+
+/**
  * Encapsulates the information used by Adapters to complete a data call.
  *
+ * **WARNING:** Do not construct a Request object manually. Instead, pass a {@link DataDefinition} object
+ * to {@link DataLayer#createRequest|createRequest}.
+ *
  * @typedef {Object} Request
- * @property {string|Adapter} adapter The name of the adapter to use to complete this data
- * call, or a direct Adapter instance. If a name is provided, it should match the name passed
- * to {@link DataLayer.setAdapter}.
- * @property {string} url The endpoint to hit, constructed using the {@link Proxy} instance
- * passed to {@link module:data.createDataLayer}.
- * @property {string} version The version of the endpoint to invoke, constructed using the
- * {@link Proxy} instance passed to {@link module:data/createDataLayer}.
- * @property {string} method The HTTP method for the operation (e.g. 'GET', 'POST', or 'PATCH').
- * @property {boolean} withCredentials Whether to include cookies with the request.
- * @property {*} body An optional payload to send with the request.
- * @property {RequestTransform} transformRequest Enables optional transformation of the request
- * payload and/or the request headers prior to sending.
- * @property {ResponseTransform} transformResponse Enables optional transformation of the
- * response payload before passing it back to callers.
- * @property {Cache} cache An optional Cache instance with logic for if and/or when to cache
- * the adapter Response.
- * @property {Object.<string, *>} ignore A map of values that adapters may use to skip or
- * configure specific steps in the data pipeline.
- * @property {Object.<string, string>} headers A map of header names and values to send with
- * the request. This object may be modified by adapters.
+ * @mixin
+ * @mixes DataDefinition
+ * @property {string} url The URL to open, constructed automatically using {@link Proxy#url|Proxy.url()}, any {@link ProxyRule}s that match the
+ * given Request properties, and any parameters passed to {@link DataLayer#createRequest|createRequest}.
+ * @property {*} body An optional payload to send to the URL, set when calling {@link DataLayer#createRequest|createRequest}.
  */
 
 /**
@@ -125,7 +134,6 @@ function verifyResponse(response) {
  * @async
  * @callback Adapter
  * @param {Request} request The data operation request to fulfill.
- * @param {Proxy} proxy The Proxy instance used to construct the request.
  * @returns {Promise<Response>} A Promise resolved with a Response instance.
  */
 
@@ -146,15 +154,11 @@ function verifyResponse(response) {
  * const ignore = () => {};
  *
  * export const cache = {
- *   async get(request, proxy) {
- *     const version = request.version && `@${request.version}` || '';
- *     const key = `${request.url}${version}`;
- *     return await store.get(key).catch(ignore);
+ *   async get(request) {
+ *     return await store.get(request.url).catch(ignore);
  *   },
- *   async set(request, response, proxy) {
- *     const version = request.version && `@${request.version}` || '';
- *     const key = `${request.url}${version}`;
- *     return await store.set(key, response).catch(ignore);
+ *   async set(request, response) {
+ *     return await store.set(request.url, response).catch(ignore);
  *   }
  * }
  */
@@ -167,10 +171,8 @@ function verifyResponse(response) {
  * @async
  * @method Cache#get
  * @param {Request} request Contains information you can use to create
- * a cache key. Typical cache keys combine the `url` and `version`
- * properties. See the example code.
- * @param {Proxy} proxy The Proxy used to construct the request `url`
- * and `version`.
+ * a cache key. Typically, the `url` is unique enough to act as a key.
+ * See the example code.
  * @returns {Promise<?Response>} Promise resolved with `undefined` if
  * the key could not be found in the cache or is invalid; otherwise,
  * resolved with the {@link Response} object passed to {@link Cache.set}.
@@ -182,9 +184,7 @@ function verifyResponse(response) {
  *
  * export const cache = {
  *   async get(request, proxy) {
- *     const version = request.version && `@${request.version}` || '';
- *     const key = `${request.url}${version}`;
- *     return await store.get(key).catch(ignore);
+ *     return await store.get(request.url).catch(ignore);
  *   }
  * }
  */
@@ -197,11 +197,10 @@ function verifyResponse(response) {
  * @async
  * @method Cache#set
  * @param {Request} request Contains information you can use to create
- * a cache key. Typical cache keys combine the `url` and `version`
- * properties. See the example code.
+ * a cache key. Typically, the `url` is unique enough to act as a key.
+ * See the example code.
  * @param {Response} response The Response to cache. This is the value
  * that should be returned from {@link Cache.get}.
- * @param {Proxy} proxy The Proxy used to handle the request.
  * @returns {Promise} A promise resolved when the value is cached.
  * @example
  * import { indexedDB } from '@paychex/core/stores'
@@ -211,9 +210,7 @@ function verifyResponse(response) {
  *
  * export const cache = {
  *   async set(request, response, proxy) {
- *     const version = request.version && `@${request.version}` || '';
- *     const key = `${request.url}${version}`;
- *     return await store.set(key, response).catch(ignore);
+ *     return await store.set(request.url, response).catch(ignore);
  *   }
  * }
  */
@@ -231,6 +228,20 @@ function verifyResponse(response) {
  */
 
 /**
+ * Invoked when a 401 error is returned from an Adapter. Indicates that
+ * the user's authentication token is invalid and should be regenerated.
+ * Typically, a reauth function will add a Proxy rule to ensure the token
+ * is applied in the correct format (e.g. as an Authorize header) and on
+ * the correct Requests (e.g. Requests having a specific `adapter` value).
+ *
+ * @async
+ * @callback Reauth
+ * @returns {Promise} A promise that will be resolved when the user's
+ * authentication token has been retrieved and any corresponding Proxy
+ * rules have been applied.
+ */
+
+/**
  * Invoked when a connection to Paychex is aborted but the user has a
  * connection to the Internet. NOTE: This method may be called multiple
  * times; its logic should ensure it only runs diagnostics once. Also,
@@ -244,38 +255,26 @@ function verifyResponse(response) {
  */
 
 /**
- * Invoked when an endpoint returns a 505 error code, indicating there
- * is a version mismatch between the client's expected endpoint version
- * and the actual endpoint version. NOTE: This method may be called
- * multiple times, so logic for how frequently to notify the user (e.g.
- * once per session vs. once per endpoint) should be implemented.
- *
- * @callback Upgrade
- * @param {Request} request The Request that returned a 505 error response.
- * @param {Response} response The Response whose status code is 505.
- */
-
-/**
  * A map of dependencies used by the DataLayer. It is the responsibility
  * of the creator/consumer of the DataLayer to provide the necessary
  * functionality.
  *
  * @typedef {Object} DataLayerConfiguration
  * @property {Proxy} proxy The proxy to use to construct {@link Request} objects.
- * @property {Upgrade} upgrade Method to invoke when a 505 Version Mismatch is returned from an {@link Adapter}.
+ * @property {Reauth} reauth Method to invoke when a 401 Authentication Failure is returned from an {@link Adapter}.
  * @property {Reconnect} reconnect Method to invoke when the user's network connection fails.
  * @property {Diagnostics} diagnostics Method to invoke when a request is aborted but the user has a network connection.
  */
 
 export default function createDataLayer({
     proxy,
-    upgrade,
+    reauth,
     reconnect,
     diagnostics
 } = {}) {
 
     if (!proxy) throw getError('Creating a new data layer requires a proxy.');
-    if (!upgrade) throw getError('Creating a new data layer requires an upgrade method.');
+    if (!reauth) throw getError('Creating a new data layer requires a reauthentication method.');
     if (!reconnect) throw getError('Creating a new data layer requires a reconnect method.');
     if (!diagnostics) throw getError('Creating a new data layer requires a diagnostics method.');
 
@@ -325,7 +324,7 @@ export default function createDataLayer({
 
         let response;
         if (request.cache) {
-            if (response = await request.cache.get(request, proxy).catch(ignore)) {
+            if (response = await request.cache.get(request).catch(ignore)) {
                 response.meta.cached = true;
                 return response.data;
             }
@@ -344,24 +343,22 @@ export default function createDataLayer({
 
             retry = false;
 
-            response = await adapter(request, proxy);
+            response = await adapter(request);
             verifyResponse(response);
             request.response = response;
 
             if (!response.meta.error) {
                 if (request.cache)
-                    await request.cache.set(request, response, proxy).catch(ignore);
+                    await request.cache.set(request, response).catch(ignore);
                 return response.data;
             } else if (response.status === AUTH_ERROR) {
                 if (++authCount > 1)
                     break;
-                await proxy.auth(true);
+                await reauth();
                 retry = true;
+                proxy.apply(request);
                 continue;
             } else if (response.status === VALIDATION_ERROR) {
-                break;
-            } else if (response.status === VERSION_MISMATCH) {
-                upgrade(request, response);
                 break;
             } else if (response.status <= ABORTED) {
                 if (response.meta.timeout) {
@@ -375,7 +372,7 @@ export default function createDataLayer({
             }
 
             if (request.retry)
-                retry = await request.retry(request, response, proxy).catch(no);
+                retry = await request.retry(request, response).catch(no);
 
         } while (retry);
 
@@ -392,7 +389,7 @@ export default function createDataLayer({
      * Converts the Data Definition Object into a Request instance. You can
      * pass the returned Request instance directly to the `fetch` method.
      *
-     * @param {Object} ddo The data definition object to transform.
+     * @param {DataDefinition} ddo The data definition object to transform.
      * @param {Object} [params] Optional parameters. Parameter values will be
      * used to tokenize the URL; any untokenized values will be appended to
      * the URL as the querystring.
@@ -412,20 +409,17 @@ export default function createDataLayer({
      * const request = createRequest(ddo, null, payload);
      */
     function createRequest(ddo, params = {}, body = undefined) {
-        const version = proxy.version(ddo);
-        const url = tokenize(proxy.url(ddo.base, ddo.path), params);
-        const key = `${url}@${version || 'latest'}`;
-        return {
+        const request = proxy.apply({
             method: 'GET',
             withCredentials: false,
             ...ddo,
-            url,
-            version,
             ignore: { ...ddo.ignore },
             headers: { ...ddo.headers },
-            cache: { key, ...ddo.cache },
-            body
-        };
+            cache: { ...ddo.cache },
+        });
+        request.body = body;
+        request.url = tokenize(proxy.url(ddo.base, ddo.path), params);
+        return request;
     }
 
     /**

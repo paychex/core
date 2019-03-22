@@ -184,20 +184,6 @@ describe('stores', () => {
                 });
         });
 
-        it('appends version to key', async () => {
-            const request = {
-                method: 'GET',
-                url: 'http://url.com/path',
-                version: 'application/json+v1'
-            };
-            return asResponseCache(store).get(request)
-                .then(() => {
-                    const key = `${request.url}@${request.version}`;
-                    expect(store.get.called).toBe(true);
-                    expect(store.get.args[0]).toBe(key);
-                });
-        });
-
         it('sets meta.cached to true if value was cached', async () => {
             const cached = { meta: { cached: true } };
             store.get.returns({ meta: {} });

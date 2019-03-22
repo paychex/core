@@ -14,23 +14,23 @@ describe('DataLayer', () => {
             expect(() => createDataLayer()).toThrow(/requires a proxy/);
         });
 
-        it('throws if upgrade not provided', () => {
+        it('throws if reauth not provided', () => {
             expect(() => createDataLayer({
                 proxy: {}
-            })).toThrow(/requires an upgrade/);
+            })).toThrow(/requires a reauth/);
         });
 
         it('throws if reconnect not provided', () => {
             expect(() => createDataLayer({
                 proxy: {},
-                upgrade: Function.prototype
+                reauth: Function.prototype
             })).toThrow(/requires a reconnect/);
         });
 
         it('throws if diagnostics not provided', () => {
             expect(() => createDataLayer({
                 proxy: {},
-                upgrade: Function.prototype,
+                reauth: Function.prototype,
                 reconnect: Function.prototype
             })).toThrow(/requires a diagnostics/);
         });
@@ -40,7 +40,7 @@ describe('DataLayer', () => {
             it(`exports ${method} method`, () => {
                 const dataLayer = createDataLayer({
                     proxy: {},
-                    upgrade: Function.prototype,
+                    reauth: Function.prototype,
                     reconnect: Function.prototype,
                     diagnostics: Function.prototype
                 });
@@ -63,7 +63,7 @@ describe('DataLayer', () => {
                 const request = { adapter: 'my-adapter' };
                 const dataLayer = createDataLayer({
                     proxy: {},
-                    upgrade: Function.prototype,
+                    reauth: Function.prototype,
                     reconnect: Function.prototype,
                     diagnostics: Function.prototype
                 });
@@ -84,11 +84,11 @@ describe('DataLayer', () => {
             beforeEach(() => {
                 proxy = {
                     url: Function.prototype,
-                    version: Function.prototype
+                    apply: (arg) => arg
                 };
                 createRequest = createDataLayer({
                     proxy,
-                    upgrade: Function.prototype,
+                    reauth: Function.prototype,
                     reconnect: Function.prototype,
                     diagnostics: Function.prototype
                 }).createRequest;
@@ -121,12 +121,6 @@ describe('DataLayer', () => {
                 expect(request.body).toBe(body);
             });
 
-            it('invokes proxy.version', () => {
-                proxy.version = () => 'v1';
-                const request = createRequest({});
-                expect(request.version).toBe('v1');
-            });
-
             it('invokes proxy.url', () => {
                 proxy.url = () => 'url.com';
                 const request = createRequest({});
@@ -143,19 +137,6 @@ describe('DataLayer', () => {
                 expect(request.url).toContain('key=value');
             });
 
-            it('uses specified version in cache key', () => {
-                proxy.url = () => 'url.com';
-                proxy.version = () => 'v2';
-                const request = createRequest({});
-                expect(request.cache.key).toBe('url.com@v2');
-            });
-
-            it('defaults to "latest" version in cache key', () => {
-                proxy.url = () => 'url.com';
-                const request = createRequest({});
-                expect(request.cache.key).toBe('url.com@latest');
-            });
-
         });
 
         describe('fetch', () => {
@@ -168,11 +149,11 @@ describe('DataLayer', () => {
 
             beforeEach(() => {
                 proxy = {
-                    auth: spy()
+                    apply: () => {}
                 };
                 dataOptions = {
                     proxy,
-                    upgrade: spy(),
+                    reauth: spy(),
                     reconnect: spy(),
                     diagnostics: spy()
                 };
@@ -300,7 +281,7 @@ describe('DataLayer', () => {
                 };
                 await fetch(request);
                 expect(request.cache.set.called).toBe(true);
-                expect(request.cache.set.args).toEqual([request, response, proxy]);
+                expect(request.cache.set.args).toEqual([request, response]);
             });
 
             it('retries once if auth error occurs', async () => {
@@ -342,21 +323,21 @@ describe('DataLayer', () => {
                 }
             });
 
-            it('invokes upgrade if version mismatch error occurs', async () => {
-                response.status = 505;
+            it('invokes reauth if 401 error occurs', async () => {
+                response.status = 401;
                 response.meta.error = true;
                 try {
                     await fetch(request);
                 } catch (e) {
                     // ignore
                 } finally {
-                    expect(dataOptions.upgrade.called).toBe(true);
+                    expect(dataOptions.reauth.called).toBe(true);
                 }
             });
 
-            it('does not check retry logic if version mismatch error occurs', async () => {
+            it('does not check retry logic if reauth error occurs', async () => {
                 request.retry = spy();
-                response.status = 505;
+                response.status = 401;
                 response.meta.error = true;
                 try {
                     await fetch(request);
@@ -364,20 +345,6 @@ describe('DataLayer', () => {
                     // ignore
                 } finally {
                     expect(request.retry.called).toBe(false);
-                }
-            });
-
-            it('sets response.error if version mismatch error occurs', async () => {
-                request.retry = spy();
-                response.status = 505;
-                response.meta.error = true;
-                try {
-                    await fetch(request);
-                } catch (e) {
-                    // ignore
-                } finally {
-                    expect(response.error).toBeDefined();
-                    expect(response.error instanceof Error).toBe(true);
                 }
             });
 

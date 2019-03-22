@@ -47,7 +47,7 @@
  */
 export function withFalloff(times = 3, base = 200, scheduler = setTimeout) {
     const invokes = new WeakMap();
-    return function retry(request, response, proxy) {
+    return function retry(request, response) {
         const count = invokes.get(request) || 0;
         invokes.set(request, count + 1);
         if (count >= times) return Promise.reject();
@@ -70,15 +70,15 @@ export function withFalloff(times = 3, base = 200, scheduler = setTimeout) {
  * import { isResponseStatus } from '@paychex/core/data/utils'
  *
  * export default class MyCache {
- *   set: ifResponseStatus(200, async function set(request, response, proxy) {
+ *   set: ifResponseStatus(200, async function set(request, response) {
  *     // do caching logic here
  *   })
  * }
  */
 export function ifResponseStatus(status, setter) {
-    return async function set(request, response, proxy) {
+    return async function set(request, response) {
         if (response.status === status)
-            return await setter(request, response, proxy);
+            return await setter(request, response);
     };
 }
 
@@ -96,14 +96,14 @@ export function ifResponseStatus(status, setter) {
  * import { ifRequestMethod } from '@paychex/core/data/utils'
  *
  * export default class MyCache {
- *   get: ifRequestMethod('POST', async function get(request, proxy) {
+ *   get: ifRequestMethod('POST', async function get(request) {
  *     // retrieve from cache here
  *   })
  * }
  */
 export function ifRequestMethod(method, getter) {
-    return async function get(request, proxy) {
+    return async function get(request) {
         if (request.method === method)
-            return await getter(request, proxy);
+            return await getter(request);
     };
 }
