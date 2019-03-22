@@ -123,7 +123,15 @@ function hasSeverity(message) {
  * @param {'FATAL'|'ERROR'|'NONE'} severity The message severity to look for.
  * @returns {Function} A function that can be used as a Promise.then callback.
  * @example
+ * import { throwIfSeverity } from '@paychex/core/data/utils';
+ * import { fetch, createRequest } from '@paychex/landing/data';
+ * import { tracker } from '@paychex/landing';
+ * import { loadUserData } from '../data/user';
  *
+ * loadUserData()
+ *   .then(throwIfSeverity('ERROR'))
+ *   .then(throwIfSeverity('FATAL'))
+ *   .catch(tracker.error);
  */
 export function throwIfSeverity(severity) {
     return function handler(response) {
