@@ -10,10 +10,6 @@ describe('localStore', () => {
         });
     });
 
-    it('allows optional config', () => {
-        expect(localStore(undefined, {})).toBeDefined();
-    });
-
     it('allows optional provider', () => {
         global.localStorage = {};
         expect(localStore()).toBeDefined();

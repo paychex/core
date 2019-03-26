@@ -1,5 +1,8 @@
 import aesjs from 'aes-js'
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
+import isEmpty from 'lodash/isEmpty'
+import identity from 'lodash/identity'
+import isFunction from 'lodash/isFunction'
 
 import indexedDB from './indexedDB';
 import localStore from './localStore';
@@ -163,6 +166,69 @@ export function withEncryption(store, { key, salt = undefined, method = 'cbc' })
 }
 
 /**
+ * Method used to modify a key for use in a Store. Used primarily by
+ * {@link module:stores.withPrefix|withPrefix}.
+ *
+ * @global
+ * @callback Prefixer
+ * @param {string} key The key to modify before passing to a Store.
+ * @returns {string} The modified key to use in a Store.
+ * @example
+ * import { localStore, withPrefix } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const store = withPrefix(localStore(), function(key) {
+ *   return `${key}|${user.guid}`;
+ * });
+ */
+
+/**
+ * Wraps a Store so any keys are transparently modified before access.
+ * This can be useful when storing data on a machine that will have
+ * more than 1 user, to ensure different users don't access each other's
+ * stored information.
+ *
+ * @param {Store} store The store whose keys should be modified before access.
+ * @param {string|Prefixer} prefix A string to prepend to any keys _or_ a
+ * function that will modify a key.
+ * @example
+ * import { localStore, withPrefix } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const store = withPrefix(localStore(), user.guid);
+ * @example
+ * import { localStore, withPrefix } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const store = withPrefix(localStore(), function(key) {
+ *   return `${key}|${user.guid}`;
+ * });
+ */
+export function withPrefix(store, prefix) {
+
+    const prefixer = isFunction(prefix) ?
+        prefix : isEmpty(prefix) ?
+        identity : (key) => `${prefix}:${key}`;
+
+    return {
+
+        async get(key) {
+            return store.get(prefixer(key));
+        },
+
+        async set(key, value) {
+            return store.set(prefixer(key), value);
+        },
+
+        async delete(key) {
+            return store.delete(prefixer(key));
+        }
+
+    };
+
+}
+
+/**
  * Utility method to wrap a {@link Store} implementation as a {@link Cache}
  * instance. Only caches {@link Response}s with HTTP status 200, and
  * only returns cached Responses for GET requests. Uses the {@link Request}
@@ -233,15 +299,13 @@ export {
 
     /**
      * @function
-     * @param {HTMLStorageConfiguration} [config] Optional
-     * configuration for the session storage instance.
      * @returns {Store} A Store backed by the browser's
      * sessionStorage Storage provider.
      * @example
-     * import { sessionStore } from '@paychex/core/stores';
+     * import { withPrefix, sessionStore } from '@paychex/core/stores';
      * import { user } from '@paychex/landing';
      *
-     * const sessionData = sessionStore({ prefix: user.guid });
+     * const sessionData = withPrefix(sessionStore(), user.guid);
      *
      * export async function loadSomeData() {
      *   return await sessionData.get('some.key');
@@ -251,15 +315,13 @@ export {
 
     /**
      * @function
-     * @param {HTMLStorageConfiguration} [config] Optional
-     * configuration for the session storage instance.
      * @returns {Store} A Store backed by the browser's
      * localStorage Storage provider.
      * @example
-     * import { localStore } from '@paychex/core/stores';
+     * import { withPrefix, localStore } from '@paychex/core/stores';
      * import { user } from '@paychex/landing';
      *
-     * const persistentData = localStore({ prefix: user.guid });
+     * const persistentData = withPrefix(localStore(), user.guid);
      *
      * export async function loadSomeData() {
      *   return await persistentData.get('some.key');

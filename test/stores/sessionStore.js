@@ -10,10 +10,6 @@ describe('sessionStore', () => {
         });
     });
 
-    it('allows optional config', () => {
-        expect(sessionStore(undefined, {})).toBeDefined();
-    });
-
     it('allows optional provider', () => {
         global.sessionStorage = {};
         expect(sessionStore()).toBeDefined();

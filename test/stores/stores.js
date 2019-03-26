@@ -1,6 +1,6 @@
 import expect from 'expect'
 import { spy } from '../utils';
-import { withEncryption, asResponseCache } from '../../stores'
+import { withEncryption, withPrefix, asResponseCache } from '../../stores'
 
 describe('stores', () => {
 
@@ -152,6 +152,48 @@ describe('stores', () => {
             const result = await wrapper.get('key');
             expect(store.get.called).toBe(true);
             expect(result).toMatchObject(value);
+        });
+
+    });
+
+    describe('withPrefix', () => {
+
+        let store,
+            prefixed,
+            prefixer;
+
+        beforeEach(() => {
+            store = {
+                get: spy(),
+                set: spy(),
+                delete: spy()
+            };
+            prefixer = spy();
+            prefixed = withPrefix(store, prefixer);
+        });
+
+        ['get', 'set', 'delete'].forEach(method => {
+
+            it('invokes prefixer with key', () => {
+                prefixer.returns('prefix:key')
+                prefixed[method]('key');
+                expect(prefixer.called).toBe(true);
+                expect(prefixer.args[0]).toEqual('key');
+                expect(store[method].args[0]).toEqual('prefix:key');
+            });
+
+            it('works with string', () => {
+                prefixed = withPrefix(store, 'prefix');
+                prefixed.get('key');
+                expect(store.get.args[0]).toBe('prefix:key');
+            });
+
+            it('ignores empty string', () => {
+                prefixed = withPrefix(store, '');
+                prefixed.get('key');
+                expect(store.get.args[0]).toBe('key');
+            });
+
         });
 
     });

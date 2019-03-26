@@ -1,7 +1,7 @@
 import createStore from './htmlStore';
 
-export default function localStore(config = {}, provider = localStorage) {
+export default function localStore(provider = localStorage) {
 
-    return createStore(config, provider);
+    return createStore(provider);
 
 }

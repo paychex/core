@@ -1,7 +1,7 @@
 import createStore from './htmlStore';
 
-export default function sessionStore(config = {}, provider = sessionStorage) {
+export default function sessionStore(provider = sessionStorage) {
 
-    return createStore(config, provider);
+    return createStore(provider);
 
 }
