@@ -51,8 +51,7 @@ function verifyResponse(response) {
  * may expect different properties, all DataDefinition objects have certain required
  * fields and a few optional fields.
  *
- * @typedef {Object} DataDefinition
- * @mixin
+ * @interface DataDefinition
  * @property {string} adapter The adapter to use to complete the request.
  * @property {string} base Used by the Proxy to determine a base path.
  * @property {string} path Combined with the base path to construct a full URL.
@@ -74,9 +73,8 @@ function verifyResponse(response) {
  * **WARNING:** Do not construct a Request object manually. Instead, pass a {@link DataDefinition} object
  * to {@link DataLayer#createRequest|createRequest}.
  *
- * @typedef {Object} Request
- * @mixin
- * @mixes DataDefinition
+ * @interface Request
+ * @extends DataDefinition
  * @property {string} url The URL to open, constructed automatically using {@link Proxy#url|Proxy.url()}, any {@link ProxyRule}s that match the
  * given Request properties, and any parameters passed to {@link DataLayer#createRequest|createRequest}.
  * @property {*} body An optional payload to send to the URL, set when calling {@link DataLayer#createRequest|createRequest}.
