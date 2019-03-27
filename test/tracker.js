@@ -153,7 +153,7 @@ describe('tracker', () => {
 
         it('creates timer info', async () => {
             const stop = tracker.start('label');
-            await new Promise(setTimeout);
+            await new Promise(resolve => setTimeout(resolve, 10));
             stop({key: 'value'});
             const info = subscriber.args[0];
             expect(info).toMatchObject({

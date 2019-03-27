@@ -230,6 +230,26 @@ describe('Proxy', () => {
                 });
             });
 
+            it('merges nested objects', () => {
+                proxy.use(
+                    { headers: { a: '1' } },
+                    { headers: { b: '2' } }
+                );
+                expect(proxy.apply({})).toMatchObject({
+                    headers: { a: '1', b: '2' }
+                });
+            });
+
+            it('unions array elements', () => {
+                proxy.use(
+                    { headers: ['1'] },
+                    { headers: ['2'] }
+                );
+                expect(proxy.apply({})).toMatchObject({
+                    headers: ['1', '2']
+                });
+            });
+
         });
 
     });

@@ -1,7 +1,17 @@
 import omit from 'lodash/omit';
+import isArray from 'lodash/isArray';
+import mergeWith from 'lodash/mergeWith';
 
 const DOUBLE_SLASH = /\/\//g;
 const LEADING_SLASHES = /^\/+/;
+
+const merge = (lhs, rhs) => mergeWith(lhs, rhs, arrayConcat);
+
+function arrayConcat(lhs, rhs) {
+    if (isArray(lhs)) {
+        return lhs.concat(rhs);
+    }
+}
 
 function patternMatches([key, pattern]) {
     return new RegExp(pattern, 'i').test(this[key]);
@@ -81,7 +91,7 @@ export default function createProxy() {
                 .replace(LEADING_SLASHES, '');
             const { protocol = '', host = base, port = 80 } = config
                 .filter(ruleMatches, { base, path })
-                .reduce(Object.assign, {});
+                .reduce(merge, {});
             return `${protocol}${protocol ? ':' : ''}//${protocol === 'file' ? '/' : ''}${host}${port === 80 ? '' : `:${port}`}${path ? `/${path}` : ''}`;
         },
 
@@ -137,7 +147,7 @@ export default function createProxy() {
             return config
                 .filter(ruleMatches, request)
                 .map(withoutMatchObject)
-                .reduce(Object.assign, request);
+                .reduce(merge, request);
         },
 
         /**
