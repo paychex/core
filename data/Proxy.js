@@ -52,6 +52,27 @@ export default function createProxy() {
          * @param {(...string|string[])} paths One or more URL paths to combine into the final URL.
          * @returns {string} A URL with the appropriate protocol, host, port, and paths
          * given the currently configured proxy rules.
+         * @example
+         * import { proxy } from '@paychex/landing/data';
+         * import { tokenize } from '@paychex/core/data';
+         *
+         * proxy.use({
+         *   port: 8118,
+         *   protocol: 'https',
+         *   host: 'ecs.cloud.paychex.com',
+         *   match: {
+         *     base: 'paychex-cloud'
+         *   }
+         * });
+         *
+         * ```html
+         *   <img src="{{ getCloudImage('avatars', 'e13d429a') }}" alt="" />
+         *   <!-- https://ecs.cloud.paychex.com:8118/avatars/e13d429a -->
+         * ```
+         * export function getCloudImage(bucket, id) {
+         *   const url = proxy.url('paychex-cloud', '/:bucket', '/:id');
+         *   return tokenize(url, { bucket, id });
+         * }
          */
         url(base, ...paths) {
             const path = Array.prototype.concat.apply([], paths)
@@ -69,10 +90,16 @@ export default function createProxy() {
          * Rules are applied in the order they were added to the Proxy, so later rules will
          * always override earlier rules.
          *
+         * **NOTE:** You will not typically call this method directly. Instead, the
+         * DataLayer.createRequest method will invoke this function on your behalf. See
+         * that method for details.
+         *
          * @param {Request} request The request object whose key/value pairs will be used
          * to determine which proxy rules should be used to determine the version.
          * @returns {Request} The input Request object, with properties modified according
          * to the matching Proxy rules.
+         * @see {@link DataLayer#createRequest|createRequest} &mdash; invokes the apply
+         * method for you
          * @example
          * import { throwIfSeverity } from '@paychex/core/data/utils';
          * import { proxy, createRequest, fetch } from '@paychex/landing/data';
@@ -117,6 +144,19 @@ export default function createProxy() {
          * Add rules to the proxy instance. The order rules are added determines
          * the order they are applied.
          * @param {(...ProxyRule|ProxyRule[])} rules The rules to use to configure this proxy instance.
+         * @example
+         * import { proxy } from '@paychex/landing/data';
+         *
+         * // any {@link Request|Requests} with base == 'paychex-cloud'
+         * // will be routed to https://ecs.cloud.paychex.com:8118
+         * proxy.use({
+         *   port: 8118,
+         *   protocol: 'https',
+         *   host: 'ecs.cloud.paychex.com',
+         *   match: {
+         *     base: 'paychex-cloud'
+         *   }
+         * });
          */
         use(...rules) {
             config.push(...Array.prototype.concat.apply([], rules));

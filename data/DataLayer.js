@@ -1,4 +1,5 @@
 import tokenize from './Tokenizer';
+import has from 'lodash/has';
 import identity from 'lodash/identity';
 
 const ABORTED = 0;
@@ -137,6 +138,53 @@ function verifyResponse(response) {
 
 /**
  * Provides end-to-end data operations for Paychex applications.
+ *
+ * **Unit Testing**
+ *
+ * To mock out server responses in your unit tests, import the proxy and
+ * data layer method your code uses:
+ *
+ * ```javascript
+ * import { spy } from '@paychex/core/test/utils';
+ * import { proxy, setAdapter, createRequest, fetch } from '@paychex/landing/data';
+ *
+ * let response, adapter;
+ *
+ * before(() => { // register the test adapter for all tests
+ *   response = {};
+ *   adapter = spy().returns(response);
+ *   setAdapter('@paychex/test', adapter);
+ *   proxy.use({ adapter: '@paychex/test' });
+ * });
+ *
+ * beforeEach(() => {
+ *   Object.assign(response, {
+ *     status: 200,
+ *     statusText: 'OK',
+ *     data: null,
+ *     meta: {
+ *       error: false,
+ *       cached: false,
+ *       messages: []
+ *     }
+ *   });
+ * });
+ *
+ * describe('some data operation', () => {
+ *   it('propagates errors', () => {
+ *     response.status = 401;
+ *     response.meta.error = true;
+ *     // assuming `someDataOperation` calls
+ *     // `fetch` with a Request object created
+ *     // by calling `createRequest` with a
+ *     // DataDefinition object
+ *     return someDataOperation().catch((e) => {
+ *       expect(adapter.called).toBe(true);
+ *       expect(e.status).toBe(401);
+ *     });
+ *   });
+ * });
+ * ```
  *
  * @interface DataLayer
  */
@@ -321,7 +369,7 @@ export default function createDataLayer({
     async function fetch(request) {
 
         let response;
-        if (request.cache) {
+        if (has(request, 'cache.get')) {
             if (response = await request.cache.get(request).catch(ignore)) {
                 response.meta.cached = true;
                 return response.data;
@@ -346,7 +394,7 @@ export default function createDataLayer({
             request.response = response;
 
             if (!response.meta.error) {
-                if (request.cache)
+                if (has(request, 'cache.set'))
                     await request.cache.set(request, response).catch(ignore);
                 return response.data;
             } else if (response.status === AUTH_ERROR) {

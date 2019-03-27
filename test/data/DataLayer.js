@@ -1,6 +1,7 @@
 import expect from 'expect'
 import { spy } from '../utils';
 import createDataLayer from '../../data/DataLayer'
+import createProxy from '../../data/Proxy';
 
 describe('DataLayer', () => {
 
@@ -401,6 +402,31 @@ describe('DataLayer', () => {
                     }
                 });
 
+            });
+
+            it('works in unit tests', () => {
+                const response = {
+                    status: 200,
+                    statusText: 'OK',
+                    data: null,
+                    meta: {
+                        error: false,
+                        cached: false,
+                        messages: [],
+                    }
+                };
+                const proxy = createProxy();
+                const testAdapter = spy().returns(response);
+                const { setAdapter, createRequest, fetch } = createDataLayer({
+                    proxy,
+                    reauth: Function.prototype,
+                    reconnect: Function.prototype,
+                    diagnostics: Function.prototype
+                });
+                setAdapter('@paychex/test', testAdapter);
+                proxy.use({ adapter: '@paychex/test' });
+                return fetch(createRequest({/* ddo */})).then(() =>
+                    expect(testAdapter.called).toBe(true));
             });
 
         });
