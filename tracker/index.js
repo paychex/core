@@ -1,6 +1,7 @@
 import uuid from 'uuid/v4';
 import noop from 'lodash/noop';
 import invoke from 'lodash/invoke';
+import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
 import mergeWith from 'lodash/mergeWith';
 import isFunction from 'lodash/isFunction';
@@ -311,6 +312,184 @@ export default function createTracker(subscriber) {
                     count: ++count,
                     data: getContext(data)
                 });
+            };
+        }
+
+    };
+
+}
+
+/**
+ * Enables nested timings for the given Tracker instance.
+ *
+ * **NOTE:** If you call start() and stop() an unequal number of times,
+ * the timing entry will be marked invalid. See the examples for details.
+ *
+ * @function
+ * @param {Tracker} tracker The Tracker to wrap to enable nested timings.
+ * @returns {Tracker} A Tracker instance that will create a nested timing
+ * tree for each time start() is invoked.
+ * @example
+ * // invalid timing entry
+ *
+ * import { tracker } from '@paychex/landing';
+ * import { withNesting } from '@paychex/core/tracking';
+ *
+ * const nested = withNesting(tracker);
+ * const stop = nested.start('root timing');
+ * nested.start('child timing #1'); // notice that we aren't invoking
+ * nested.start('child timing #2'); // the stop methods returned by start()
+ * stop();
+ * // because we called start 3 times and stop 1 time, the timing
+ * // entry created for this operation will look like the following:
+ * {
+ *   "id": "80f3fccb-e0fd-4320-bae5-a0bc2077a0d2",
+ *   "label": "root",
+ *   "start": 1553783595834,
+ *   "stop": 1553783595834,
+ *   "duration": 0,
+ *   "type": "timer",
+ *   "count": 1,
+ *   "data": {
+ *     "invalid": true,
+ *     "message": "start() called 2 time(s) more than stop()"
+ *   }
+ * }
+ * @example
+ * // nested timings
+ *
+ * import { tracker } from '@paychex/landing';
+ * import { withNesting } from '@paychex/core/tracking';
+ *
+ * const nested = withNesting(tracker);
+ *
+ * async function loadSecurity(clientId) {
+ *   const security = {};
+ *   const stop = nested.start('load client security');
+ *   // ... data operation
+ *   stop();
+ *   return security;
+ * }
+ *
+ * async function loadFeatures(product) {
+ *   product.features = [];
+ *   const stop = nested.start('load product features');
+ *   // ... data operation
+ *   stop();
+ * }
+ *
+ * async function loadProducts(clientId) {
+ *   const products = [];
+ *   const stop = nested.start('load client products');
+ *   // ... data operation
+ *   await Promise.all(products.map(loadFeatures));
+ *   stop();
+ *   return products;
+ * }
+ *
+ * export async function loadClientData(clientId) {
+ *   const result = {};
+ *   const stop = nested.start('load client data');
+ *   result.security = await loadSecurity(clientId);
+ *   result.products = await loadProducts(clientId);
+ *   stop({ clientId });
+ *   return result;
+ * }
+ *
+ * // the above function produces a TrackingInfo entry like this:
+ * // note that parallel calls produce nested timings but sequential
+ * // calls produce sibling timings
+ * {
+ *  "id": "44a61275-a331-47eb-a214-f455bae00f87",
+ *  "label": "load client data",
+ *  "start": 1553783025026,
+ *  "stop": 1553783025398,
+ *  "duration": 372,
+ *  "type": "timer",
+ *  "count": 1,
+ *  "data": {
+ *    "children": [
+ *      {
+ *        "label": "load client security",
+ *        "children": [],
+ *        "start": 1553783025026,
+ *        "end": 1553783025226,
+ *        "duration": 200
+ *      },
+ *      {
+ *        "label": "load client products",
+ *        "children": [
+ *          {
+ *            "label": "load product features",
+ *            "children": [
+ *              {
+ *                "label": "load product features",
+ *                "children": [],
+ *                "start": 1553783025348,
+ *                "end": 1553783025398,
+ *                "duration": 50,
+ *                "id": "prod-b",
+ *                "features": []
+ *              }
+ *            ],
+ *            "start": 1553783025348,
+ *            "end": 1553783025398,
+ *            "duration": 50,
+ *            "id": "prod-a",
+ *            "features": []
+ *          }
+ *        ],
+ *        "start": 1553783025226,
+ *        "end": 1553783025398,
+ *        "duration": 172
+ *      }
+ *    ],
+ *    "clientId": "abc123"
+ *  }
+ * }
+ */
+export function withNesting(tracker) {
+
+    let ref,
+        stack = 0,
+        tree = {};
+
+    return {
+
+        ...tracker,
+
+        start(label) {
+            stack++;
+            if (isEmpty(tree)) {
+                ref = tree.children = [];
+                const end = tracker.start(label);
+                return function stop(data = {}) {
+                    if (--stack !== 0) {
+                        tree = {};
+                        data.invalid = true;
+                        data.message = (stack > 0) ?
+                            `start() called ${stack} time(s) more than stop()` :
+                            `stop() called ${Math.abs(stack)} time(s) more than start()`;
+                    }
+                    end(mergeWith(tree, data, customizer));
+                    tree = {};
+                };
+            }
+            const info = {
+                label,
+                parent: ref,
+                children: [],
+                start: Date.now(),
+            };
+            ref.push(info);
+            ref = info.children;
+            return function stop(data) {
+                stack--;
+                ref = info.parent;
+                delete info.parent;
+                info.end = Date.now();
+                info.duration = info.end - info.start;
+                mergeWith(info, data, customizer);
             };
         }
 
