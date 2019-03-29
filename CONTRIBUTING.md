@@ -45,6 +45,10 @@ It's the returned implementation that consumers will access. It's the Proxy's jo
 
 Try to follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.3/#summary) standard. See [this wiki page](https://wiki.paychex.com/display/ENTAPPS/Git+Commit+Standards) for more information.
 
+## Documentation
+
+Make sure your public methods and types are all documented. Use [jsDocs](http://usejsdoc.org/index.html) and run `npm run docs` to ensure your documentation compiles. Include examples of typical use cases.
+
 ## Unit Tests
 
 This repository contains code that will be used by many developers. Accordingly, you should aim for 100% code coverage of any features you write. Each conditional branch should be tested, edge cases should be considered, and errors should be propagated appropriately.
@@ -57,5 +61,6 @@ Please ensure you do the following before submitting any code for review:
 - Use [conventional commit](https://www.conventionalcommits.org/en/v1.0.0-beta.3/#summary) messages on all commits.
 - Reach out to at least one repository maintainer early in development to assist with design decisions.
 - Ensure your test coverage is at 100%.
+- Write documentation for any public methods.
 
 Finally, because your code will be consumed by many other developers, please allow enough time for the maintainers to review your proposed changes thoroughly.
