@@ -213,20 +213,18 @@ describe('tracker', () => {
             root();
             expect(subscriber.args[0].data).toMatchObject({
                 invalid: true,
-                message: 'start() called 2 time(s) more than stop()'
+                message: 'Some nested timers were not stopped.',
+                timers: ['child', 'grandchild']
             });
         });
 
-        it('sets invalid if stop called more than start', () => {
+        it('ignores multiple calls to stop', () => {
             const root = tracker.start('root');
             const child = tracker.start('child');
             child();
             child();
             root();
-            expect(subscriber.args[0].data).toMatchObject({
-                invalid: true,
-                message: 'stop() called 1 time(s) more than start()'
-            });
+            expect(subscriber.args[0].data).not.toMatchObject({ invalid: true });
         });
 
     });

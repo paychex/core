@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4';
 import noop from 'lodash/noop';
+import once from 'lodash/once';
 import invoke from 'lodash/invoke';
 import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
@@ -322,8 +323,9 @@ export default function createTracker(subscriber) {
 /**
  * Enables nested timings for the given Tracker instance.
  *
- * **NOTE:** If you call start() and stop() an unequal number of times,
- * the timing entry will be marked invalid. See the examples for details.
+ * **NOTE:** With a nested tracker, calling stop() multiple times will be
+ * ignored. However, forgetting to stop a nested timing before stopping the
+ * root timing will result in an invalid timing. See the examples for details.
  *
  * @function
  * @param {Tracker} tracker The Tracker to wrap to enable nested timings.
@@ -352,7 +354,8 @@ export default function createTracker(subscriber) {
  *   "count": 1,
  *   "data": {
  *     "invalid": true,
- *     "message": "start() called 2 time(s) more than stop()"
+ *     "message": "Some nested timers were not stopped.",
+ *     "timers": ["child timing #1", "child timing #2"]
  *   }
  * }
  * @example
@@ -451,25 +454,29 @@ export default function createTracker(subscriber) {
 export function withNesting(tracker) {
 
     let ref,
-        stack = 0,
         tree = {};
+
+    function getUnstopped(node = tree, arr = []) {
+        if (!('end' in node)) arr.push(node.label);
+        node.children.forEach(child => getUnstopped(child, arr));
+        return arr;
+    }
 
     return {
 
         ...tracker,
 
         start(label) {
-            stack++;
             if (isEmpty(tree)) {
                 ref = tree.children = [];
                 const end = tracker.start(label);
                 return function stop(data = {}) {
-                    if (--stack !== 0) {
+                    const unstopped = getUnstopped().filter(Boolean);
+                    if (!isEmpty(unstopped)) {
                         tree = {};
                         data.invalid = true;
-                        data.message = (stack > 0) ?
-                            `start() called ${stack} time(s) more than stop()` :
-                            `stop() called ${Math.abs(stack)} time(s) more than start()`;
+                        data.message = 'Some nested timers were not stopped.';
+                        data.timers = unstopped;
                     }
                     end(mergeWith(tree, data, customizer));
                     tree = {};
@@ -483,14 +490,13 @@ export function withNesting(tracker) {
             };
             ref.push(info);
             ref = info.children;
-            return function stop(data) {
-                stack--;
+            return once(function stop(data) {
                 ref = info.parent;
                 delete info.parent;
                 info.end = Date.now();
                 info.duration = info.end - info.start;
                 mergeWith(info, data, customizer);
-            };
+            });
         }
 
     };
