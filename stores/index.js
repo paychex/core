@@ -117,10 +117,32 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  * @property {any} value The value modified (or `undefined`, if a
  * delete operation occurred).
  * @example
+ * import { tracker } from '@paychex/landing';
+ * import { combineLatest, filter, map } from 'rxjs/operators';
  * import { asObservable, indexedDB } from '@paychex/core/stores';
+ * import { selectedClients } from '../data/clients';
  *
  * export const clients = asObservable(indexedDB({ store: 'clients' }));
+ *
+ * function isSelectedClient([e, selected]) {
+ *   return selected.includes(e.key);
+ * }
+ *
+ * function asClientId([e, _]) {
+ *   return e.key;
+ * }
+ *
+ * function trackClientChange(id) {
+ *   tracker.event('client changed', { id, category: 'audit' });
+ * }
+ *
  * clients.observe()
+ *   .pipe(
+ *     combineLatest(selectedClients),
+ *     filter(isSelectedClient),
+ *     map(asClientId)
+ *   )
+ *   .subscribe(trackClientChange);
  */
 
 /**
