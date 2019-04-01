@@ -1,4 +1,4 @@
-# Contributing to @paychex/core
+# Contributor's Guide
 
 Thank you for wanting to contribute to the `@paychex/core` library!
 
@@ -22,9 +22,7 @@ If you have written your feature following SRP and O-C principles, you should be
 - **Adapter**: wraps an object and returns a different interface
 - **Decorator**: wraps an object and adds methods to the interface
 
-To assist consumers, the following naming convention should apply to your extension methods: If you are modifying the interface, name your method `as<Feature>`; if you are returning the same interface, name your method `with<Feature>`.
-
-In other words, all Proxy wrappers will start with `with` and all Adapter and Decorator wrappers will start with `as`.
+To assist consumers, the following naming convention should apply to your extension methods: If you are modifying the interface, name your method `as<Feature>`; if you are returning the same interface, name your method `with<Feature>`. In other words, all Proxy wrappers will start with `with` and all Adapter and Decorator wrappers will start with `as`.
 
 **IMPORTANT:** Wrapper methods must _never_ modify the original, wrapped object. Imagine if `withEncryption()` modified the underlying `indexedDB()` store -- all other consumers of the store would receive encryption even though they didn't ask for it. New code should not change the behavior of existing code.
 
@@ -65,9 +63,7 @@ Now that we know how the wrapper methods should work, let's examine each design 
 
 #### Proxy Pattern
 
-```text
-A proxy is an object that has the same interface as another object and is used in place of that other object. It provides a surrogate or placeholder for another object to control access to it. It intends to add a wrapper and delegation to protect the real component from undue complexity.
-```
+> A proxy is an object that has the same interface as another object and is used in place of that other object. It provides a surrogate or placeholder for another object to control access to it. It intends to add a wrapper and delegation to protect the real component from undue complexity.
 
 Proxy methods in `@paychex/core` can be identified by their name. Each starts with the prefix `'with'`:
 
@@ -85,9 +81,7 @@ It's the returned implementation that consumers will access. It's the Proxy's jo
 
 #### Adapter Pattern
 
-```text
-An adapter allows the interface of an existing class to be used as another interface. It is often used to make existing classes work with others without modifying their source code.
-```
+> An adapter allows the interface of an existing class to be used as another interface. It is often used to make existing classes work with others without modifying their source code.
 
 Adapter methods in `@paychex/core` can be identified by their name. Each starts with the prefix `'as'`:
 
@@ -103,9 +97,7 @@ export function asFeature( delegate:IDelegate [, options:{[string]: any}] ): IOt
 
 #### Decorator Pattern
 
-```text
-A decorator modifies the surface API of a single object, often by adding new functionality.
-```
+> A decorator modifies the surface API of a single object, often by adding new functionality.
 
 Decorator methods in `@paychex/core` can be identified by their name. Like Adapters, each decorator wrapper starts with the prefix `'as'`:
 

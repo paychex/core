@@ -29,3 +29,7 @@ name | description
 [stores]{@link module:stores} | Provides client-side storage. How long data is persisted for depends on the store type and configuration options.
 [tracker]{@link module:tracker} | Provides event, error, and performance logging for applications.
 [test]{@link module:test} | Provides functionality useful during unit testing.
+
+## Contributing
+
+Before creating a new feature for the `@paychex/core` library, please read [CONTRIBUTING.md](https://code.paychex.com/projects/HTML5/repos/paychex-core/browse/CONTRIBUTING.md?at=refs%2Fheads%2Fdevelop).

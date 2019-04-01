@@ -20,7 +20,7 @@
   },
   "scripts": {
     "test": "nyc mocha --require babel-register --recursive",
-    "docs": "jsdoc -c jsdoc.json -R README.md"
+    "docs": "jsdoc -c jsdoc.json"
   },
   "babel": {
     "presets": [
