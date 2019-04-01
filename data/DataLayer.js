@@ -229,8 +229,11 @@ function verifyResponse(response) {
  * const ignore = () => {};
  *
  * export const cache = {
- *   async get(request, proxy) {
+ *   async get(request) {
  *     return await store.get(request.url).catch(ignore);
+ *   },
+ *   async set(request, response) {
+ *     return await store.set(request.url, response).catch(ignore);
  *   }
  * }
  */
@@ -255,7 +258,10 @@ function verifyResponse(response) {
  * const ignore = () => {};
  *
  * export const cache = {
- *   async set(request, response, proxy) {
+ *   async get(request) {
+ *     return await store.get(request.url).catch(ignore);
+ *   },
+ *   async set(request, response) {
  *     return await store.set(request.url, response).catch(ignore);
  *   }
  * }
