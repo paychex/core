@@ -3,6 +3,8 @@ import merge from 'lodash/merge';
 import isEmpty from 'lodash/isEmpty'
 import identity from 'lodash/identity'
 import isFunction from 'lodash/isFunction'
+import { Subject, Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import indexedDB from './indexedDB';
 import localStore from './localStore';
@@ -35,6 +37,22 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  * @returns {Promise<*>} A promise that will be resolved
  * with the value of the item in storage (or undefined, if
  * the item does not exist), or rejected if an error occurs.
+ * @example
+ * import { rethrow } from '@paychex/core/errors';
+ * import { withPrefix, localStore } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const store = withPrefix(localStore(), user.guid);
+ *
+ * function defaultFalse(result) {
+ *   return (result === undefined) ? false : result;
+ * }
+ *
+ * export async function termsAccepted() {
+ *   return await store.get('terms_accepted')
+ *     .then(defaultFalse)
+ *     .catch(rethrow({ tags: ['legal'] }));
+ * }
  */
 
 /**
@@ -46,6 +64,17 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  * @param {*} value The value to store under the associated key.
  * @returns {Promise} A Promise that will be resolved with the key when the
  * item is stored, or rejected if the storage operation fails.
+ * @example
+ * import { rethrow } from '@paychex/core/errors';
+ * import { withPrefix, localStore } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const store = withPrefix(localStore(), user.guid);
+ *
+ * export async function markTermsAndConditionsRead() {
+ *   return await store.set('terms_accepted', true)
+ *     .catch(rethrow({ tags: ['legal'] }));
+ * }
  */
 
 /**
@@ -57,6 +86,49 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  * @returns {Promise} A Promise that will be resolved when the item
  * is removed from storage successfully _or_ if the item is not found.
  * This promise should only be rejected if the delete operation fails.
+ * @example
+ * import { rethrow } from '@paychex/core/errors';
+ * import { withPrefix, localStore } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const store = withPrefix(localStore(), user.guid);
+ *
+ * export async function resetTermsAndConditions() {
+ *   return await store.delete('terms_accepted')
+ *     .catch(rethrow({ tags: ['legal'] }));
+ * }
+ */
+
+/**
+ * Provides a subscription mechanism to watch for changes to the Store.
+ *
+ * @global
+ * @interface ObservableStore
+ * @extends Store
+ */
+
+/**
+ * Provides change information to {@link ObservableStore} subscribers.
+ *
+ * @global
+ * @typedef {object} ObservableStoreEvent
+ * @property {string} key The key that was modified.
+ * @property {'set'|'delete'} type The type of change that occurred.
+ * @property {any} value The value modified (or `undefined`, if a
+ * delete operation occurred).
+ * @example
+ * import { asObservable, indexedDB } from '@paychex/core/stores';
+ *
+ * export const clients = asObservable(indexedDB({ store: 'clients' }));
+ * clients.observe()
+ */
+
+/**
+ * Provides manipulation and subscription to a stream whose emitted
+ * values can change over time. [Read more...](https://rxjs-dev.firebaseapp.com/api/index/class/Observable)
+ *
+ * @global
+ * @external Observable
  */
 
 /**
@@ -272,6 +344,115 @@ export function asResponseCache(store) {
         set: ifResponseStatus(200, async function set(request, response) {
             return await store.set(request.url, response);
         })
+
+    };
+
+}
+
+/**
+ * Utility method to add observation to a {@link Store} implementation. When
+ * the returned Store implementation's `set` and `delete` methods are invoked,
+ * any observers subscribed to those keys will be notified.
+ *
+ * @param {Store} store The Store implementation to wrap.
+ * @returns {ObservableStore} A Store implementation with a new `observe` method.
+ * @example
+ * import { filter } from 'rxjs/operators';
+ * import { tracker } from '@paychex/landing';
+ * import { rethrow } from '@paychex/core/errors';
+ * import { asObservable, indexedDB } from '@paychex/core/stores';
+ * import { user } from '../data/user';
+ *
+ * const userInfo = asObservable(indexedDB({ store: 'users' }));
+ *
+ * export async function updateUserInfo(guid, userData) {
+ *   return await userInfo.set(guid, userData)
+ *     .catch(rethrow({ guid }));
+ * }
+ *
+ * function userModified(e) {
+ *   return e.type === 'set' && e.key === String(this);
+ * }
+ *
+ * userInfo.observe()
+ *   .pipe(filter(userModified, user.guid))
+ *   .subscribe(function audit(e) {
+ *     tracker.event('user modified', {
+ *       guid: e.key,
+ *       category: 'audit',
+ *     });
+ *   });
+ */
+export function asObservable(store) {
+
+    const subject = new Subject();
+
+    function event(type, key, value) {
+        return { type, key, value };
+    }
+
+    function matches(e) {
+        return this === undefined || e.key === String(this);
+    }
+
+    return {
+
+        ...store,
+
+        set(key, value) {
+            return store.set(key, value)
+                .then((result) => {
+                    subject.next(event('set', key, value));
+                    return result;
+                });
+        },
+
+        delete(key) {
+            return store.delete(key)
+                .then((result) => {
+                    subject.next(event('delete', key));
+                    return result;
+                });
+        },
+
+        /**
+         * Notifies subscribers of changes to the specified key.
+         *
+         * @function ObservableStore#observe
+         * @param {string} [key] Key to watch for changes. If not specified,
+         * observers will be notified of changes to all keys.
+         * @returns {external:Observable<ObservableStoreEvent>} A new Observable instance.
+         * @example
+         * import { filter } from 'rxjs/operators';
+         * import { tracker } from '@paychex/landing';
+         * import { rethrow } from '@paychex/core/errors';
+         * import { asObservable, indexedDB } from '@paychex/core/stores';
+         * import { user } from '../data/user';
+         *
+         * const userInfo = asObservable(indexedDB({ store: 'users' }));
+         *
+         * export async function updateUserInfo(guid, userData) {
+         *   return await userInfo.set(guid, userData)
+         *     .catch(rethrow({ guid }));
+         * }
+         *
+         * function userModified(e) {
+         *   return e.type === 'set' && e.key === String(this);
+         * }
+         *
+         * userInfo.observe()
+         *   .pipe(filter(userModified, user.guid))
+         *   .subscribe(function audit(e) {
+         *     tracker.event('user modified', {
+         *       guid: e.key,
+         *       category: 'audit',
+         *     });
+         *   });
+         */
+        observe(key) {
+            return subject.asObservable()
+                .pipe(filter(matches, key));
+        }
 
     };
 

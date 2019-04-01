@@ -28,3 +28,4 @@ name | description
 [router]{@link module:router} | Ensure URL changes and component navigation are reflected correctly.
 [stores]{@link module:stores} | Provides client-side storage. How long data is persisted for depends on the store type and configuration options.
 [tracker]{@link module:tracker} | Provides event, error, and performance logging for applications.
+[test]{@link module:test} | Provides functionality useful during unit testing.

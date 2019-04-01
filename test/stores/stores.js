@@ -1,6 +1,11 @@
 import expect from 'expect'
 import { spy } from '../utils';
-import { withEncryption, withPrefix, asResponseCache } from '../../stores'
+import {
+    withEncryption,
+    withPrefix,
+    asResponseCache,
+    asObservable
+} from '../../stores'
 
 describe('stores', () => {
 
@@ -250,6 +255,105 @@ describe('stores', () => {
         it('stores 200 responses in cache', async () => {
             return asResponseCache(store).set({}, { status: 200 })
                 .then(() => expect(store.set.called).toBe(true));
+        });
+
+    });
+
+    describe('asObservable', () => {
+
+        let store, wrapped;
+
+        beforeEach(() => {
+            store = {
+                get: spy().returns(Promise.resolve()),
+                set: spy().returns(Promise.resolve()),
+                delete: spy().returns(Promise.resolve())
+            };
+            wrapped = asObservable(store);
+        });
+
+        it('adds observe method', () => {
+            expect('observe' in store).toBe(false);
+            expect(typeof wrapped.observe).toBe('function');
+        });
+
+        describe('set', () => {
+
+            it('passes result through', async () => {
+                store.set.returns(Promise.resolve('abc'));
+                const result = await wrapped.set('key', 'value');
+                expect(store.set.args).toEqual(['key', 'value']);
+                expect(result).toBe('abc');
+            });
+
+            it('emits "set" event', (done) => {
+                wrapped.observe('key').subscribe((e) => {
+                    expect(e).toMatchObject({
+                        key: 'key',
+                        type: 'set',
+                        value: 'value'
+                    });
+                    done();
+                });
+                wrapped.set('key', 'value');
+            });
+
+        });
+
+        describe('delete', () => {
+
+            it('passes result through', async () => {
+                store.delete.returns(Promise.resolve('ok'));
+                const result = await wrapped.delete('key');
+                expect(store.delete.args).toEqual(['key']);
+                expect(result).toBe('ok');
+            });
+
+            it('emits "delete" event', (done) => {
+                wrapped.observe('key').subscribe((e) => {
+                    expect(e).toMatchObject({
+                        key: 'key',
+                        type: 'delete'
+                    });
+                    done();
+                });
+                wrapped.delete('key');
+            });
+
+        });
+
+        describe('observe', () => {
+
+            it('ignores non-matching keys', () => {
+                const observer = spy();
+                wrapped.observe('key').subscribe(observer);
+                wrapped.set('another key', 'value');
+                expect(observer.called).toBe(false);
+            });
+
+            it('returns new Observable each call', () => {
+                const observer1 = wrapped.observe('key');
+                const observer2 = wrapped.observe('key');
+                expect(observer1).not.toBe(observer2);
+            });
+
+            it('notifies for all keys if none specified', async () => {
+                const observer = spy();
+                wrapped.observe().subscribe(observer);
+                await wrapped.set('key', 'value');
+                expect(observer.args[0]).toMatchObject({
+                    key: 'key',
+                    type: 'set',
+                    value: 'value',
+                });
+                await wrapped.set('another key', 'value 2');
+                expect(observer.args[0]).toMatchObject({
+                    key: 'another key',
+                    type: 'set',
+                    value: 'value 2',
+                });
+            });
+
         });
 
     });
