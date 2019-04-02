@@ -41,11 +41,11 @@
  * import { User } from '~/data/schemas';
  * import { setLoading, cue } from '~/data/actions';
  *
- * const userInfoCache = ((key, salt) => {
+ * const userInfoCache = ((key, iv) => {
  *     const store = indexedDB({store: 'userInfo'});
- *     const encrypted = withEncryption(store, {key, salt});
+ *     const encrypted = withEncryption(store, {key, iv});
  *     return asResponseCache(encrypted);
- * })(window.userKey, window.userHash);
+ * })(window.userKey, window.userGuid);
  *
  * const setUserInfo = (user) => ({
  *     type: 'set-user-info',

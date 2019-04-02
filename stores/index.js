@@ -1,13 +1,15 @@
-import aesjs from 'aes-js'
+import sjcl from 'sjcl';
 import merge from 'lodash/merge';
-import isEmpty from 'lodash/isEmpty'
-import identity from 'lodash/identity'
-import isFunction from 'lodash/isFunction'
-import { Subject, Observable } from 'rxjs';
+import isEmpty from 'lodash/isEmpty';
+import memoize from 'lodash/memoize';
+import identity from 'lodash/identity';
+import isFunction from 'lodash/isFunction';
+import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import indexedDB from './indexedDB';
 import localStore from './localStore';
+import memoryStore from './memoryStore';
 import sessionStore from './sessionStore';
 import { ifRequestMethod, ifResponseStatus } from '../data/utils';
 
@@ -156,27 +158,29 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
 /**
  * @global
  * @typedef {Object} EncryptionConfiguration
- * @property {string|number[]} key The private key to use to encrypt
+ * @property {string} key The private key to use to encrypt
  * values in the store. The same key will need to be provided
  * on subsequent encrypted store instantiations, so a value
  * that is unique to the user (and unguessable by other users)
- * is recommended. The string should be base64-encoded; otherwise,
- * a byte array of length 32 can be provided directly.
- * @property {string|number[]} [salt] A fairly unique value that can
- * be used to generate an initialization vector. The same value
- * will need to be provided on subsequent store insantiations,
- * so a value that is unique to the user (such as a GUID) is
- * recommended. A normal UTF8 string is expected, but you can also
- * specify a byte array of length 16. Note: the salt is only
- * needed when the encryption method is 'cbc'.
- * @property {string} [method='cbc'] The encryption
- * method to use to encrypt values in the store. Currently,
- * only 'cbc' or 'ctr' is recommended.
+ * is recommended. Any string of any length can be used.
+ * @property {string} iv The initialization vector to use when
+ * encrypting. Must be at least 7 characters long. The same value
+ * should be provided on subsequent store instantiations, so a
+ * value that is unique to the user (such as a GUID) is recommended.
+ * @example
+ * import { memoryStore } from '@paychex/core/stores';
+ *
+ * const iv = window.crypto.getRandomBytes(new UintArray(16));
+ * const key = window.crypto.getRandomBytes(new UintArray(8));
+ *
+ * export const lockbox = withEncryption(memoryStore(), { key, iv });
  */
 
 /**
  * Wraps a {@link Store} instance so values are encrypted and
- * decrypted transparently when get and set.
+ * decrypted transparently when get and set. For increased security,
+ * the key used to store a value will also be used to salt the given
+ * private key, ensuring each object is stored with a unique key.
  *
  * @param {Store} store Underlying Store instance whose values will
  * be encrypted during `set` calls and decrypted during `get` calls.
@@ -185,15 +189,27 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  * @returns {Store} A Store instance that will encrypt and decrypt
  * values in the underlying store transparently.
  * @example
+ * // random private key and initialization vector
+ *
+ * import { memoryStore } from '@paychex/core/stores';
+ *
+ * const iv = window.crypto.getRandomBytes(new UintArray(16));
+ * const key = window.crypto.getRandomBytes(new UintArray(8));
+ *
+ * export const lockbox = withEncryption(memoryStore(), { key, iv });
+ * @example
+ * // user-specific private key and initialization vector
+ *
  * import { proxy } from 'path/to/proxy';
  * import { indexedDB, withEncryption } from '@paychex/core/stores'
- * import { getUserPrivateKey } from '../data/user';
+ * import { getUserPrivateKey, getUserGUID } from '../data/user';
+ *
+ * const database = indexedDB({ store: 'my-store' });
  *
  * export async function loadData(id) {
- *   const salt = String(id);
+ *   const iv = await getUserGUID();
  *   const key = await getUserPrivateKey();
- *   const database = indexedDB({ store: 'my-store' });
- *   const encrypted = withEncryption(database, { key, salt });
+ *   const encrypted = withEncryption(database, { key, iv });
  *   try {
  *     return await encrypted.get(id);
  *   } catch (e) {
@@ -205,50 +221,39 @@ import { ifRequestMethod, ifResponseStatus } from '../data/utils';
  *   }
  * }
  */
-export function withEncryption(store, { key, salt = undefined, method = 'cbc' }) {
+export function withEncryption(store, { key, iv }) {
 
-    function byteArrayFromBase64(b64) {
-        const chars = Array.from(b64).map(c => c.charCodeAt(0)).slice(-32);
-        const array = new Uint8Array(chars.length);
-        array.set(chars);
-        return array;
-    }
+    const vector = sjcl.codec.utf8String.toBits(iv);
+    const secret = memoize(function generateKey(salt) {
+        return sjcl.misc.pbkdf2(key, salt);
+    });
 
-    const k = typeof key === 'string'
-        ? byteArrayFromBase64(key)
-        : key;
-
-    const iv = method === 'cbc'
-        ? typeof salt === 'string'
-            ? aesjs.utils.utf8.toBytes(new Array(16).join(salt)).slice(-16)
-            : salt
-        : new aesjs.Counter(5);
-
-    async function encrypt(value) {
-        const aes = new aesjs.ModeOfOperation[method](k, iv);
+    async function encrypt(value, salt) {
         const json = JSON.stringify(value);
-        const bytes = aesjs.utils.utf8.toBytes(json);
-        const final = aesjs.padding.pkcs7.pad(bytes);
-        return aesjs.utils.hex.fromBytes(aes.encrypt(final));
+        const bits = sjcl.codec.utf8String.toBits(json);
+        const aes = new sjcl.cipher.aes(secret(salt));
+        const bytes = sjcl.mode.ccm.encrypt(aes, bits, vector);
+        return sjcl.codec.hex.fromBits(bytes);
     }
 
-    async function decrypt(value) {
-        const aes = new aesjs.ModeOfOperation[method](k, iv);
-        const bytes = aes.decrypt(aesjs.utils.hex.toBytes(value));
-        const unpadded = aesjs.padding.pkcs7.strip(bytes);
-        const json = aesjs.utils.utf8.fromBytes(unpadded);
+    async function decrypt(value, salt) {
+        const bytes = sjcl.codec.hex.toBits(value);
+        const aes = new sjcl.cipher.aes(secret(salt));
+        const bits = sjcl.mode.ccm.decrypt(aes, bytes, vector);
+        const json = sjcl.codec.utf8String.fromBits(bits);
         return JSON.parse(json);
     }
 
     return {
 
         async get(key) {
-            return await store.get(key).then(decrypt);
+            const cleartext = data => decrypt(data, key);
+            return await store.get(key).then(cleartext);
         },
 
         async set(key, value) {
             const setInStore = data => store.set(key, data);
-            return await encrypt(value).then(setInStore);
+            return await encrypt(value, key).then(setInStore);
         },
 
         async delete(key) {
@@ -483,6 +488,15 @@ export function asObservable(store) {
 export {
 
     /**
+     * A persistent store whose objects are retained between visits.
+     *
+     * **NOTE**: Objects are serialized to JSON during storage to ensure
+     * any modifications to the original object are not reflected in the
+     * cached copy as a side-effect. Retrieving the cached version will
+     * always reflect the object as it existed at the time of storage.
+     * _However_, some property types cannot be serialized to JSON. For
+     * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+     *
      * @function
      * @param {IndexedDBConfiguration} config Configures
      * the IndexedDB store to be used.
@@ -501,6 +515,17 @@ export {
     indexedDB,
 
     /**
+     * A persistent store whose data will be deleted when the browser
+     * window is closed. However, the data will remain during normal
+     * navigation and refreshes.
+     *
+     * **NOTE**: Objects are serialized to JSON during storage to ensure
+     * any modifications to the original object are not reflected in the
+     * cached copy as a side-effect. Retrieving the cached version will
+     * always reflect the object as it existed at the time of storage.
+     * _However_, some property types cannot be serialized to JSON. For
+     * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+     *
      * @function
      * @returns {Store} A Store backed by the browser's
      * sessionStorage Storage provider.
@@ -517,6 +542,15 @@ export {
     sessionStore,
 
     /**
+     * A persistent store that keeps data between site visits.
+     *
+     * **NOTE**: Objects are serialized to JSON during storage to ensure
+     * any modifications to the original object are not reflected in the
+     * cached copy as a side-effect. Retrieving the cached version will
+     * always reflect the object as it existed at the time of storage.
+     * _However_, some property types cannot be serialized to JSON. For
+     * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+     *
      * @function
      * @returns {Store} A Store backed by the browser's
      * localStorage Storage provider.
@@ -530,7 +564,40 @@ export {
      *   return await persistentData.get('some.key');
      * }
      */
-    localStore
+    localStore,
 
+    /**
+     * An in-memory store whose contents will be cleared each time the
+     * user navigates away from the page or refreshes their browser.
+     *
+     * **NOTE**: Objects are serialized to JSON during storage to ensure
+     * any modifications to the original object are not reflected in the
+     * cached copy as a side-effect. Retrieving the cached version will
+     * always reflect the object as it existed at the time of storage.
+     * _However_, some property types cannot be serialized to JSON. For
+     * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+     *
+     * @function
+     * @returns {Store} A Store that is not persisted. The store will
+     * be cleared when the site is refreshed or navigated away from.
+     * @example
+     * import { rethrow } from '@paychex/core/errors';
+     * import { fetch, createRequest } from '@paychex/landing';
+     * import { memoryStore, asResponseCache } from '@paychex/core/stores';
+     *
+     * const operation = {
+     *   base: 'reports',
+     *   path: 'jobs/:id',
+     *   adapter: '@paychex/rest',
+     *   cache: asResponseCache(memoryStore())
+     * };
+     *
+     * export async function loadData(id) {
+     *   const params = { id };
+     *   const request = createRequest(operation, params);
+     *   return await fetch(request).catch(rethrow(params));
+     * }
+     */
+    memoryStore
 
 }

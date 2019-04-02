@@ -42,6 +42,7 @@
   "dependencies": {
     "lodash": "^4.17.11",
     "query-string": "^6.4.0",
+    "sjcl": "^1.0.8",
     "uuid": "^3.3.2"
   }
 }
