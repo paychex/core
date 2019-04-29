@@ -25,7 +25,6 @@ name | description
 [data]{@link module:data} | Provides methods for creating and configuring a data layer, providing applications the ability to invoke data operations for various endpoints.
 [data/utils]{@link module:data/utils} | Provides utility methods for working with data operations.
 [errors]{@link module:errors} | Provides utility methods for working with Errors.
-[router]{@link module:router} | Ensure URL changes and component navigation are reflected correctly.
 [stores]{@link module:stores} | Provides client-side storage. How long data is persisted for depends on the store type and configuration options.
 [tracker]{@link module:tracker} | Provides event, error, and performance logging for applications.
 [test]{@link module:test} | Provides functionality useful during unit testing.
