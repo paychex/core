@@ -102,16 +102,19 @@ export function spy(name = 'spy') {
 
     let value, err,
         args = [],
+        context = null,
         callCount = 0;
 
-    return Object.defineProperties((...params) => {
+    return Object.defineProperties(function spy(...params) {
         args = params;
+        context = this;
         callCount++;
         if (err) throw err;
         return value;
     }, {
         name: { get: () => name },
         args: { get: () => args },
+        context: { get: () => context },
         called: { get: () => callCount > 0 },
         callCount: { get: () => callCount },
         reset: {

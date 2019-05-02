@@ -22,6 +22,7 @@ The @paychex/core library contains functionality separated into various modules:
 
 name | description
 :--- | :---
+[index]{@link module:index} | Contains utilities that do not fall under any of the other module categories.
 [data]{@link module:data} | Provides methods for creating and configuring a data layer, providing applications the ability to invoke data operations for various endpoints.
 [data/utils]{@link module:data/utils} | Provides utility methods for working with data operations.
 [errors]{@link module:errors} | Provides utility methods for working with Errors.
