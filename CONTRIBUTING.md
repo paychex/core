@@ -20,9 +20,9 @@ If you have written your feature following SRP and O-C principles, you should be
 
 - **Proxy**: wraps an object and returns the same interface
 - **Adapter**: wraps an object and returns a different interface
-- **Decorator**: wraps an object and adds methods to the interface
+- **Decorator**: wraps an object and _adds_ methods to the interface
 
-To assist consumers, the following naming convention should apply to your extension methods: If you are modifying the interface, name your method `as<Feature>`; if you are returning the same interface, name your method `with<Feature>`. In other words, all Proxy wrappers will start with `with` and all Adapter and Decorator wrappers will start with `as`.
+To assist consumers, the following naming convention should apply to your extension methods: If you are _narrowing_ or _changing_ the interface, name your method `as<Feature>`; if you are returning the same or _expanded_ interface, name your method `with<Feature>`. In other words, Proxy and Delegate wrappers typically start with `with` while Adapter wrappers start with `as`.
 
 **IMPORTANT:** Wrapper methods must _never_ modify the original, wrapped object. Imagine if `withEncryption()` modified the underlying `indexedDB()` store -- all other consumers of the store would receive encryption even though they didn't ask for it. New code should not change the behavior of existing code.
 

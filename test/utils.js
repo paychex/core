@@ -50,6 +50,7 @@
  * @property {string} name The name of the spy instance.
  * @property {boolean} called Whether the spy has been invoked.
  * @property {number} callCount The number of times the spy was invoked.
+ * @property {any} context The `this` context in which the spy was invoked.
  * @property {array.<any>} args The last set of arguments the spy was invoked with.
  * @property {SpyReset} reset Returns the spy to its initial state.
  * @property {SpyReturns} returns Returns the specified value when the spy is invoked.

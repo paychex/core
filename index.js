@@ -12,12 +12,8 @@ import defaults from 'lodash/defaults';
  * Provides publish/subscribe functionality.
  *
  * @global
- * @typedef {Object} EventBus
- * @property {SubscribeMethod} on Registers a subscriber for the given event.
- * @property {SubscribeMethod} one Registers a subscriber that will only be invoked once for the given event.
- * @property {FireMethod} fire Fires the given event with optional arguments.
- * @property {PauseMethod} pause Stops notifying subscribers of fired events.
- * @property {ResumeMethod} resume Resumes notifying subscribers of fired events after being paused.
+ * @interface EventBus
+ * @borrows EventBus#on as EventBus#one
  * @example
  * import { eventBus } from '@paychex/core';
  * import { tracker } from '@paychex/landing';
@@ -44,9 +40,7 @@ import defaults from 'lodash/defaults';
 /**
  * Stops notifying subscribers of fired events until {@link ResumeMethod resume} is called.
  *
- * @global
- * @see EventBus
- * @callback PauseMethod
+ * @method EventBus#pause
  * @example
  * import { eventBus } from '@paychex/core';
  *
@@ -64,9 +58,7 @@ import defaults from 'lodash/defaults';
 /**
  * Resumes notifying subscribers after {@link PauseMethod pause} was called.
  *
- * @global
- * @see EventBus
- * @callback ResumeMethod
+ * @method EventBus#resume
  * @example
  * import { eventBus } from '@paychex/core';
  *
@@ -90,9 +82,7 @@ import defaults from 'lodash/defaults';
  * the bus, but any other subscribers will continue to be notified of the
  * initial event.
  *
- * @global
- * @see EventBus
- * @callback FireMethod
+ * @method EventBus#fire
  * @param {string} event The name of the event to fire.
  * @param {...*} [args] Optional arguments to pass to subscribers.
  * @example
@@ -123,9 +113,7 @@ import defaults from 'lodash/defaults';
  * in the context used to create the {@link EventBus} and passed any arguments
  * provided to the {@link FireMethod fire method}.
  *
- * @global
- * @see EventBus
- * @callback SubscribeMethod
+ * @method EventBus#on
  * @param {string} event The name of the event to listen for.
  * @param {Function} subscriber The subscriber to invoke when the event is fired.
  * @returns {Function} Method to invoke to remove the subscriber.
