@@ -99,16 +99,16 @@ export function asFeature( delegate:IDelegate [, options:{[string]: any}] ): IOt
 
 > A decorator modifies the surface API of a single object, often by adding new functionality.
 
-Decorator methods in `@paychex/core` can be identified by their name. Like Adapters, each decorator wrapper starts with the prefix `'as'`:
+Decorator methods in `@paychex/core` can be identified by their name. Like Proxies, each decorator wrapper starts with the prefix `'with'`:
 
-- `asObservable`
+- `withOrdering`
 
-For example, the `asObservable` decorator method wraps a `Store` implementation to add an `observe` method that returns an RxJS [Observable](https://rxjs-dev.firebaseapp.com/api/index/class/Observable). This is a decorator because it extends the underlying Store interface with new methods.
+For example, the `withOrdering` decorator method wraps a `ModelList` implementation to add an `orderBy` method. This is a decorator because it extends the underlying ModelList interface with new methods, _expanding_ the public API.
 
 In general, the Decorator methods in `@paychex/core` have the following signature:
 
 ```text
-export function asFeature( delegate:IDelegate [, options:{[string]: any}] ): IDelegate & IOtherInterface
+export function withFeature( delegate:IDelegate [, options:{[string]: any}] ): IDelegate & IOtherInterface
 ```
 
 ### Patterns & Principles Summary
