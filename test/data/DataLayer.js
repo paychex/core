@@ -211,6 +211,15 @@ describe('DataLayer', () => {
                 expect(request.adapter.called).toBe(true);
             });
 
+            it('calls adapter if cache.get fails', async () => {
+                request.cache = {
+                    set: spy().returns(Promise.reject()),
+                    get: spy().returns(Promise.resolve())
+                }
+                await fetch(request);
+                expect(request.adapter.called).toBe(true);
+            });
+
             it('calls adapter if no cache specified', async () => {
                 await fetch(request);
                 expect(request.adapter.called).toBe(true);
@@ -372,6 +381,21 @@ describe('DataLayer', () => {
                         // ignore
                     } finally {
                         expect(request.retry.called).toBe(true);
+                    }
+                });
+
+                it('does not retry if retry fails', async () => {
+                    request.retry = spy().returns(Promise.reject());
+                    response.status = 0;
+                    response.meta.error = true;
+                    response.meta.timeout = true;
+                    try {
+                        await fetch(request);
+                    } catch (e) {
+                        // ignore
+                    } finally {
+                        expect(request.retry.called).toBe(true);
+                        expect(request.adapter.callCount).toBe(1);
                     }
                 });
 
