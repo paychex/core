@@ -6,6 +6,7 @@ import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
 import identity from 'lodash/identity';
+import uniqBy from 'lodash/uniqBy';
 import negate from 'lodash/negate';
 
 import { eventBus } from '../index';
@@ -95,6 +96,23 @@ function readonly(getter) {
  * });
  *
  * list.remove(2, 3); // "items removed: [2, 3]"
+ */
+
+/**
+ * Fired when a new uniqueness method is specified.
+ *
+ * @event ModelList~UniqueModelList~unique-change
+ * @type {undefined}
+ * @example
+ * import { modelList, withUnique } from '@paychex/core/models';
+ *
+ * const list = withUnique(modelList(1.0, 1.5, 2.0));
+ *
+ * list.on('unique-change', () => {
+ *   console.log('items:', list.items());
+ * });
+ *
+ * list.uniqueBy(Math.floor); // "items: [1.0, 2.0]"
  */
 
 /**
@@ -409,7 +427,6 @@ export function modelList(...elements) {
  * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee} and {@link https://lodash.com/docs/4.17.11#orderBy _.orderBy}
  * @example
  * import { modelList, withOrdering } from '@paychex/core/models';
- * import { cond, conforms, constant, stubTrue } from 'lodash';
  * import { getClientData } from '../data';
  *
  * export async function getClientList() {
@@ -1270,5 +1287,75 @@ export function withPaging(list, num = 50) {
     }, {
         pageCount: readonly(() => numPages)
     });
+
+}
+
+/**
+ * Adds a uniqueness constraint to an existing {@link ModelList}'s items.
+ *
+ * @interface ModelList~UniqueModelList
+ * @mixes ModelList
+ */
+
+/**
+ * Applies a uniqueness constraint to the wrapped {@link ModelList} items.
+ *
+ * @method ModelList~UniqueModelList#uniqueBy
+ * @param {iteratee} [iteratee=identity] Optional iteratee to use as a selector function.
+ * @fires ModelList~UniqueModelList~unique-change
+ * @example
+ * import { modelList, withUnique } from '@paychex/core/models';
+ *
+ * const list = withUnique(modelList());
+ *
+ * list.add(1, 2, 3);
+ * list.items(); // [1, 2, 3]
+ *
+ * list.add(1, 2, 2.5, 3, 4);
+ * list.items(); // [1, 2, 2.5, 3, 4]
+ *
+ * list.uniqueBy(Math.floor);
+ * list.items(); // [1, 2, 3, 4]
+ */
+
+/**
+ * Applies a uniqueness constraint to the specified {@link ModelList}.
+ *
+ * @function
+ * @param {ModelList} list The ModelList instance to apply the uniqueness constraint to.
+ * @param {iteratee} [iteratee=identity] Optional key selector to use for uniqueness.
+ * @returns {ModelList~UniqueModelList} A ModelList with a uniqueness constraint.
+ * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee} and {@link https://lodash.com/docs/4.17.11#uniqBy _.uniqBy}
+ * @example
+ * import { modelList, withUnique } from '@paychex/core/models';
+ * import { getUsers } from '../data/users';
+ *
+ * export async function getUsersList() {
+ *   const users = await getUsers();
+ *   const userList = modelList(...users);
+ *   // NOTE: we can use lodash iteratee shortcuts for our selector; see
+ *   // https://lodash.com/docs/4.17.11#iteratee for more information.
+ *   return withUnique(userList, 'username');
+ * }
+ */
+export function withUnique(list, selector = identity) {
+
+    let unique = selector;
+
+    function uniqueBy(fnUniqBy) {
+        unique = fnUniqBy;
+        list.fire('unique-change');
+    }
+
+    function items() {
+        return uniqBy(list.items(), unique);
+    }
+
+    return {
+        ...list,
+        items,
+        uniqueBy,
+        [Symbol.iterator]: getIterator(items)
+    };
 
 }

@@ -8,6 +8,7 @@ import {
     withGrouping,
     withPaging,
     withActive,
+    withUnique,
 } from '../models';
 
 describe('modelList', () => {
@@ -799,6 +800,44 @@ describe('modelList', () => {
             list.remove(2, 3);
             expect(list.active()).toBe(5);
             expect(list.pageIndex()).toBe(1);
+        });
+
+    });
+
+    describe('withUnique', () => {
+
+        beforeEach(() => list = withUnique(list));
+
+        it('uses identity as default', () => {
+            list.add(1, 2, 3, 2, 1);
+            expect(list.items()).toEqual([1, 2, 3]);
+        });
+
+        it('accepts factory selector', () => {
+            const a = { key: 'a' };
+            const b = { key: 'b' };
+            const c = { key: 'a' };
+            list = withUnique(modelList(), 'key');
+            list.add(a, b, c);
+            expect(list.items()).toEqual([a, b]);
+        });
+
+        it('works with previous list items', () => {
+            const a = { key: 'a' };
+            const b = { key: 'b' };
+            const c = { key: 'a' };
+            list = withUnique(modelList(a, b, c), 'key');
+            expect(list.items()).toEqual([a, b]);
+        });
+
+        it('accepts method selector', () => {
+            const a = { key: 'a' };
+            const b = { key: 'b' };
+            const c = { key: 'a' };
+            list.add(a, b, c);
+            expect(list.items()).toEqual([a, b, c]);
+            list.uniqueBy('key');
+            expect(list.items()).toEqual([a, b]);
         });
 
     });
