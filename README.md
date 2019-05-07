@@ -27,6 +27,7 @@ name | description
 [data/utils]{@link module:data/utils} | Provides utility methods for working with data operations.
 [errors]{@link module:errors} | Provides utility methods for working with Errors.
 [models]{@link module:models} | Provides utilities for working with collections of structured data.
+[process]{@link module:process} | Provides utilities for running complex, asynchronous processes.
 [stores]{@link module:stores} | Provides client-side storage. How long data is persisted for depends on the store type and configuration options.
 [tracker]{@link module:tracker} | Provides event, error, and performance logging for applications.
 [test]{@link module:test} | Provides functionality useful during unit testing.
