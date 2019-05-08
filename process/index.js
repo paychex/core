@@ -9,7 +9,7 @@ import iteratee from 'lodash/iteratee';
 import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 
-import { rethrow, error, ignore } from '../errors';
+import { rethrow, error } from '../errors';
 import { withUnique } from '../models';
 
 /**
@@ -261,7 +261,53 @@ function fork(step) {
     call(step[method], context, ...args);
 }
 
-function run(step, context, initialize = true) {
+/**
+ * Utility method to run a single {@link ProcessStep} in isolation.
+ * This method is used internally by both workflows and state machines
+ * but is made available publicly for unusual situations.
+ *
+ * **NOTE:** The success and failure methods will not be run using this
+ * method since their invocation depends on whether or not a collection
+ * of ProcessSteps has completed successfully. If you want to invoke
+ * the success and failure methods, you should do so manually. See the
+ * example for details.
+ *
+ * @function
+ * @param {ProcessStep} step The ProcessStep whose methods should be invoked.
+ * @param {object} context The context accessed using `this` within a step method.
+ * @param {boolean} [initialize=true] Whether to run the ProcessStep's init method.
+ * @example
+ * import { step, run } from '@paychex/core/process';
+ *
+ * const myStep = step('something', {
+ *   count: 0,
+ *   init() { this.count = 0; },
+ *   execute() {
+ *     console.log(this.args);
+ *     this.count = this.count + 1;
+ *     return this.count * this.factor;
+ *   },
+ *   success() {}, // must be invoked manually
+ *   failure(err) {}, // must be invoked manually
+ * });
+ *
+ * export async function invokeSomething(...args) {
+ *   const context = { args, factor: 3 };
+ *   const promise = run(myStep, context);
+ *   // invoke success and failure methods
+ *   // on separate promise chain than the
+ *   // one we return to callers; we don't
+ *   // care if these fail and we don't want
+ *   // their return values to override the
+ *   // return value from the execute method
+ *   promise.then(
+ *     () => step.success.call(context),
+ *     (err) => step.failure.call(context, err)
+ *   );
+ *   return await promise; // value returned by execute()
+ * }
+ */
+export function run(step, context, initialize = true) {
     const name = step.name;
     const init = initialize && call(step.init, context);
     const fail = rethrow({ step: name });
@@ -380,7 +426,7 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
 
         cancel = function cancel(data = {}) {
             runtimeInfo.cancelled = true;
-            reject(error('Process cancelled.', ignore(data)));
+            reject(error('Process cancelled.', data));
         };
 
         stop = function stop() {
@@ -827,7 +873,7 @@ export function workflow(name, stepList, dependencies = {}) {
  * addSaga(function* saga() {
  *   yield takeEvery('some-action', function* run(action) {
  *     const conditions = action.payload;
- *     yield call(start, 'initial state', conditions);
+ *     yield call(start, 'a', conditions);
  *   });
  * });
  */

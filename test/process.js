@@ -1,6 +1,6 @@
 import expect from 'expect';
 import { spy } from './utils';
-import { IGNORE } from '../errors';
+import { ERROR } from '../errors';
 import { modelList } from '../models';
 import {
     step,
@@ -195,7 +195,7 @@ describe('steps', () => {
             const promise = factory()();
             promise.catch((err) => {
                 expect(err.key).toBe('value');
-                expect(err.severity).toBe(IGNORE);
+                expect(err.severity).toBe(ERROR);
                 expect(err.message).toBe('Process cancelled.');
                 done();
             });
