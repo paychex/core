@@ -60,7 +60,7 @@ function verifyResponse(response) {
  * @property {boolean} [withCredentials=false] Whether to send Cookies with the request.
  * @property {boolean} [compression=false] Whether to gzip the request payload. The server will need to decompress the payload.
  * @property {number} [timeout=0] The number of milliseconds to wait before aborting the data call.
- * @property {object} [headers={accept: 'application/json'}] accept: 'application/json'}` | The HTTP headers to use on the request.
+ * @property {object} [headers={accept: 'application/json'}] The HTTP headers to use on the request.
  * @property {object} [ignore={}] Can be used to skip certain adapter behaviors. See your adapter's documentation for details.
  * @property {RetryFunction} [retry] Determines whether a failed request should be retried.
  * @property {Cache} [cache] Controls caching logic for requests.
