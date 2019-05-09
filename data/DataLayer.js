@@ -538,4 +538,4 @@ export default function createDataLayer({
         setAdapter
     };
 
-};
+}

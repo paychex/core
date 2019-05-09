@@ -73,6 +73,9 @@ function tryMeasure(label, start) {
 /**
  * Method to stop a running timer and create a timer entry.
  *
+ * **NOTE:** This method also creates a [browser performance measure]{@link https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure}
+ * with the label that was passed to {@link Tracker#start start}.
+ *
  * @global
  * @callback TimerStopFunction
  * @param {object.<string,any>} [data] Optional data to include in the timer entry.
@@ -279,8 +282,6 @@ export default function createTracker(subscriber) {
         /**
          * Starts a timer to measure performance.
          *
-         * **NOTE:** This method also creates a [browser performance measure]{@link https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMeasure} with the given message name.
-         *
          * @function
          * @param {string} label The name of the timer to create.
          * @returns {TimerStopFunction} Method to invoke to stop and log the timer.
@@ -299,7 +300,7 @@ export default function createTracker(subscriber) {
             const id = uuid();
             const start = Date.now();
             tryMark(id);
-            return function stop(data) {
+            return function end(data) {
                 const stop = Date.now();
                 const duration = stop - start;
                 tryMeasure(label, id);
