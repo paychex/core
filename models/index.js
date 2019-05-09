@@ -42,11 +42,18 @@ import { eventBus } from '../index';
  * }
  */
 
-function getIterator(factory) {
+function getIterator(items) {
     return function* iterator() {
-        for (let item of factory()) {
+        for (let item of items()) {
             yield item;
         }
+    };
+}
+
+function mixin(items) {
+    return {
+        items,
+        [Symbol.iterator]: getIterator(items)
     };
 }
 
@@ -366,11 +373,10 @@ export function modelList(...elements) {
     add(...elements);
 
     return Object.assign(list, {
-        items,
         add,
         remove,
         clear,
-        [Symbol.iterator]: getIterator(items),
+        ...mixin(items),
         ...bus
     });
 
@@ -463,9 +469,8 @@ export function withOrdering(list, ...args) {
 
     return {
         ...list,
-        items,
+        ...mixin(items),
         orderBy: _setOrderBy,
-        [Symbol.iterator]: getIterator(items),
     };
 
 }
@@ -558,9 +563,8 @@ export function withFiltering(list, filterer = identity) {
 
     return {
         ...list,
-        items,
+        ...mixin(items),
         filterBy,
-        [Symbol.iterator]: getIterator(items),
     };
 
 }
@@ -1278,12 +1282,11 @@ export function withPaging(list, num = 50) {
 
     return Object.defineProperties({
         ...list,
-        items,
+        ...mixin(items),
         pageSize,
         nextPage,
         prevPage,
         pageIndex,
-        [Symbol.iterator]: getIterator(items)
     }, {
         pageCount: readonly(() => numPages)
     });
@@ -1353,9 +1356,8 @@ export function withUnique(list, selector = identity) {
 
     return {
         ...list,
-        items,
+        ...mixin(items),
         uniqueBy,
-        [Symbol.iterator]: getIterator(items)
     };
 
 }
