@@ -9,6 +9,7 @@ import {
     withPaging,
     withActive,
     withUnique,
+    withUpdating,
 } from '../models';
 
 describe('modelList', () => {
@@ -33,6 +34,13 @@ describe('modelList', () => {
         list.add(1, 2, 3);
         expect(handler.context).toBe(list);
         expect(handler.args[0]).toEqual([1, 2, 3]);
+    });
+
+    it('add nothing does not fire items-add', () => {
+        const handler = spy();
+        list.on('items-add', handler);
+        list.add();
+        expect(handler.called).toBe(false);
     });
 
     it('adds factory arguments', () => {
@@ -68,6 +76,13 @@ describe('modelList', () => {
         expect(handler.args[0]).toEqual([2, 3]);
     });
 
+    it('remove nothing does not fire items-remove', () => {
+        const handler = spy();
+        list.on('items-remove', handler);
+        list.remove();
+        expect(handler.called).toBe(false);
+    });
+
     it('clears entire collection', () => {
         list.add(1, 2, 3);
         list.clear();
@@ -81,6 +96,13 @@ describe('modelList', () => {
         list.clear();
         expect(handler.context).toBe(list);
         expect(handler.args[0]).toEqual([1, 2, 3]);
+    });
+
+    it('clear nothing does not fire items-remove', () => {
+        const handler = spy();
+        list.on('items-remove', handler);
+        list.clear();
+        expect(handler.called).toBe(false);
     });
 
     describe('withOrdering', () => {
@@ -839,6 +861,109 @@ describe('modelList', () => {
             list.uniqueBy('key');
             expect(list.items()).toEqual([a, b]);
         });
+
+    });
+
+    describe('withUpdating', () => {
+
+        let a, b, c;
+        beforeEach(() => {
+            list = withUpdating(list, 'key');
+            a = { key: 123, value: 'a' };
+            b = { key: 456, value: 'b' };
+            c = { key: 789, value: 'c' };
+        });
+
+        it('adds expected methods', () => {
+            ['upsert', 'merge', 'uniqueBy'].forEach(method =>
+                expect(typeof list[method]).toBe('function'));
+        });
+
+        it('uses identity if no selector given', () => {
+            list = withUpdating(modelList());
+            list.add(1, 2, 3);
+            list.merge(2, 3);
+            expect(list.items()).toEqual([2, 3]);
+        });
+
+        describe('merge', () => {
+
+            it('delegates to upsert', () => {
+                list.merge(b, c);
+                expect(list.items()).toEqual([b, c]);
+            });
+
+            it('removes old items', () => {
+                list.add(a);
+                list.merge(b, c);
+                expect(list.items()).toEqual([b, c]);
+            });
+
+            it('fires items-remove', () => {
+                const handler = spy();
+                list.on('items-remove', handler);
+                list.add(a);
+                list.merge(b, c);
+                expect(handler.called).toBe(true);
+                expect(handler.args[0]).toEqual([a]);
+            });
+
+        });
+
+        describe('upsert', () => {
+
+            it('adds new items', () => {
+                list.add(a);
+                list.upsert(b, c);
+                expect(list.items()).toEqual([a, b, c]);
+            });
+
+            it('fires items-add', () => {
+                const handler = spy();
+                list.on('items-add', handler);
+                list.add(a);
+                list.upsert(b, c);
+                expect(handler.called).toBe(true);
+                expect(handler.args[0]).toEqual([b, c]);
+            });
+
+            it('updates existing items', () => {
+                const clone = { ...a, value: 'a1' };
+                list.add(a, b, c);
+                list.upsert(clone);
+                expect(list.items()).toEqual([b, c, clone]);
+            });
+
+            it('fires items-update', () => {
+                const handler = spy();
+                const clone = { ...a, value: 'a1' };
+                list.on('items-update', handler);
+                list.add(a, b, c);
+                list.upsert(clone);
+                expect(handler.called).toBe(true);
+                expect(handler.args[0]).toEqual([clone]);
+            });
+
+            it('does not fire items-add for updates', () => {
+                const handler = spy();
+                const clone = { ...a, value: 'a1' };
+                list.add(a, b, c);
+                list.on('items-add', handler);
+                list.upsert(clone);
+                expect(handler.called).toBe(false);
+            });
+
+            it('does not fire items-remove for updates', () => {
+                const handler = spy();
+                const clone = { ...a, value: 'a1' };
+                list.add(a, b, c);
+                list.on('items-remove', handler);
+                list.upsert(clone);
+                expect(handler.called).toBe(false);
+            });
+
+        });
+
 
     });
 

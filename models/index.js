@@ -7,6 +7,8 @@ import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
 import identity from 'lodash/identity';
 import uniqBy from 'lodash/uniqBy';
+import differenceBy from 'lodash/differenceBy';
+import intersectionBy from 'lodash/intersectionBy';
 import negate from 'lodash/negate';
 
 import { eventBus } from '../index';
@@ -232,9 +234,31 @@ function readonly(getter) {
  *   console.log('page changed', pageIndex);
  * });
  *
- * list.add(1, 2, 3);
+ * list.add(...users);
  * list.nextPage(); // "page changed 1"
  * list.prevPage(); // "page changed 0"
+ */
+
+/**
+ * Fired when one or more items in the collection were
+ * updated during an {@link ModelList~UpdatingModelList#upsert upsert}
+ * or {@link ModelList~UpdatingModelList#merge merge} operation.
+ *
+ * @event ModelList~UpdatingModelList~items-update
+ * @type {any[]}
+ * @example
+ * import { modelList, withUpdating } from '@paychex/core/models';
+ * import { newUsers, allUsers, activeUsers } from '../data/users';
+ *
+ * const list = withUpdating(modelList(), 'username');
+ *
+ * list.on('items-update', (modified) => {
+ *   console.log('users updated', modified);
+ * });
+ *
+ * list.add(...newUsers);
+ * list.upsert(...allUsers);
+ * list.merge(...activeUsers);
  */
 
 /**
@@ -354,19 +378,19 @@ export function modelList(...elements) {
 
     function add(...elements) {
         collection = collection.concat(elements);
-        bus.fire('items-add', elements);
+        isEmpty(elements) || bus.fire('items-add', elements);
     }
 
     function remove(...elements) {
         const removed = [];
         collection = collection.filter(removeFrom, { elements, removed });
-        bus.fire('items-remove', removed);
+        isEmpty(removed) || bus.fire('items-remove', removed);
     }
 
     function clear() {
         const removed = items();
         collection.length = 0;
-        bus.fire('items-remove', removed);
+        isEmpty(removed) || bus.fire('items-remove', removed);
     }
 
 
@@ -927,7 +951,7 @@ export function withActive(list) {
  * have been filtered out can not be selected.
  *
  * @method ModelList~SelectionModelList#selected
- * @param {any[]} [items] The items to select. Must be present in the current list.
+ * @param {...any} [items] The items to select. Must be present in the current list.
  * To retrieve the currently selected items, do not pass any arguments.
  * @returns {any[]} The currently selected items.
  * @fires ModelList~SelectionModelList~selection-change
@@ -964,7 +988,7 @@ export function withActive(list) {
  * ```
  *
  * @method ModelList~SelectionModelList#toggle
- * @param {any[]} [items] The items to select or deselect. Must be present
+ * @param {...any} [items] The items to select or deselect. Must be present
  * in the current list. To select or deselect all items, pass no arguments.
  * @returns {any[]} The currently selected items.
  * @fires ModelList~SelectionModelList~selection-change
@@ -1358,6 +1382,125 @@ export function withUnique(list, selector = identity) {
         ...list,
         ...mixin(items),
         uniqueBy,
+    };
+
+}
+
+/**
+ * Adds methods to update a {@link ModelList}'s items based on a more current
+ * collection of items.
+ *
+ * @interface ModelList~UpdatingModelList
+ * @mixes ModelList~UniqueModelList
+ */
+
+/**
+ * Adds or updates items in the underlying collection. Does _not_ remove any
+ * existing items.
+ *
+ * @method ModelList~UpdatingModelList#upsert
+ * @param {...any} [items] The items to add or update in the underlying collection.
+ * @fires ModelList~UpdatingModelList~items-add
+ * @fires ModelList~UpdatingModelList~items-update
+ * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee}
+ * @example
+ * import { modelList, withUpdating } from '@paychex/core/models';
+ *
+ * // our selector can use lodash iteratee
+ * const list = withUpdating(modelList(), 'id');
+ *
+ * list.add({ id: 123, name: 'Alice' });
+ * list.add({ id: 456, name: 'Bob' });
+ *
+ * // update the first entry, keeping the second entry
+ * list.upsert({ id: 123, name: 'Alicia' });
+ */
+
+/**
+ * Adds, updates, _and_ removes items in the underlying collection based on
+ * the incoming items.
+ *
+ * @method ModelList~UpdatingModelList#merge
+ * @param {...any} [items] The items to add or update in the underlying collection.
+ * Any items in the existing collection that are _not_ in the incoming collection
+ * will be removed.
+ * @fires ModelList~items-add
+ * @fires ModelList~items-remove
+ * @fires ModelList~UpdatingModelList~items-update
+ * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee}
+ * @example
+ * import { modelList, withUpdating } from '@paychex/core/models';
+ *
+ * // our selector can use lodash iteratee
+ * const list = withUpdating(modelList(), 'id');
+ * let users = [
+ *   { id: 123, name: 'Alice' },
+ *   { id: 456, name: 'Bob' }
+ * ];
+ *
+ * list.add(...users);
+ *
+ * // update the first entry and REMOVE the second entry
+ * users = [ { id: 123, name: 'Alicia' } ];
+ * list.merge(...users);
+ */
+
+/**
+ * Adds methods to update the underlying collection based on a new collection.
+ *
+ * **NOTE:** This wrapper also invoked {@link module:models.withUnique withUnique}
+ * to ensure that only 1 instance of an item is present in the underlying collection.
+ *
+ * @function
+ * @param {ModelList} list The ModelList to add updating functionality to.
+ * @param {iteratee} [selector=identity] The key selector to use to uniquely
+ * identify elements in the collection.
+ * @returns {ModelList~UpdatingModelList} A ModelList that has various methods
+ * you can invoke to update the underlying collection based on a new collection.
+ * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee} and {@link https://lodash.com/docs/4.17.11#uniqBy _.uniqBy}
+ * @example
+ * import { modelList, withUpdating } from '@paychex/core/models';
+ * import { getUsers } from '../data/users';
+ *
+ * export async function getUsersList() {
+ *   const users = await getUsers();
+ *   const userList = modelList(...users);
+ *   // NOTE: we can use lodash iteratee shortcuts for our selector; see
+ *   // https://lodash.com/docs/4.17.11#iteratee for more information.
+ *   return withUpdating(userList, 'username');
+ * }
+ *
+ * // USAGE:
+ * const list = await getUsersList();
+ * const currentUsers = await getUsers(); // maybe on a poll
+ * list.merge(...currentUsers);
+ */
+export function withUpdating(list, selector = identity) {
+
+    function merge(...items) {
+        const toRemove = differenceBy(list.items(), items, selector);
+        list.remove(...toRemove);
+        upsert(...items);
+    }
+
+    function upsert(...items) {
+        const toAdd = differenceBy(items, list.items(), selector);
+        const toUpdate = intersectionBy(list.items(), items, selector);
+        list.add(...toAdd);
+        if (!isEmpty(toUpdate)) {
+            list.pause();
+            const modified = intersectionBy(items, toUpdate, selector);
+            list.remove(...toUpdate);
+            list.add(...modified);
+            list.resume();
+            list.fire('items-update', modified);
+        }
+    }
+
+    return {
+        ...withUnique(list, selector),
+        merge,
+        upsert
     };
 
 }
