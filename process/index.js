@@ -848,15 +848,15 @@ export function dependencies(deps = {}) {
 /**
  * Creates a {@link ProcessLogic} instance that can be passed to the {@link module:process.process process}
  * method. When started, the process will use the transition criteria to determine which {@link Action actions}
- * can be invoked based on the current set of {@link ProcessContext#conditions conditions} as specified through
- * the {@link ProcessStart start} method's optional 2nd argument _or_ through calls to {@link ExecutionUpdate update}.
+ * can be invoked based on the current set of {@link ProcessContext#conditions conditions} as passed to
+ * the {@link ProcessStart start} method *or* through calls to {@link ExecutionUpdate update}.
  *
  * **NOTE:** A process using transitions logic will not stop until and unless one of the following occurs:
  *  - someone invokes the `stop()` method
  *  - someone invokes the `cancel()` method
  *  - a {@link Action} method throws an Error or returns a rejected Promise
  *
- * This method results in the process running like a _state machine, with one action allowed to run at any
+ * This method results in the process running like a _state machine_, with one action allowed to run at any
  * time and the next action determined using the current conditions and the given transition logic.
  *
  * @function
