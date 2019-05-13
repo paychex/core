@@ -4,8 +4,9 @@ import { ERROR } from '../errors';
 import { modelList } from '../models';
 import {
     action,
-    workflow,
-    stateMachine,
+    dependencies,
+    transitions,
+    process,
 } from '../process';
 
 describe('process', () => {
@@ -48,6 +49,35 @@ describe('process', () => {
         it('mixes in provided members', () => {
             const props = { key: 'value' };
             expect(action('test', props)).toMatchObject(props);
+        });
+
+    });
+
+    describe('dependencies', () => {
+
+        it('uses empty object if none provided', () => {
+            const context = { completed: [], started: [] };
+            const actions = [ { name: 'a' }, { name: 'b' }];
+            const { getInitialActions } = dependencies();
+            expect( getInitialActions(actions, context) ).toEqual(actions);
+        });
+
+    });
+
+    describe('transitions', () => {
+
+        it('uses empty array if none provided', () => {
+            const context = { completed: [], started: [] };
+            const actions = [{ name: 'a' }, { name: 'b' }];
+            const { getInitialActions } = transitions();
+            expect( getInitialActions(actions, context) ).toEqual(actions.slice(0, 1));
+        });
+
+        it('returns empty array if no actions available', () => {
+            const actions = [];
+            const context = { completed: [], started: [] };
+            const { getInitialActions } = transitions();
+            expect( getInitialActions(actions, context) ).toEqual([]);
         });
 
     });
@@ -230,7 +260,7 @@ describe('process', () => {
         return Math.abs(value1 - value2) <= delta;
     }
 
-    describe('workflow', () => {
+    describe('dependencies', () => {
 
         let steps, a, b, c;
 
@@ -254,13 +284,13 @@ describe('process', () => {
 
         sharedTests(
             () => steps,
-            () => workflow('test', steps, series),
-            () => workflow('test', modelList())
+            () => process('test', steps, dependencies(series)),
+            () => process('test', modelList(), dependencies())
         );
 
         it('dispatch passes args through context', () => {
             a.execute = spy();
-            return workflow('test', steps)(123, 'abc')
+            return process('test', steps, dependencies())(123, 'abc')
                 .then(() => expect(a.execute.context.args).toEqual([123, 'abc']));
         });
 
@@ -277,7 +307,7 @@ describe('process', () => {
             });
 
             it('series', () => {
-                const dispatch = workflow('test', steps, series);
+                const dispatch = process('test', steps, dependencies(series));
                 return dispatch().then(() => {
                     expect(time.b - time.a).not.toBeLessThan(5);
                     expect(time.c - time.b).not.toBeLessThan(5);
@@ -286,7 +316,7 @@ describe('process', () => {
             });
 
             it('parallel', () => {
-                const dispatch = workflow('test', steps);
+                const dispatch = process('test', steps, dependencies());
                 return dispatch().then(() => {
                     expect(within(time.a, time.b, 5)).toBe(true);
                     expect(within(time.a, time.c, 5)).toBe(true);
@@ -295,11 +325,11 @@ describe('process', () => {
             });
 
             it('nested parallel', () => {
-                const dispatch = workflow('test', steps, {
+                const dispatch = process('test', steps, dependencies({
                     b: ['a'],
                     c: ['b'],
                     d: ['b']
-                });
+                }));
                 return dispatch().then(() => {
                     expect(time.b - time.a).not.toBeLessThan(5);
                     expect(time.c - time.b).not.toBeLessThan(5);
@@ -309,11 +339,11 @@ describe('process', () => {
             });
 
             it('nested series', () => {
-                const dispatch = workflow('test', steps, {
+                const dispatch = process('test', steps, dependencies({
                     b: ['a'],
                     c: ['a'],
                     d: ['c']
-                });
+                }));
                 return dispatch().then(() => {
                     expect(time.b - time.a).not.toBeLessThan(5);
                     expect(time.c - time.a).not.toBeLessThan(5);
@@ -326,9 +356,9 @@ describe('process', () => {
 
     });
 
-    describe('stateMachine', () => {
+    describe('transitions', () => {
 
-        let states, a, b, c, transitions;
+        let states, a, b, c, criteria;
 
         const delay = (ms, value) => () =>
             new Promise((resolve) =>
@@ -341,7 +371,7 @@ describe('process', () => {
             c = action('c', function() {
                 this.stop();
             });
-            transitions = [
+            criteria = [
                 ['a', 'b'],
                 ['b', 'c']
             ];
@@ -350,14 +380,14 @@ describe('process', () => {
 
         sharedTests(
             () => states,
-            () => stateMachine('test', states, transitions),
-            () => stateMachine('test', modelList())
+            () => process('test', states, transitions(criteria)),
+            () => process('test', modelList(), transitions())
         );
 
         it('start passes conditions through context', () => {
             a.execute = spy();
             const conditions = { key: 'value' };
-            return stateMachine('test', states, transitions)('a', conditions)
+            return process('test', states, transitions(criteria))('a', conditions)
                 .then(() => expect(a.execute.context.conditions).toMatchObject(conditions));
         });
 
@@ -372,7 +402,7 @@ describe('process', () => {
             it('merges conditions into context', () => {
                 b.execute = spy();
                 const conditions = { key: 'value' }
-                const promise = stateMachine('test', states, transitions)();
+                const promise = process('test', states, transitions(criteria))();
                 promise.update(conditions);
                 return promise.then(() =>
                     expect(b.execute.context.conditions).toMatchObject(conditions))
@@ -381,17 +411,17 @@ describe('process', () => {
             it('handles empty conditions', () => {
                 b.execute = spy();
                 const conditions = { key: 'value' }
-                const promise = stateMachine('test', states, transitions)('a', conditions);
+                const promise = process('test', states, transitions(criteria))('a', conditions);
                 promise.update();
                 return promise.then(() =>
                     expect(b.execute.context.conditions).toMatchObject(conditions))
             });
 
             it('goes to next matching state at end of state', () => {
-                const promise = stateMachine('test', states, [
+                const promise = process('test', states, transitions([
                     ['a', 'b'],
                     ['b', 'c', { goTo: 'c' }]
-                ])();
+                ]))();
                 setTimeout(promise.update, 20, { goTo: 'c' });
                 return promise.then(() => {
                     expect(within(time.a, time.b, 20)).toBe(true);
@@ -400,10 +430,10 @@ describe('process', () => {
             });
 
             it('invokes next matching state if not in state', () => {
-                const promise = stateMachine('test', states, [
+                const promise = process('test', states, transitions([
                     ['a', 'b', 'goB'],
                     ['b', 'c', ['goTo', 'c']]
-                ])();
+                ]))();
                 setTimeout(promise.update, 20, { goB: true });
                 setTimeout(promise.update, 40, { goTo: 'c' });
                 return promise.then(() => {
@@ -413,14 +443,13 @@ describe('process', () => {
             });
 
             it('does nothing if no matching state and not in state', () => {
-                const promise = stateMachine('test', states, [
+                const promise = process('test', states, transitions([
                     ['a', 'b'],
                     ['b', 'c', ['goTo', 'c']]
-                ])();
+                ]))();
                 setTimeout(promise.update, 20, { goTo: 'd' });
                 setTimeout(promise.update, 40, { goTo: 'c' });
                 return promise.then(() => {
-                    expect(within(time.a, time.b, 20)).toBe(true);
                     expect(within(time.b, time.c, 25)).toBe(false);
                     expect(within(time.b, time.c, 45)).toBe(true);
                 });
@@ -433,10 +462,10 @@ describe('process', () => {
             it('resolves machine with results', () => {
                 c.execute = spy();
                 b.execute = function() { this.stop() };
-                return stateMachine('test', states, [
+                return process('test', states, transitions([
                     ['a', 'b'],
                     ['b', 'c']
-                ])().then((results) => {
+                ]))().then((results) => {
                     expect(results).toMatchObject({ a: 1 });
                     expect(results.b).toBeUndefined();
                     expect(results.c).toBeUndefined();
@@ -448,10 +477,10 @@ describe('process', () => {
                 a.execute = function() { this.stop() };
                 b.execute = spy();
                 c.execute = spy();
-                const promise = stateMachine('test', states, [
+                const promise = process('test', states, transitions([
                     ['a', 'b', 'goB'],
                     ['b', 'c', 'goC']
-                ])();
+                ]))();
                 return promise.then((results) => {
                     promise.update({ goB: true, goC: true });
                     expect(b.execute.called).toBe(false);
