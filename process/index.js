@@ -33,30 +33,30 @@ const DEFAULTS = {
 const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
 
 /**
- * Encapsulates the business logic for a single step within a multi-step asynchronous process.
+ * Encapsulates the business logic for a single action within a multi-step asynchronous process.
  *
  * @global
- * @interface ProcessStep
- * @see {@link module:process.step step} factory method
+ * @interface Action
+ * @see {@link module:process.action action} factory method
  */
 
 /**
- * The name of the process step. Should be unique within a given process instance.
+ * The name of the process action. Should be unique within a given process instance.
  *
- * @member ProcessStep#name
+ * @member Action#name
  * @type {string}
  */
 
 /**
  * Runs once per process invocation. Can be used to initialize local variables or set up starting conditions.
  *
- * @method ProcessStep#init
+ * @method Action#init
  * @returns {*}
  * @async
  * @example
- * import { step } from '@paychex/core/process';
+ * import { action } from '@paychex/core/process';
  *
- * const multiply = step('multiply', {
+ * const multiply = action('multiply', {
  *   factor: 2,
  *   init() {
  *     // NOTE: args are passed to the
@@ -72,23 +72,23 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  */
 
 /**
- * Performs the bulk of the step's business logic. The value returned from
+ * Performs the bulk of the action's business logic. The value returned from
  * this method (or the resolved value of the Promise returned by this method)
  * will be assigned to the `results` map automatically.
  *
- * If you return a Promise, dependent steps will not be run until the Promise
+ * If you return a Promise, dependent actions will not be run until the Promise
  * has resolved. If the Promise rejects or if the execute method throws an
- * Error, the step's {@link ProcessStep#retry retry} method will be run. If
+ * Error, the action's {@link Action#retry retry} method will be run. If
  * that method throws or rejects, the entire process will be aborted.
  *
- * @method ProcessStep#execute
+ * @method Action#execute
  * @returns {*}
  * @async
  * @example
- * import { step } from '@paychex/core/process';
+ * import { action } from '@paychex/core/process';
  * import { someAsyncOperation } from '../data';
  *
- * const loadData = step('load', {
+ * const loadData = action('load', {
  *   async execute() {
  *     return await someAsyncOperation(...this.args);
  *   }
@@ -96,20 +96,20 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  */
 
 /**
- * This method is invoked if the {@link ProcessStep#execute execute} method throws
+ * This method is invoked if the {@link Action#execute execute} method throws
  * or returns a rejected Promise. If this method also throws or rejects (which is
  * the default behavior) then the entire process will be aborted.
  *
- * @method ProcessStep#retry
- * @param {Error} error The Error raised by the {@link ProcessStep#execute execute} method
+ * @method Action#retry
+ * @param {Error} error The Error raised by the {@link Action#execute execute} method
  *  or returned as the rejection reason of that method's Promise.
  * @returns {*}
  * @async
  * @example
- * import { step } from '@paychex/core/process';
+ * import { action } from '@paychex/core/process';
  * import { someAsyncOperation } from '../data';
  *
- * const loadData = step('load', {
+ * const loadData = action('load', {
  *   errorCount: 0,
  *   init() {
  *     this.errorCount = 0;
@@ -127,19 +127,19 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  */
 
 /**
- * This method is invoked if the step ran but the process was aborted.
+ * This method is invoked if the action ran but the process was aborted.
  * You can use this opportunity to undo any behaviors performed in the
- * {@link ProcessStep#execute execute} method.
+ * {@link Action#execute execute} method.
  *
- * @method ProcessStep#rollback
+ * @method Action#rollback
  * @returns {*}
  * @async
  * @example
- * import { step } from '@paychex/core/process';
+ * import { action } from '@paychex/core/process';
  * import { localStore } from '@paychex/core/stores';
  * import { someAsyncOperation } from '../data';
  *
- * const loadData = step('load', {
+ * const loadData = action('load', {
  *   store: localStore(),
  *   async execute() {
  *     const result = await someAsyncOperation(...this.args);
@@ -153,19 +153,19 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  */
 
 /**
- * This method runs if _any_ step of the process fails (even if this
- * step was not previous executed). It provides a cross-cutting way
- * to respond to errors caused by other steps.
+ * This method runs if _any_ action of the process fails (even if this
+ * action was not previous executed). It provides a cross-cutting way
+ * to respond to errors caused by other actions.
  *
- * @method ProcessStep#failure
+ * @method Action#failure
  * @param {Error} error The Error that failed the process.
  * @returns {*}
  * @async
  * @example
  * import { tracker } from '@paychex/landing';
- * import { step } from '@paychex/core/process';
+ * import { action } from '@paychex/core/process';
  *
- * const logger = step('log process failure', {
+ * const logger = action('log process failure', {
  *   failure(err) {
  *     tracker.error(err);
  *   }
@@ -176,14 +176,14 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  * This method runs if and when the entire process resolves. It provides a
  * cross-cutting way to respond to the overall success of a complex process.
  *
- * @method ProcessStep#success
+ * @method Action#success
  * @returns {*}
  * @async
  * @example
  * import { tracker } from '@paychex/landing';
- * import { step } from '@paychex/core/process';
+ * import { action } from '@paychex/core/process';
  *
- * const logger = step('log process sucess', {
+ * const logger = action('log process sucess', {
  *   success() {
  *     tracker.event(`${this.process} successful`, this.results);
  *   }
@@ -191,16 +191,16 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  */
 
 /**
- * Creates a fully realized {@link ProcessStep} for use within a {@link module:process.stateMachine stateMachine's}
+ * Creates a fully realized {@link Action} for use within a {@link module:process.stateMachine stateMachine's}
  * or {@link module:process.workflow workflow's} internal {@link module:model.modelList modelList}.
  *
  * @function
- * @param {string} name The name of the process step.
- * @param {ProcessStep#execute|ProcessStep} api The execute method or partial {@link ProcessStep} to fill out.
- * @returns {ProcessStep}
+ * @param {string} name The name of the process action.
+ * @param {Action#execute|Action} api The execute method or partial {@link Action} to fill out.
+ * @returns {Action}
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { step, stateMachine } from '@paychex/core/process';
+ * import { action, stateMachine } from '@paychex/core/process';
  *
  * async function loadData() {
  *   // make a data call
@@ -212,20 +212,20 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  *   // to this.results.process
  * }
  *
- * const steps = modelList();
- * steps.add(step('load', loadData));
- * steps.add(step('process', processResults));
+ * const actions = modelList();
+ * actions.add(action('load', loadData));
+ * actions.add(action('process', processResults));
  *
  * // "load" should transition to "process" automatically:
  * const transitions = [ ['load', 'process'] ];
  *
- * export const start = stateMachine('get data', steps, transitions);
+ * export const start = stateMachine('get data', actions, transitions);
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { step, stateMachine } from '@paychex/core/process';
+ * import { action, stateMachine } from '@paychex/core/process';
  *
  * export const start = stateMachine('double', modelList(
- *   step('double', {
+ *   action('double', {
  *     someVariable: 123,
  *     execute() {
  *       return this.someVariable * 2;
@@ -236,7 +236,7 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  *   })
  * ));
  */
-export function step(name, api) {
+export function action(name, api) {
     const base = { name, ...DEFAULTS };
     return isFunction(api) ?
         { ...base, execute: api } :
@@ -256,30 +256,30 @@ function call(method, context, ...args) {
     });
 }
 
-function fork(step) {
+function fork(action) {
     const { method, context, args = [] } = this;
-    call(step[method], context, ...args);
+    call(action[method], context, ...args);
 }
 
 /**
- * Utility method to run a single {@link ProcessStep} in isolation.
+ * Utility method to run a single {@link Action} in isolation.
  * This method is used internally by both workflows and state machines
  * but is made available publicly for unusual situations.
  *
  * **NOTE:** The success and failure methods will not be run using this
  * method since their invocation depends on whether or not a collection
- * of ProcessSteps has completed successfully. If you want to invoke
+ * of Actions has completed successfully. If you want to invoke
  * the success and failure methods, you should do so manually. See the
  * example for details.
  *
  * @function
- * @param {ProcessStep} step The ProcessStep whose methods should be invoked.
- * @param {object} context The context accessed using `this` within a step method.
- * @param {boolean} [initialize=true] Whether to run the ProcessStep's init method.
+ * @param {Action} action The Action whose methods should be invoked.
+ * @param {object} context The context accessed using `this` within an action method.
+ * @param {boolean} [initialize=true] Whether to run the Action's init method.
  * @example
- * import { step, run } from '@paychex/core/process';
+ * import { action, run } from '@paychex/core/process';
  *
- * const myStep = step('something', {
+ * const step = action('something', {
  *   count: 0,
  *   init() { this.count = 0; },
  *   execute() {
@@ -293,7 +293,7 @@ function fork(step) {
  *
  * export async function invokeSomething(...args) {
  *   const context = { args, factor: 3 };
- *   const promise = run(myStep, context);
+ *   const promise = run(step, context);
  *   // invoke success and failure methods
  *   // on separate promise chain than the
  *   // one we return to callers; we don't
@@ -307,14 +307,14 @@ function fork(step) {
  *   return await promise; // value returned by execute()
  * }
  */
-export function run(step, context, initialize = true) {
-    const name = step.name;
-    const init = initialize && call(step.init, context);
-    const fail = rethrow({ step: name });
-    const ctx = { ...context, ...omit(step, IGNORE_KEYS) };
-    const recurse = () => run(step, ctx, false);
-    const execute = () => call(step.execute, ctx);
-    const retry = error => call(step.retry, ctx, error).then(recurse);
+export function run(action, context, initialize = true) {
+    const name = action.name;
+    const init = initialize && call(action.init, context);
+    const fail = rethrow({ action: name });
+    const ctx = { ...context, ...omit(action, IGNORE_KEYS) };
+    const recurse = () => run(action, ctx, false);
+    const execute = () => call(action.execute, ctx);
+    const retry = error => call(action.retry, ctx, error).then(recurse);
     const update = result => context.results[name] = result;
     return Promise.resolve(init)
         .then(execute)
@@ -323,29 +323,29 @@ export function run(step, context, initialize = true) {
         .then(update);
 }
 
-function readyToRun(step) {
+function readyToRun(action) {
     const { dependencies, context: { completed, started } } = this;
-    const name = step.name;
+    const name = action.name;
     const deps = dependencies[name] || [];
     const doneDeps = deps.every(Array.prototype.includes, completed);
     const notStarted = !started.includes(name);
     return notStarted && (doneDeps || isEmpty(deps));
 }
 
-function runStep(step) {
-    const name = step.name;
-    const { steps, context, dependencies, runtimeInfo } = this;
+function runAction(action) {
+    const name = action.name;
+    const { actions, context, dependencies, runtimeInfo } = this;
     context.started.push(name);
-    return run(step, context)
+    return run(action, context)
         .then(() => context.completed.push(name))
-        .then(() => runNextSteps(steps, context, dependencies, runtimeInfo));
+        .then(() => runNextSteps(actions, context, dependencies, runtimeInfo));
 }
 
-function runNextSteps(steps, context, dependencies, runtimeInfo) {
-    const ctx = { steps, context, dependencies, runtimeInfo };
-    const next = steps.filter(readyToRun, ctx);
+function runNextSteps(actions, context, dependencies, runtimeInfo) {
+    const ctx = { actions, context, dependencies, runtimeInfo };
+    const next = actions.filter(readyToRun, ctx);
     if (!runtimeInfo.cancelled && !isEmpty(next))
-        return Promise.all(next.map(runStep, ctx));
+        return Promise.all(next.map(runAction, ctx));
 }
 
 function runState(state) {
@@ -373,7 +373,7 @@ function runNextState(states, context, transitions, runtimeInfo) {
     }
 }
 
-function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
+function execute(name, actions, getInitialPromise, getNextPromise, contextProps) {
 
     function callRollback(err) {
         context.started
@@ -407,7 +407,7 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
         update: readonly(() => update),
     }));
 
-    const states = withUnique(steps, 'name').items();
+    const states = withUnique(actions, 'name').items();
     const runtimeInfo = { active: false, cancelled: false };
 
     const throwError = rethrow(Object.defineProperties({}, {
@@ -450,27 +450,27 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
 }
 
 /**
- * A map of workflow {@link ProcessStep step} names to their dependencies.
+ * A map of workflow {@link Action action} names to their dependencies.
  *
  * @global
  * @typedef {Object} WorkflowDependencies
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { step, workflow } from '@paychex/core/process';
+ * import { action, workflow } from '@paychex/core/process';
  *
  * const dependencies = {
- *   'step b': ['step a'], // step b runs after step a
- *   'step c': ['step b', 'step d'] // step c runs after steps b and d
+ *   'step b': ['step a'], // action b runs after action a
+ *   'step c': ['step b', 'step d'] // action c runs after actions b and d
  * };
  *
- * const steps = modelList(
- *   step('step a', () => console.log('step a run')),
- *   step('step b', () => console.log('step b run')),
- *   step('step c', () => console.log('step c run')),
- *   step('step d', () => console.log('step d run')),
+ * const actions = modelList(
+ *   action('step a', () => console.log('step a run')),
+ *   action('step b', () => console.log('step b run')),
+ *   action('step c', () => console.log('step c run')),
+ *   action('step d', () => console.log('step d run')),
  * );
  *
- * export const dispatch = workflow('my process', steps, dependencies);
+ * export const dispatch = workflow('my process', actions, dependencies);
  */
 
 /**
@@ -485,7 +485,7 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
  */
 
 /**
- * Invoked to stop the running process, immediately rejecting the promise. No further steps will be run.
+ * Invoked to stop the running process, immediately rejecting the promise. No further actions will be run.
  *
  * @global
  * @callback ExecutionCancel
@@ -493,7 +493,7 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
  */
 
 /**
- * Invoked to stop the running process, immediately resolving the promise. No further steps will be run.
+ * Invoked to stop the running process, immediately resolving the promise. No further actions will be run.
  *
  * @global
  * @callback ExecutionStop
@@ -537,56 +537,56 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
 /**
  * Method returned by the {@link module:process.workflow workflow} factory method;
  * used to invoke the workflow. Any arguments passed to dispatch will be made available
- * to each {@link ProcessStep}'s methods through their invocation context (`this.args`).
+ * to each {@link Action}'s methods through their invocation context (`this.args`).
  *
  * @global
  * @callback WorkflowDispatch
- * @param {...any[]} args Optional arguments; will be accessible from within
- * each {@link ProcessStep} method's invocation context (`this.args`).
+ * @param {...any} args Optional arguments; will be accessible from within
+ * each {@link Action} method's invocation context (`this.args`).
  * @returns {ExecutionPromise} A Promise that will be resolved with a map of results
- * or else rejected with the first {@link ProcessStep#execute execute} method
+ * or else rejected with the first {@link Action#execute execute} method
  * that fails. This Promise has special methods to control workflow execution.
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { step, workflow } from '@paychex/core/process';
+ * import { action, workflow } from '@paychex/core/process';
  *
- * const steps = modelList(step('start', {
+ * const actions = modelList(action('start', {
  *   execute() {
  *     console.log('args:', this.args);
  *   }
  * }));
  *
- * export const dispatch = workflow('my workflow', steps);
+ * export const dispatch = workflow('my workflow', actions);
  *
  * // dispatch(123, 'abc'); // args: [123, "abc"]
  */
 
 /**
- * Creates a new {@link WorkflowDispatch} method for the given steps. The workflow steps
+ * Creates a new {@link WorkflowDispatch} method for the given actions. The workflow actions
  * will be run in the correct order as determined from the {@link WorkflowDependencies}
  * provided (or else run immediately and in parallel if no inter-dependencies are specified).
  *
  * @function
  * @param {string} name The name of the workflow. Used in Errors to assist with debugging.
- * @param {ModelList} stepList A ModelList containing the {@link ProcessStep}s to run.
+ * @param {ModelList} actionList A ModelList containing the {@link Action}s to run.
  * @param {WorkflowDependencies} [dependencies={}] An optional map of dependencies
- * between workflow steps.
+ * between workflow actions.
  * @returns {WorkflowDispatch} A method to dispatch the workflow.
  * @example
  * import { rethrow } from '@paychex/core/errors';
  * import { modelList } from '@paychex/core/models';
- * import { step, workflow } from '@paychex/core/process';
+ * import { action, workflow } from '@paychex/core/process';
  *
  * import { loadUserInfo } from '../data/user';
  * import { loadClientData } from '../data/clients';
  *
  * import { start } from '../path/to/machine';
  *
- * const steps = modelList();
+ * const actions = modelList();
  *
- * steps.add(step('loadUserInfo', loadUserInfo));
+ * actions.add(action('loadUserInfo', loadUserInfo));
  *
- * steps.add(step('loadClientData', {
+ * actions.add(action('loadClientData', {
  *   async execute() {
  *     const clientId = this.args[0];
  *     return await loadClientData(clientId)
@@ -594,7 +594,7 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
  *   }
  * }));
  *
- * steps.add(step('merge', {
+ * actions.add(action('merge', {
  *   execute() {
  *     const user = this.results.loadUserInfo;
  *     const clients = this.results.loadClientData;
@@ -602,12 +602,12 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
  *   }
  * }));
  *
- * steps.add(step('eula', function execute() {
+ * actions.add(action('eula', function execute() {
  *   const conditions = this.results;
  *   return start('initial', conditions);
  * }));
  *
- * export const dispatch = workflow('load user clients', steps, {
+ * export const dispatch = workflow('load user clients', actions, {
  *   'eula': ['merge'],
  *   'merge': ['loadUserInfo', 'loadClientData'],
  * });
@@ -619,15 +619,15 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
  *
  * import { addSaga } from '@paychex/landing';
  * import { modelList } from '@paychex/core/models';
- * import { step, workflow } from '@paychex/core/process';
+ * import { action, workflow } from '@paychex/core/process';
  *
- * const steps = modelList(
- *   step('a', () => console.log('a')),
- *   step('b', () => console.log('b')),
- *   step('c', () => console.log('c')),
+ * const actions = modelList(
+ *   action('a', () => console.log('a')),
+ *   action('b', () => console.log('b')),
+ *   action('c', () => console.log('c')),
  * );
  *
- * const dispatch = workflow('saga handler', steps, {
+ * const dispatch = workflow('saga handler', actions, {
  *   b: ['a'],
  *   c: ['b', 'a']
  * });
@@ -638,44 +638,44 @@ function execute(name, steps, getInitialPromise, getNextPromise, contextProps) {
  *   });
  * });
  */
-export function workflow(name, stepList, dependencies = {}) {
+export function workflow(name, actionList, dependencies = {}) {
     return function dispatch(...args) {
 
-        function getInitialPromise(steps, context, runtimeInfo, resolve, reject) {
-            Promise.resolve(runNextSteps(steps, context, dependencies, runtimeInfo))
+        function getInitialPromise(actions, context, runtimeInfo, resolve, reject) {
+            Promise.resolve(runNextSteps(actions, context, dependencies, runtimeInfo))
                 .then(constant(context.results))
                 .then(resolve, reject);
         }
 
-        return execute(name, stepList, getInitialPromise, noop, { args });
+        return execute(name, actionList, getInitialPromise, noop, { args });
 
     };
 }
 
 /**
  * Method returned by the {@link module:process.stateMachine stateMachine} factory method; used
- * to start the state machine at a specific step and with optional initial conditions. The conditions
- * can be accessed by each {@link ProcessStep} method's invocation context (`this.conditions`).
+ * to start the state machine at a specific action and with optional initial conditions. The conditions
+ * can be accessed by each {@link Action} method's invocation context (`this.conditions`).
  *
  * @global
  * @callback MachineStart
- * @param {string} [start] The initial step to run. If not provided, the first step in the machine's
- * list of {@link ProcessStep}s will be used as the start step.
+ * @param {string} [start] The initial action to run. If not provided, the first action in the machine's
+ * list of {@link Action}s will be used as the start action.
  * @param {object} [conditions={}] The optional initial conditions of the machine. Conditions
  * are run against the {@link MachineTransitions} specified during machine creation to determine
  * which state to transition to each time the current state ends.
  * @returns {ExecutionPromise} A Promise that will be resolved with a map of results
- * or else rejected with the first {@link ProcessStep#execute execute} method
+ * or else rejected with the first {@link Action#execute execute} method
  * that fails. This Promise has special methods to control workflow execution.
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { step, stateMachine } from '@paychex/core/process';
+ * import { action, stateMachine } from '@paychex/core/process';
  *
  * const states = modelList();
  *
- * states.add(step('start', () => console.log('start')));
- * states.add(step('next',  () => console.log('next')));
- * states.add(step('stop',  () => console.log('stop')));
+ * states.add(action('start', () => console.log('start')));
+ * states.add(action('next',  () => console.log('next')));
+ * states.add(action('stop',  () => console.log('stop')));
  *
  * const transitions = [
  *   ['start', 'next'],
@@ -695,7 +695,7 @@ export function workflow(name, stepList, dependencies = {}) {
  * @typedef {Array} MachineTransition
  * @see lodash {@link https://lodash.com/docs/4.17.11#iteratee iteratee} options
  * @example
- * // automatic transition when first step ends
+ * // automatic transition when first action ends
  * const transition = ['from step', 'to step'];
  * @example
  * // transition if the machine's current conditions match this set
@@ -737,7 +737,7 @@ export function workflow(name, stepList, dependencies = {}) {
  *
  * const transitions = [
  *
- *   // automatic transition when first step ends
+ *   // automatic transition when first action ends
  *   ['from step', 'to step'],
  *
  *   // transition if the machine's current conditions match this set
@@ -769,35 +769,35 @@ export function workflow(name, stepList, dependencies = {}) {
  */
 
 /**
- * Creates a new {@link MachineStart} method for the given steps. The machine steps will be
- * invoked one at a time, starting with the provided start step. When each step ends, the next
- * step to invoke will be chosen based on the current set of machine conditions as matched against
+ * Creates a new {@link MachineStart} method for the given actions. The machine actions will be
+ * invoked one at a time, starting with the provided start action. When each action ends, the next
+ * action to invoke will be chosen based on the current set of machine conditions as matched against
  * the provided {@link MachineTransitions transition criteria}.
  *
  * **NOTE:** A machine will not stop until and unless one of the following occurs:
  *  - someone invokes the `stop()` method
  *  - someone invokes the `cancel()` method
- *  - a {@link ProcessStep} method throws an Error or returns a rejected Promise
+ *  - a {@link Action} method throws an Error or returns a rejected Promise
  *
  * @function
  * @param {string} name The name of the state machine. Used in Errors to assist with debugging.
- * @param {ModelList} stateList A ModelList instance containing the machine {@link ProcessStep steps}.
+ * @param {ModelList} actionList A ModelList instance containing the machine {@link Action actions}.
  * @param {MachineTransitions} [transitions=[]] Optional transitions between states.
  * @returns {MachineStart} A method to start the state machine.
  * @example
  * import { tracker } from '@paychex/landing';
  * import { modelList } from '@paychex/core/models';
- * import { step, stateMachine } from '@paychex/core/process';
+ * import { action, stateMachine } from '@paychex/core/process';
  * import { rethrow, fatal, ignore } from '@paychex/core/errors';
  *
  * import { showDialog } from '../some/dialog';
  * import { dispatch } from '../some/workflow';
  *
- * const states = modelList();
+ * const actions = modelList();
  *
  * // if no start state is explicitly passed to the start()
- * // method then this first step will be used automatically
- * states.add(step('start', {
+ * // method then this first action will be used automatically
+ * actions.add(action('start', {
  *   success() {
  *     tracker.event(`${this.process} succeeded`);
  *   },
@@ -807,20 +807,20 @@ export function workflow(name, stepList, dependencies = {}) {
  *   }
  * }));
  *
- * states.add(step('show dialog', {
+ * actions.add(action('show dialog', {
  *   execute() {
  *     return showDialog('accept.cookies');
  *   }
  * }));
  *
- * // we can dispatch a workflow in one of our steps
- * states.add(step('run workflow', function execute() {
+ * // we can dispatch a workflow in one of our actions
+ * actions.add(action('run workflow', function execute() {
  *   const cookiesEnabled = this.results['show dialog'];
  *   const ignoreError = rethrow(ignore({ cookiesEnabled }));
  *   return dispatch(cookiesEnabled).catch(ignoreError);
  * }));
  *
- * states.add(step('stop', function() {
+ * actions.add(action('stop', function() {
  *   this.stop(); // stop the machine
  * }));
  *
@@ -850,22 +850,22 @@ export function workflow(name, stepList, dependencies = {}) {
  *
  * ];
  *
- * export const start = stateMachine('intro', states, transitions);
+ * export const start = stateMachine('intro', actions, transitions);
  * @example
  * // state machine used within a saga
  * import { call, takeEvery } from 'redux-saga/effects';
  *
  * import { addSaga } from '@paychex/landing';
  * import { modelList } from '@paychex/core/models';
- * import { step, machine } from '@paychex/core/process';
+ * import { action, machine } from '@paychex/core/process';
  *
- * const steps = modelList(
- *   step('a', () => console.log('a')),
- *   step('b', () => console.log('b')),
- *   step('c', function() { this.stop(); }),
+ * const actions = modelList(
+ *   action('a', () => console.log('a')),
+ *   action('b', () => console.log('b')),
+ *   action('c', function() { this.stop(); }),
  * );
  *
- * const start = machine('saga handler', steps, [
+ * const start = machine('saga handler', actions, [
  *   ['a', 'b'],
  *   ['b', 'c']
  * ]);
@@ -877,7 +877,7 @@ export function workflow(name, stepList, dependencies = {}) {
  *   });
  * });
  */
-export function stateMachine(name, stateList, transitions = []) {
+export function stateMachine(name, actionList, transitions = []) {
     return function start(state, conditions = {}) {
 
         function getInitialPromise(states, context, runtimeInfo, _, reject) {
@@ -891,7 +891,7 @@ export function stateMachine(name, stateList, transitions = []) {
                 .catch(reject);
         }
 
-        return execute(name, stateList, getInitialPromise, getNextPromise, { conditions });
+        return execute(name, actionList, getInitialPromise, getNextPromise, { conditions });
 
     };
 }

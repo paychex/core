@@ -3,20 +3,20 @@ import { spy } from './utils';
 import { ERROR } from '../errors';
 import { modelList } from '../models';
 import {
-    step,
+    action,
     workflow,
     stateMachine,
 } from '../process';
 
-describe('steps', () => {
+describe('process', () => {
 
     let time;
     beforeEach(() => time = {});
 
-    describe('step', () => {
+    describe('action', () => {
 
         it('assigns default methods', () => {
-            const item = step('test');
+            const item = action('test');
             expect(item.name).toBe('test');
             ['init', 'execute', 'retry', 'rollback', 'success', 'failure']
                 .forEach(method => expect(typeof item[method]).toBe('function'));
@@ -24,7 +24,7 @@ describe('steps', () => {
 
         it('retry propagates rejection by default', (done) => {
             const error = new Error();
-            const item = step('test');
+            const item = action('test');
             item.retry(error).catch((e) => {
                 expect(e).toBe(error);
                 done();
@@ -34,20 +34,20 @@ describe('steps', () => {
         it('mixes in provided methods', () => {
             const retry = spy();
             const rollback = spy();
-            const item = step('test', { retry, rollback });
+            const item = action('test', { retry, rollback });
             expect(item.retry).toBe(retry);
             expect(item.rollback).toBe(rollback);
         });
 
         it('assumes function is execute method', () => {
             const exec = spy();
-            const item = step('test', exec);
+            const item = action('test', exec);
             expect(item.execute).toBe(exec);
         });
 
         it('mixes in provided members', () => {
             const props = { key: 'value' };
-            expect(step('test', props)).toMatchObject(props);
+            expect(action('test', props)).toMatchObject(props);
         });
 
     });
@@ -106,7 +106,7 @@ describe('steps', () => {
             a.execute = spy().throws(new Error('failed'));
             factory()().catch((err) => {
                 expect(err.completed).toEqual([]);
-                expect(err.step).toBe('a');
+                expect(err.action).toBe('a');
                 expect(err.running).toContain('a');
                 expect(err.process).toBe('test');
                 expect(err.message).toBe('failed');
@@ -246,9 +246,9 @@ describe('steps', () => {
 
         beforeEach(() => {
             steps = modelList();
-            a = step('a', delay(10, 1));
-            b = step('b', delay(10, 2));
-            c = step('c', delay(10, 3));
+            a = action('a', delay(10, 1));
+            b = action('b', delay(10, 2));
+            c = action('c', delay(10, 3));
             steps.add(a, b, c);
         });
 
@@ -267,7 +267,7 @@ describe('steps', () => {
         describe('dependencies', () => {
 
             let d;
-            beforeEach(() => steps.add(d = step('d', delay(10, 4))));
+            beforeEach(() => steps.add(d = action('d', delay(10, 4))));
 
             beforeEach(() => {
                 a.execute = timestamp(a.execute, 'a');
@@ -336,9 +336,9 @@ describe('steps', () => {
 
         beforeEach(() => {
             states = modelList();
-            a = step('a', delay(10, 1));
-            b = step('b', delay(10, 2));
-            c = step('c', function() {
+            a = action('a', delay(10, 1));
+            b = action('b', delay(10, 2));
+            c = action('c', function() {
                 this.stop();
             });
             transitions = [
