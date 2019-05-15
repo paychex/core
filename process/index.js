@@ -6,7 +6,9 @@ import keys from 'lodash/keys';
 import without from 'lodash/without';
 import iteratee from 'lodash/iteratee';
 import isEmpty from 'lodash/isEmpty';
+import isString from 'lodash/isString';
 import isFunction from 'lodash/isFunction';
+import isPlainObject from 'lodash/isPlainObject';
 
 import { withUnique } from '../models';
 import { rethrow, error } from '../errors';
@@ -888,6 +890,9 @@ export function dependencies(deps = {}) {
  * start();
  * start('next');
  * start('stop', { initial: 'conditions' });
+ * // you can also just provide initial conditions;
+ * // the first action will still be used as the start action
+ * start({ initial: 'conditions' });
  */
 export function transitions(criteria = []) {
 
@@ -909,8 +914,8 @@ export function transitions(criteria = []) {
     }
 
     function contextFromArgs(args) {
-        const start = args.shift();
-        const conditions = args.shift() || {};
+        const start = args.find(isString);
+        const conditions = args.find(isPlainObject) || {};
         return { start, conditions };
     }
 
