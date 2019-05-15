@@ -48,6 +48,7 @@
  *
  * @typedef {object} Spy
  * @property {string} name The name of the spy instance.
+ * @property {array} calls Array of call data.
  * @property {boolean} called Whether the spy has been invoked.
  * @property {number} callCount The number of times the spy was invoked.
  * @property {any} context The `this` context in which the spy was invoked.
@@ -102,22 +103,24 @@
 export function spy(name = 'spy') {
 
     let value, err,
-        args = [],
-        context = null,
-        callCount = 0;
+        calls = [];
 
-    return Object.defineProperties(function spy(...params) {
-        args = params;
-        context = this;
-        callCount++;
+    return Object.defineProperties(function spy(...args) {
+        const data = {
+            args,
+            context: this
+        };
+        calls.push(data);
+        calls.mostRecent = () => data;
         if (err) throw err;
         return value;
     }, {
         name: { get: () => name },
-        args: { get: () => args },
-        context: { get: () => context },
-        called: { get: () => callCount > 0 },
-        callCount: { get: () => callCount },
+        calls: { get: () => calls },
+        args: { get: () => calls.mostRecent().args },
+        context: { get: () => calls.mostRecent().context },
+        called: { get: () => calls.length > 0 },
+        callCount: { get: () => calls.length },
         reset: {
             configurable: false,
             writable: false,
