@@ -31,6 +31,7 @@ function withoutMatchObject(rule) {
  * object with an additional property `match` that specifies the property values on a Request
  * instance that must match in order for the rule to be applied.
  *
+ * @global
  * @typedef {Object} ProxyRule
  * @alias ProxyRule
  * @mixes Request
@@ -49,7 +50,18 @@ function withoutMatchObject(rule) {
  * @interface Proxy
  */
 
-export default function createProxy() {
+/**
+* Creates a new proxy instance.
+*
+* @function module:data.createProxy
+* @returns {Proxy}
+* @example
+* import {createProxy} from '@paychex/data'
+* import rules from '~/config/proxy'
+* export const proxy = createProxy();
+* proxy.use(rules);
+*/
+export function createProxy() {
 
     const config = [];
 
@@ -63,7 +75,7 @@ export default function createProxy() {
          * @returns {string} A URL with the appropriate protocol, host, port, and paths
          * given the currently configured proxy rules.
          * @example
-         * import { proxy } from '@paychex/landing/data';
+         * import { proxy } from '~/path/to/data';
          * import { tokenize } from '@paychex/core/data';
          *
          * proxy.use({
@@ -108,11 +120,11 @@ export default function createProxy() {
          * to determine which proxy rules should be used to determine the version.
          * @returns {Request} The input Request object, with properties modified according
          * to the matching Proxy rules.
-         * @see {@link DataLayer#createRequest|createRequest} &mdash; invokes the apply
+         * @see {@link DataLayer#createRequest createRequest} &mdash; invokes the apply
          * method for you
          * @example
-         * import { throwIfSeverity } from '@paychex/core/data/utils';
-         * import { proxy, createRequest, fetch } from '@paychex/landing/data';
+         * import { rethrow, fatal } from '@paychex/core/errors';
+         * import { proxy, createRequest, fetch } from '~/path/to/data';
          * import switches from '../config/features';
          *
          * if (switches.useV2endpoint) {
@@ -139,8 +151,9 @@ export default function createProxy() {
          *     path: '/endpoint',
          *     method: 'POST'
          *   });
-         *   return fetch(request)
-         *     .then(throwIfSeverity('FATAL'));
+         *   const response = fetch(request)
+         *     .then(rethrow(fatal()));
+         *   return response.data;
          * }
          */
         apply(request) {
@@ -155,9 +168,9 @@ export default function createProxy() {
          * the order they are applied.
          * @param {(...ProxyRule|ProxyRule[])} rules The rules to use to configure this proxy instance.
          * @example
-         * import { proxy } from '@paychex/landing/data';
+         * import { proxy } from '~/path/to/data';
          *
-         * // any {@link Request|Requests} with base == 'paychex-cloud'
+         * // any {@link Request Requests} with base == 'paychex-cloud'
          * // will be routed to https://ecs.cloud.paychex.com:8118
          * proxy.use({
          *   port: 8118,

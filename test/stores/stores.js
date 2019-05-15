@@ -3,7 +3,7 @@ import { spy } from '../utils';
 import {
     withEncryption,
     withPrefix,
-    asResponseCache,
+    asDataCache,
     asObservable
 } from '../../stores'
 import { randomBytes } from 'crypto';
@@ -108,7 +108,7 @@ describe('stores', () => {
 
     });
 
-    describe('asResponseCache', () => {
+    describe('asDataCache', () => {
 
         let store;
 
@@ -119,46 +119,29 @@ describe('stores', () => {
             };
         });
 
-        it('ignores non-GET requests', async () => {
-            return asResponseCache(store).get({method: 'POST'})
-                .then(() => expect(store.get.called).toBe(false));
-        });
-
         it('uses request url as key', async () => {
             const request = {
                 method: 'GET',
                 url: 'http://url.com/path'
             };
-            return asResponseCache(store).get(request)
+            return asDataCache(store).get(request)
                 .then(() => {
                     expect(store.get.called).toBe(true);
                     expect(store.get.args[0]).toBe(request.url);
                 });
         });
 
-        it('sets meta.cached to true if value was cached', async () => {
-            const cached = { meta: { cached: true } };
-            store.get.returns({ meta: {} });
-            return asResponseCache(store).get({
+        it('retrieves cached values', async () => {
+            const cached = {};
+            store.get.returns(cached);
+            return asDataCache(store).get({
                 method: 'GET',
                 url: 'http://url.com/path'
             }).then(response => expect(response).toMatchObject(cached));
         });
 
-        it('does not set meta.cached if value not cached', async () => {
-            return asResponseCache(store).get({
-                method: 'GET',
-                url: 'http://url.com/path'
-            }).then(response => expect(response).toBeUndefined());
-        });
-
-        it('ignores non-200 responses', async () => {
-            return asResponseCache(store).set({}, { status: 401 })
-                .then(() => expect(store.set.called).toBe(false));
-        });
-
-        it('stores 200 responses in cache', async () => {
-            return asResponseCache(store).set({}, { status: 200 })
+        it('stores responses in cache', async () => {
+            return asDataCache(store).set({}, { status: 200 })
                 .then(() => expect(store.set.called).toBe(true));
         });
 

@@ -18,7 +18,7 @@ import { eventBus } from '../index';
  *
  * @module models
  * @example
- * import { createRequest, fetch } from '@paychex/landing/data';
+ * import { createRequest, fetch } from '~/path/to/data';
  * import { modelList, withOrdering } from '@paychex/core/models';
  *
  * const getUserReports = {
@@ -38,7 +38,7 @@ import { eventBus } from '../index';
  *
  * export async function getReports(user) {
  *   const request = createRequest(getUserReports, { user });
- *   const reportList = await fetch(request);
+ *   const reportList = await fetch(request).data;
  *   // order reports newest first and then by name
  *   return withOrdering(reportList, ['date', 'name'], ['desc', 'asc']);
  * }
@@ -267,14 +267,14 @@ function readonly(getter) {
  * @mixes EventBus
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { createRequest, fetch } from '@paychex/landing/data';
+ * import { createRequest, fetch } from '~/path/to/data';
  *
  * import { loadClientData } from '../data';
  *
  * export async function createClientDataModel(client) {
  *   const request = createRequest(loadClientData, { client });
- *   const results = await fetch(request);
- *   return modelList(...results); // spread values
+ *   const response = await fetch(request);
+ *   return modelList(...response.data); // spread values
  * }
  */
 
@@ -355,14 +355,14 @@ function readonly(getter) {
  * export const filledModel = createModelList(1, 2, 3);
  * @example
  * import { modelList } from '@paychex/core/models';
- * import { createRequest, fetch } from '@paychex/landing/data';
+ * import { createRequest, fetch } from '~/path/to/data';
  *
  * import { loadClientData } from '../data';
  *
  * export async function createClientDataModel(client) {
  *   const request = createRequest(loadClientData, { client });
- *   const results = await fetch(request);
- *   return modelList(...results); // spread values
+ *   const response = await fetch(request);
+ *   return modelList(...results.data); // spread values
  * }
  */
 export function modelList(...elements) {

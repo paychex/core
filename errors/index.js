@@ -123,13 +123,14 @@ export const IGNORE = 'NONE';
  * }
  * @example
  * import { rethrow, fatal } from '@paychex/core/errors';
- * import { fetch, createRequest } from '@paychex/landing/data';
+ * import { fetch, createRequest } from '~/path/to/data';
  * import { loadClientOperation } from '../data/clients';
  *
  * export async function loadClientData(clientId) {
  *   const params = { clientId };
  *   const request = createRequest(loadClientOperation, params);
- *   return await fetch(request).catch(rethrow(fatal(params)));
+ *   const response = await fetch(request).catch(rethrow(fatal(params)));
+ *   return response.data;
  * }
  */
 export const rethrow = curry(function throwWithProps() {
@@ -193,13 +194,14 @@ export function error(message, data = {}) {
  * }
  * @example
  * import { rethrow, fatal } from '@paychex/core/errors';
- * import { fetch, createRequest } from '@paychex/landing/data';
+ * import { fetch, createRequest } from '~/path/to/data';
  * import { loadClientOperation } from '../data/clients';
  *
  * export async function loadClientData(clientId) {
  *   const params = { clientId };
  *   const request = createRequest(loadClientOperation, params);
- *   return await fetch(request).catch(rethrow(fatal(params)));
+ *   const response = await fetch(request).catch(rethrow(fatal(params)));
+ *   return response.data;
  * }
  */
 export function fatal(data = {}) {

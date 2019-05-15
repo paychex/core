@@ -16,7 +16,7 @@ import defaults from 'lodash/defaults';
  * @borrows EventBus#on as EventBus#one
  * @example
  * import { eventBus } from '@paychex/core';
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  *
  * const bus = eventBus();
  *
@@ -87,7 +87,7 @@ import defaults from 'lodash/defaults';
  * @param {...*} [args] Optional arguments to pass to subscribers.
  * @example
  * import { eventBus } from '@paychex/core';
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  *
  * const bus = eventBus();
  *
@@ -142,7 +142,7 @@ import defaults from 'lodash/defaults';
  * @returns {EventBus} An EventBus that provides publish/subscribe functionality.
  * @example
  * import { eventBus } from '@paychex/core';
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  *
  * const bus = eventBus();
  *

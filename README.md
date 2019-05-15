@@ -24,7 +24,7 @@ name | description
 :--- | :---
 [index]{@link module:index} | Contains utilities that do not fall under any of the other module categories.
 [data]{@link module:data} | Provides methods for creating and configuring a data layer, providing applications the ability to invoke data operations for various endpoints.
-[data/utils]{@link module:data/utils} | Provides utility methods for working with data operations.
+[data/utils]{@link module:data/utils} | Functionality used to customize a DataLayer pipeline.
 [errors]{@link module:errors} | Provides utility methods for working with Errors.
 [models]{@link module:models} | Provides utilities for working with collections of structured data.
 [process]{@link module:process} | Provides utilities for running complex, asynchronous processes.

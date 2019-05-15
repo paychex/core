@@ -60,7 +60,7 @@ function tryMeasure(label, start) {
  * });
  * @example
  * import createTracker from '@paychex/core/tracker';
- * import { store } from '@paychex/landing/actions';
+ * import { store } from '~/path/to/actions';
  *
  * const tracker = createTracker((info) => {
  *   store.dispatch({
@@ -141,8 +141,8 @@ export default function createTracker(subscriber) {
          * @function
          * @returns {string} A [RFC 4122 v4 UUID]{@link https://tools.ietf.org/html/rfc4122#section-4.4}
          * @example
-         * import { tracker } from '@paychex/landing';
-         * import { proxy } from '@paychex/landing/data';
+         * import { tracker } from '~/tracking';
+         * import { proxy } from '~/path/to/data';
          *
          * proxy.use({
          *   headers: {
@@ -163,7 +163,7 @@ export default function createTracker(subscriber) {
          * root subscriber of {@link TrackingInfo} entries, mixing in ancestor
          * contextual data as needed.
          * @example
-         * import { tracker } from '@paychex/landing';
+         * import { tracker } from '~/tracking';
          *
          * // this tracker will inherit any context data
          * // set in landing's tracker while also mixing
@@ -190,7 +190,7 @@ export default function createTracker(subscriber) {
          * methods.
          * @example
          * import get from 'lodash/get';
-         * import { store, tracker } from '@paychex/landing';
+         * import { store, tracker } from '~/tracking';
          *
          * store.subscribe(() => {
          *   const state = store.getState();
@@ -213,7 +213,7 @@ export default function createTracker(subscriber) {
          * @param {string} message The name of the event to log.
          * @param {object.<string, any>} [data] Optional information to associate with this {@link TrackingInfo}.
          * @example
-         * import { tracker } from '@paychex/landing';
+         * import { tracker } from '~/tracking';
          *
          * window.addEventListener('click', (e) => {
          *   if (e.target.matches('button, a')) {
@@ -249,7 +249,7 @@ export default function createTracker(subscriber) {
          * @function
          * @param {Error} err The Error instance to log.
          * @example
-         * import { tracker } from '@paychex/landing';
+         * import { tracker } from '~/tracking';
          * import { rethrow } from '@paychex/core/errors';
          *
          * export function doSomething(param) {
@@ -286,7 +286,7 @@ export default function createTracker(subscriber) {
          * @param {string} label The name of the timer to create.
          * @returns {TimerStopFunction} Method to invoke to stop and log the timer.
          * @example
-         * import { tracker } from '@paychex/landing';
+         * import { tracker } from '~/tracking';
          *
          * export async function doSomething(param) {
          *   const stop = tracker.start('doSomething');
@@ -335,7 +335,7 @@ export default function createTracker(subscriber) {
  * @example
  * // invalid timing entry
  *
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  * import { withNesting } from '@paychex/core/tracking';
  *
  * const nested = withNesting(tracker);
@@ -362,7 +362,7 @@ export default function createTracker(subscriber) {
  * @example
  * // nested timings
  *
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  * import { withNesting } from '@paychex/core/tracking';
  *
  * const nested = withNesting(tracker);

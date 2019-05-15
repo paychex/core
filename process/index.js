@@ -203,7 +203,7 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  * @this ProcessContext
  * @async
  * @example
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  * import { action } from '@paychex/core/process';
  *
  * const logger = action('log process failure', {
@@ -222,7 +222,7 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  * @async
  * @this ProcessContext
  * @example
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  * import { action } from '@paychex/core/process';
  *
  * const logger = action('log process sucess', {
@@ -560,7 +560,7 @@ export function run(action, context, initialize = true) {
  * // USAGE: dispatch(clientId);
  * @example
  * // state machine
- * import { tracker } from '@paychex/landing';
+ * import { tracker } from '~/tracking';
  * import { modelList } from '@paychex/core/models';
  * import { action, process, transitions } from '@paychex/core/process';
  * import { rethrow, fatal, ignore } from '@paychex/core/errors';
@@ -630,7 +630,7 @@ export function run(action, context, initialize = true) {
  * // workflow used within a saga
  * import { call, takeEvery } from 'redux-saga/effects';
  *
- * import { addSaga } from '@paychex/landing';
+ * import { addSaga } from '~/store';
  * import { modelList } from '@paychex/core/models';
  * import { action, process, dependencies } from '@paychex/core/process';
  *
@@ -654,7 +654,7 @@ export function run(action, context, initialize = true) {
  * // state machine used within a saga
  * import { call, takeEvery } from 'redux-saga/effects';
  *
- * import { addSaga } from '@paychex/landing';
+ * import { addSaga } from '~/store';
  * import { modelList } from '@paychex/core/models';
  * import { action, process, transitions } from '@paychex/core/process';
  *
