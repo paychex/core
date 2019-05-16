@@ -1,5 +1,4 @@
 import sjcl from 'sjcl';
-import merge from 'lodash/merge';
 import isEmpty from 'lodash/isEmpty';
 import memoize from 'lodash/memoize';
 import identity from 'lodash/identity';

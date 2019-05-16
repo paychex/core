@@ -4,15 +4,52 @@ Thank you for wanting to contribute to the `@paychex/core` library!
 
 Please read this entire file before pushing any code to the repository.
 
-## Patterns & Principles
+## Design Principles
 
-Code written for a library is different from application code. A library provides a toolbox for other developers. And much like a screwdriver or a hammer, library code is completely unaware of how it will be used. Also like a tool, each exported feature in a library should serve a single well-defined purpose.
+Code written for a library is different from application code. A library provides a toolbox for other developers. And much like a screwdriver or a hammer, library code is completely unaware of how it will be used. Also like a tool, each feature in a library should serve a single well-defined purpose.
 
-To that end, when developing a new feature in `@paychex/core`, always seek to provide the _minimum viable product_ for that feature. **Be ruthless in excluding requirements which are not absolutely necessary for the base functionality.**
+The design principles most important to code in this repo are:
 
-For example, each Store instance is solely responsible for coordinating with its persistence mechanism. Functionality such as encryption and key-prefixing (while important and perhaps even required by all Stores) has been separated from the Store implementations. This enables each Store to focus on doing _one_ thing as well as it can.
+1. [Single Responsibility Principle](https://en.wikipedia.org/wiki/Single_responsibility_principle)
+2. [Open-Closed Principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)
 
-This also follows standard programming best practices ([DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself), [SRP](https://en.wikipedia.org/wiki/Single_responsibility_principle), and _especially_ [O-C](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)). In general, restricting your feature to core functionality will actually _improve_ extension later.
+Please review the above links and make sure you feel comfortable with the general ideas.
+
+To ensure we follow the above principles, every function the `@paychex/core` library can be categorized as one of the following:
+
+1. feature function
+2. factory function
+3. wrapper function
+
+### Feature Function
+
+The `feature function` is the building block of good code. It follows the Single Responsibility Principle, meaning it accomplishes one logical operation. Examples of feature functions include:
+
+- get user information
+- start timing an operation
+- activate the next item in a list
+
+If a function has more than 1 logical purpose then it is too big and should be split up. We will see an example of that later in this document.
+
+### Factory Function
+
+A `factory function` is a type of feature function. Its job is to create an object (or a function).
+
+The following methods in this repo are all factory functions:
+
+- `modelList()`
+- `eventBus()`
+- `createTracker()`
+- `createDataLayer()`
+- `createProxy()`
+
+### Wrapper Function
+
+A `wrapper function` is also a type of feature function. And like a factory function, its job is to create a new instance of an item. But more specifically, it is the mechanism we use to extend the behavior of existing objects and functions. We will see examples of wrapper functions later in this document.
+
+## Design Principles in Action
+
+Each Store instance is solely responsible for coordinating with its persistence mechanism. Functionality such as encryption and key-prefixing (while important and perhaps even required by all Stores) has been separated from the Store implementations. This enables each Store to focus on doing _one_ thing as well as it can.
 
 ### Extending Functionality: Useful Design Patterns
 
@@ -56,6 +93,26 @@ export function withUppercase(delegate) {
         }
 
     };
+}
+```
+
+If wrapping a function, you can use the following template:
+
+```javascript
+export function withSomeNewFeature(fn) {
+
+    return function newFeature(...args) {
+
+        // we can modify the args or pass them
+        // unchanged to the original function:
+        const result = fn(...args);
+
+        // we can now modify the result however
+        // we wish before returning it:
+        return String(result).toUpperCase();
+
+    };
+
 }
 ```
 
@@ -113,7 +170,7 @@ export function withFeature( delegate:IDelegate [, options:{[string]: any}] ): I
 
 ### Patterns & Principles Summary
 
-If we apply single-responsibility and open/close principles to our code -- and if we've been ruthless in eliminating non-essential features from a class's core functionality -- then we can easily provide new features through `proxy`, `adapter`, and `decorator` wrapper methods.
+Apply single-responsibility and open-closed principles to our code allows us to provide new features easily through `proxy`, `adapter`, and `decorator` wrapper methods.
 
 ## Commit Messages
 
