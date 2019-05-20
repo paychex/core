@@ -156,6 +156,12 @@ describe('data', () => {
                 });
             });
 
+            it('returns original request if no rules apply', () => {
+                const actual = { a: 123, b: 'abc' };
+                const expected = { a: 123, b: 'abc' };
+                expect(proxy.apply(actual)).toMatchObject(expected);
+            });
+
             it('applies version from matching rule', () => {
                 proxy.use({
                     version: 'v1',
@@ -408,6 +414,13 @@ describe('data', () => {
                 });
             });
 
+            it('does not modify existing definition', () => {
+                const body = { token: 'abc', arr: [123, 456] };
+                const request = dataLayer.createRequest(definition, null, body);
+                expect(request.body).not.toBeUndefined();
+                expect(definition.body).toBeUndefined();
+            });
+
             it('proxies url', () => {
                 proxy.apply.returns(definition);
                 dataLayer.createRequest(definition);
@@ -426,6 +439,19 @@ describe('data', () => {
                 const body = {};
                 const request = dataLayer.createRequest(definition, {}, body);
                 expect(request.body).toBe(body);
+            });
+
+            it('uses existing body if provided', () => {
+                definition.body = Object.create(null);
+                const request = dataLayer.createRequest(definition);
+                expect(request.body).toBe(definition.body);
+            });
+
+            it('returns frozen object', () => {
+                const request = dataLayer.createRequest(definition);
+                expect(() => {
+                    request.body = 'abc';
+                }).toThrow();
             });
 
         });

@@ -171,6 +171,11 @@ function isErrorResponse(response) {
  * **WARNING:** Do not construct a Request object manually. Instead, pass a {@link DataDefinition}
  * object to {@link DataLayer#createRequest createRequest()} directly.
  *
+ * **IMPORTANT:** The Request object is frozen. Any attempt to modify existing Request values
+ * will result in an Error. If you need to modify a Request as part of a data pipeline, use
+ * {@link https://lodash.com/docs/4.17.11#cloneDeep cloneDeep} (or similar) to make a copy of
+ * the Request that can be safely modified.
+ *
  * @global
  * @typedef {DataDefinition} Request
  * @property {string} url The URL to open, constructed using {@link Proxy#url Proxy.url()} and any
@@ -366,7 +371,8 @@ export function createDataLayer(proxy, adapters = new Map()) {
         if (!conformsTo(definition, DDO_SCHEMA))
             throw error('A valid DataDefinition object must be passed to createRequest.');
 
-        const object = defaults(definition, {
+        const request = defaults({}, definition, {
+            body,
             ignore: {},
             timeout: 0,
             method: 'GET',
@@ -375,10 +381,11 @@ export function createDataLayer(proxy, adapters = new Map()) {
             headers: { accept: 'application/json' },
         });
 
-        const request = proxy.apply(object);
-        const url = tokenize(proxy.url(request.base, request.path), params);
+        proxy.apply(request);
 
-        return Object.assign(request, { body, url });
+        request.url = tokenize(proxy.url(request.base, request.path), params);
+
+        return Object.freeze(request);
 
     }
 
