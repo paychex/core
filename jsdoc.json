@@ -20,5 +20,16 @@
     "templates": {
         "cleverLinks": false,
         "monospaceLinks": false
+    },
+    "docdash": {
+        "search": true,
+        "menu": {
+            "Source Code": {
+                "href": "https://code.paychex.com/projects/HTML5/repos/paychex-core/browse",
+                "target": "_blank",
+                "class": "menu-item",
+                "id": "repository"
+            }
+        }
     }
 }

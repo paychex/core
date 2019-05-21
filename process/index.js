@@ -1043,7 +1043,7 @@ export function transitions(criteria = []) {
  * const transition =  ['from step', 'to step', conforms({
  *   'error': isNil,
  *   'value': isNumber,
- *   'property': (value) => value > 0 and value < 100
+ *   'property': (value) => value > 0 && value < 100
  * })];
  */
 
@@ -1083,7 +1083,7 @@ export function transitions(criteria = []) {
  *   ['from step', 'to step', conforms({
  *     'error': isNil,
  *     'value': isNumber,
- *     'property': (value) => value > 0 and value < 100
+ *     'property': (value) => value > 0 && value < 100
  *   })]
  *
  * ];
