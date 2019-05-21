@@ -1,6 +1,6 @@
 # @paychex/core
 
-Provides framework-agnostic functionality for use in all Paychex FLEX applications.
+Provides framework-agnostic functionality for use in applications.
 
 ## Commands
 
