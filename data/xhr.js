@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+import attempt from 'lodash/attempt';
 import forEach from 'lodash/forEach';
 import isString from 'lodash/isString';
 
@@ -42,6 +44,8 @@ export async function xhr(request) {
             response.data = http.response;
             response.status = http.status;
             response.statusText = http.statusText;
+            if (get(request, 'headers.content-type', '').includes('json'))
+                attempt(() => response.data = JSON.parse(response.data));
             finish();
         }
 

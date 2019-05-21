@@ -566,6 +566,42 @@ describe('data', () => {
                 http.addEventListener.calls[0].args[1](); // load
             });
 
+            it('parses JSON string', (done) => {
+                http.status = 200;
+                http.response = '{"key":"value"}';
+                request.headers = { 'content-type': 'application/json' };
+                adapter(request).then(response => {
+                    expect(response.status).toBe(200);
+                    expect(response.data).toMatchObject({ key: 'value' });
+                    done();
+                });
+                http.addEventListener.calls[0].args[1](); // load
+            });
+
+            it('ignores non-string JSON', (done) => {
+                http.status = 200;
+                http.response = { key: 'value' };
+                request.headers = { 'content-type': 'application/json' };
+                adapter(request).then(response => {
+                    expect(response.status).toBe(200);
+                    expect(response.data).toMatchObject({ key: 'value' });
+                    done();
+                });
+                http.addEventListener.calls[0].args[1](); // load
+            });
+
+            it('ignores invalid JSON', (done) => {
+                http.status = 200;
+                http.response = '{ "invalid" }';
+                request.headers = { 'content-type': 'application/json' };
+                adapter(request).then(response => {
+                    expect(response.status).toBe(200);
+                    expect(response.data).toBe(http.response);
+                    done();
+                });
+                http.addEventListener.calls[0].args[1](); // load
+            });
+
             it('error returns correct response', (done) => {
                 http.status = 404;
                 http.statusText = 'Not Found';
