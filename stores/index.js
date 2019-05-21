@@ -3,8 +3,6 @@ import isEmpty from 'lodash/isEmpty';
 import memoize from 'lodash/memoize';
 import identity from 'lodash/identity';
 import isFunction from 'lodash/isFunction';
-import { Subject } from 'rxjs';
-import { filter } from 'rxjs/operators';
 
 import indexedDB from './indexedDB';
 import localStore from './localStore';
@@ -97,60 +95,6 @@ import sessionStore from './sessionStore';
  *   return await store.delete('terms_accepted')
  *     .catch(rethrow({ tags: ['legal'] }));
  * }
- */
-
-/**
- * Provides a subscription mechanism to watch for changes to the Store.
- *
- * @global
- * @interface ObservableStore
- * @extends Store
- */
-
-/**
- * Provides change information to {@link ObservableStore} subscribers.
- *
- * @global
- * @typedef {object} ObservableStoreEvent
- * @property {string} key The key that was modified.
- * @property {'set'|'delete'} type The type of change that occurred.
- * @property {any} value The value modified (or `undefined`, if a
- * delete operation occurred).
- * @example
- * import { tracker } from '~/tracking';
- * import { combineLatest, filter, map } from 'rxjs/operators';
- * import { asObservable, indexedDB } from '@paychex/core/stores';
- * import { selectedClients } from '../data/clients';
- *
- * export const clients = asObservable(indexedDB({ store: 'clients' }));
- *
- * function isSelectedClient([e, selected]) {
- *   return selected.includes(e.key);
- * }
- *
- * function asClientId([e, _]) {
- *   return e.key;
- * }
- *
- * function trackClientChange(id) {
- *   tracker.event('client changed', { id, category: 'audit' });
- * }
- *
- * clients.observe()
- *   .pipe(
- *     combineLatest(selectedClients),
- *     filter(isSelectedClient),
- *     map(asClientId)
- *   )
- *   .subscribe(trackClientChange);
- */
-
-/**
- * Provides manipulation and subscription to a stream whose emitted
- * values can change over time. [Read more...](https://rxjs-dev.firebaseapp.com/api/index/class/Observable)
- *
- * @global
- * @external Observable
  */
 
 /**
@@ -366,115 +310,6 @@ export function asDataCache(store) {
 
         async set(request, response) {
             return await store.set(request.url, response);
-        }
-
-    };
-
-}
-
-/**
- * Utility method to add observation to a {@link Store} implementation. When
- * the returned Store implementation's `set` and `delete` methods are invoked,
- * any observers subscribed to those keys will be notified.
- *
- * @param {Store} store The Store implementation to wrap.
- * @returns {ObservableStore} A Store implementation with a new `observe` method.
- * @example
- * import { filter } from 'rxjs/operators';
- * import { tracker } from '~/tracking';
- * import { rethrow } from '@paychex/core/errors';
- * import { asObservable, indexedDB } from '@paychex/core/stores';
- * import { user } from '../data/user';
- *
- * const userInfo = asObservable(indexedDB({ store: 'users' }));
- *
- * export async function updateUserInfo(guid, userData) {
- *   return await userInfo.set(guid, userData)
- *     .catch(rethrow({ guid }));
- * }
- *
- * function userModified(e) {
- *   return e.type === 'set' && e.key === String(this);
- * }
- *
- * userInfo.observe()
- *   .pipe(filter(userModified, user.guid))
- *   .subscribe(function audit(e) {
- *     tracker.event('user modified', {
- *       guid: e.key,
- *       category: 'audit',
- *     });
- *   });
- */
-export function asObservable(store) {
-
-    const subject = new Subject();
-
-    function event(type, key, value) {
-        return { type, key, value };
-    }
-
-    function matches(e) {
-        return this === undefined || e.key === String(this);
-    }
-
-    return {
-
-        ...store,
-
-        set(key, value) {
-            return store.set(key, value)
-                .then((result) => {
-                    subject.next(event('set', key, value));
-                    return result;
-                });
-        },
-
-        delete(key) {
-            return store.delete(key)
-                .then((result) => {
-                    subject.next(event('delete', key));
-                    return result;
-                });
-        },
-
-        /**
-         * Notifies subscribers of changes to the specified key.
-         *
-         * @function ObservableStore#observe
-         * @param {string} [key] Key to watch for changes. If not specified,
-         * observers will be notified of changes to all keys.
-         * @returns {external:Observable<ObservableStoreEvent>} A new Observable instance.
-         * @example
-         * import { filter } from 'rxjs/operators';
-         * import { tracker } from '~/tracking';
-         * import { rethrow } from '@paychex/core/errors';
-         * import { asObservable, indexedDB } from '@paychex/core/stores';
-         * import { user } from '../data/user';
-         *
-         * const userInfo = asObservable(indexedDB({ store: 'users' }));
-         *
-         * export async function updateUserInfo(guid, userData) {
-         *   return await userInfo.set(guid, userData)
-         *     .catch(rethrow({ guid }));
-         * }
-         *
-         * function userModified(e) {
-         *   return e.type === 'set' && e.key === String(this);
-         * }
-         *
-         * userInfo.observe()
-         *   .pipe(filter(userModified, user.guid))
-         *   .subscribe(function audit(e) {
-         *     tracker.event('user modified', {
-         *       guid: e.key,
-         *       category: 'audit',
-         *     });
-         *   });
-         */
-        observe(key) {
-            return subject.asObservable()
-                .pipe(filter(matches, key));
         }
 
     };
