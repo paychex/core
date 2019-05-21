@@ -95,7 +95,7 @@ import { error } from '../errors';
  */
 
 const rxToken = /:(\w+)/g;
-const rxTrailing = /\?$/;
+const rxTrailing = /[&?]+$/;
 
 const CACHE_SCHEMA = {
     get: isFunction,
@@ -716,7 +716,8 @@ export function withDiagnostics(fetch, diagnostics) {
         try {
             return await fetch(request);
         } catch (e) {
-            if (lte(get(e, 'status', 0), 0))
+            const status = get(e, 'status', get(e, 'response.status', 0));
+            if (lte(status, 0))
                 Promise.resolve()
                     .then(() => diagnostics(request))
                     .catch(noop);

@@ -1136,6 +1136,10 @@ describe('data', () => {
                 expect(tokenize(qs, params)).toBe('http://www.url.com?key=value&token1=value1&token2=value2');
             });
 
+            it('maintains existing querystring when no params', () => {
+                expect(tokenize(qs)).toBe('http://www.url.com?key=value');
+            });
+
             it('uses correct array syntax', () => {
                 expect(tokenize(none, {
                     arr: ['value1', 'value2']
