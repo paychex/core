@@ -1,6 +1,6 @@
 {
   "name": "@paychex/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Common components for Paychex Flex.",
   "main": "dist/index.js",
   "author": "Dan Barnes",
