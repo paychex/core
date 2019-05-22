@@ -336,18 +336,6 @@ describe('data', () => {
                 });
             });
 
-            it('sets request.response', () => {
-                const adapter = spy().returns({ status: 200 });
-                const request = {
-                    method: 'GET',
-                    adapter: 'test',
-                    url: 'www.test.com'
-                };
-                adapters.set('test', adapter);
-                return dataLayer.fetch(request).then(response =>
-                    expect(request.response).toBe(response));
-            });
-
             it('returns successful response', async () => {
                 const response = { status: 200 };
                 const adapter = spy().returns(response);
@@ -375,7 +363,7 @@ describe('data', () => {
                 };
                 adapters.set('test', adapter);
                 dataLayer.fetch(request).catch(e => {
-                    expect(e.status).toBe(404);
+                    expect(e.response.status).toBe(404);
                     expect(e.message).toBe('Not Found');
                     done();
                 });

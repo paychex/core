@@ -323,9 +323,9 @@ export function createDataLayer(proxy, adapters = new Map()) {
         if (!isFunction(adapter))
             throw error('Adapter not found.', fatal({ adapter: request.adapter }));
 
-        const response = request.response = await adapter(request);
+        const response = await adapter(request);
         if (isErrorResponse(response))
-            throw error(response.statusText, response);
+            throw error(response.statusText, { response });
 
         return response;
 

@@ -21,11 +21,11 @@ function customizer(lhs, rhs) {
 }
 
 function tryMark(label) {
-    invoke(global, 'window.performance.mark', label)
+    invoke(window, 'performance.mark', label)
 }
 
 function tryMeasure(label, start) {
-    invoke(global, 'window.performance.measure', label, start);
+    invoke(window, 'performance.measure', label, start);
 }
 
 /**
