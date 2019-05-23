@@ -245,8 +245,8 @@ function defineBehaviors(context, behaviors, index, calls) {
  *
  *   beforeEach(() => {
  *     dependency = {
- *       methodA: spy('method a'),
- *       methodB: spy('method b')
+ *       methodA: spy().returns('a'),
+ *       methodB: spy().returns('b')
  *     };
  *     instance = someFactoryMethod(dependency);
  *   });

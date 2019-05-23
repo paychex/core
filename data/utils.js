@@ -282,7 +282,8 @@ export function withRetry(fetch, retry, retries = new Map()) {
                 .then(() => useRetry(request))
                 .catch(() => {
                     retries.delete(request);
-                    throw Object.assign(e, { retryCount: count + 1 });
+                    set(e, 'response.meta.retryCount', count + 1);
+                    throw e;
                 });
         }
     };

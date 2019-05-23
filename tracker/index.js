@@ -12,6 +12,26 @@ import defaultsDeep from 'lodash/defaultsDeep';
  * Provides event, error, and performance logging for applications.
  *
  * @module tracker
+ * @see {@link Tracker Tracker API}
+ * @example
+ * import createTracker from '@paychex/core/tracker';
+ *
+ * export const tracker = createTracker(console.log);
+ *
+ * export async function bootstrap(appId) {
+ *   try {
+ *     tracker.context({ app: appId });
+ *     const stop = tracker.start('bootstrap time');
+ *     const scripts = await loadScripts();
+ *     tracker.event('app bootstrapped');
+ *     stop({
+ *       tags: ['perf', 'ct-003'],
+ *       scriptCount: scripts.length
+ *     });
+ *   } catch (e) {
+ *     tracker.error(e);
+ *   }
+ * }
  */
 
 function customizer(lhs, rhs) {
@@ -84,26 +104,73 @@ function tryMeasure(label, start) {
 /**
  * Provides methods for logging events, errors, and performance.
  *
+ * **Best Practices**
+ *
+ * - Combine {@link Tracker#child tracker.child()} with {@link Tracker#context tracker.context()}
+ * to set cross-cutting information specific to your application and to each high-level business
+ * process or transaction you have to track. You can create any number of child trackers that
+ * inherit settings from their ancestors.
+ *
  * @global
  * @interface Tracker
  * @example
- * import createTracker from '@paychex/core/tracker';
+ * // app/index.js
  *
- * const tracker = createTracker(console.log);
+ * import { createTracker } from '@paychex/core/tracker';
  *
- * export async function bootstrap(appId) {
- *   try {
- *     const stop = tracker.start('bootstrap time');
- *     const scripts = await loadScripts();
- *     tracker.event('app bootstrapped', { appId });
- *     stop({
- *       appId,
- *       tags: ['perf', 'ct-003'],
- *       scriptCount: scripts.length
- *     });
- *   } catch (e) {
- *     tracker.error(e);
- *   }
+ * export const tracker = createTracker();
+ *
+ * tracker.context({
+ *   app: 'my-app'
+ * });
+ * @example
+ * // app/components/search.js
+ *
+ * // import the root tracker with 'app' defined
+ * import { tracker } from '../index';
+ *
+ * import { rest, createRequest } from '../data';
+ * import { rethrow } from '@paychex/core/errors';
+ * import { withOrdering, modelList } from '@paychex/core/models';
+ *
+ * // create a child tracker for use
+ * // only within this file
+ * const child = tracker.child();
+ *
+ * // all calls to child tracker methods
+ * // will include this 'component', along
+ * // with 'app' set by the root tracker
+ * child.context({
+ *   component: 'my-app-search'
+ * });
+ *
+ * const operation = {
+ *   base: 'my-app',
+ *   path: '/search'
+ * };
+ *
+ * export async function getSearchResults(query) {
+ *
+ *   // additional data for the child tracker
+ *   child.context({ query });
+ *
+ *   // the following event will include 'query'
+ *   // and 'component' from the child tracker
+ *   // as well as 'app' from the root tracker
+ *   child.event('search');
+ *
+ *   const params = { query };
+ *   const stop = child.start('perform search');
+ *   const request = createRequest(operation, params);
+ *   const response = await rest(request).catch(rethrow(params));
+ *   const results = response.data;
+ *
+ *   // the following timer will include 'query',
+ *   // 'component', 'app', and -- only on this
+ *   // timer -- a 'status' value
+ *   stop({ status: results.length ? 'Found' : 'Not Found' });
+ *
+ *   return withOrdering(modelList(...results), ['priority'], ['desc']);
  * }
  */
 
@@ -324,9 +391,15 @@ export default function createTracker(subscriber) {
 /**
  * Enables nested timings for the given Tracker instance.
  *
- * **NOTE:** With a nested tracker, calling stop() multiple times will be
- * ignored. However, forgetting to stop a nested timing before stopping the
- * root timing will result in an invalid timing. See the examples for details.
+ * **NOTE:** In a normal Tracker, calling `stop()` multiple times creates
+ * multiple timer entries, each with the same starting point but having
+ * different stopping points and durations. With a _nested_ tracker, calling
+ * `stop()` more than once does nothing.
+ *
+ * **IMPORTANT:** However, forgetting to stop a nested timer before stopping
+ * the root timer will result in an invalid timer entry. All child timers
+ * should be stopped before stopping the root timer. See the examples for
+ * more information.
  *
  * @function
  * @param {Tracker} tracker The Tracker to wrap to enable nested timings.
@@ -340,9 +413,12 @@ export default function createTracker(subscriber) {
  *
  * const nested = withNesting(tracker);
  * const stop = nested.start('root timing');
+ *
  * nested.start('child timing #1'); // notice that we aren't invoking
  * nested.start('child timing #2'); // the stop methods returned by start()
- * stop();
+ *
+ * stop(); // stop the root timing while children are still running
+ *
  * // because we called start 3 times and stop 1 time, the timing
  * // entry created for this operation will look like the following:
  * {

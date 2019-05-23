@@ -15,6 +15,9 @@ import { eventBus } from '../index';
 
 /**
  * Provides utilities for working with collections of structured data.
+ * Simplifies and standardizes support for common UI and business logic
+ * surrounding data collections. You can easily extend functionality by
+ * combining existing wrappers or by writing your own.
  *
  * @module models
  * @example
@@ -25,20 +28,12 @@ import { eventBus } from '../index';
  *   method: 'GET',
  *   base: 'reporting',
  *   path: 'reports/:user',
- *   adapter: '@paychex/rest',
- *   transformResponse(data) {
- *     // return a basic ModelList;
- *     // let callers determine how
- *     // to adapt the model further
- *     // based on their specific UX
- *     // or business requirements
- *     return modelList(data.items);
- *   }
  * };
  *
  * export async function getReports(user) {
  *   const request = createRequest(getUserReports, { user });
- *   const reportList = await fetch(request).data;
+ *   const reports = await fetch(request).data;
+ *   const reportList = modelList(...reports);
  *   // order reports newest first and then by name
  *   return withOrdering(reportList, ['date', 'name'], ['desc', 'asc']);
  * }
@@ -362,7 +357,7 @@ function readonly(getter) {
  * export async function createClientDataModel(client) {
  *   const request = createRequest(loadClientData, { client });
  *   const response = await fetch(request);
- *   return modelList(...results.data); // spread values
+ *   return modelList(...response.data); // spread values
  * }
  */
 export function modelList(...elements) {
@@ -538,6 +533,7 @@ export function withOrdering(list, ...args) {
  *
  * const isOdd = num => num % 2;
  * const list = withFiltering(modelList(), isOdd);
+ *
  * list.add(1, 2, 3, 4, 5);
  * list.items(); // [1, 3, 5]
  *
@@ -566,6 +562,7 @@ export function withOrdering(list, ...args) {
  *
  * const isOdd = num => num % 2;
  * const list = withFiltering(modelList(), isOdd);
+ *
  * list.add(1, 2, 3, 4, 5);
  * list.items(); // [1, 3, 5]
  *
@@ -620,10 +617,12 @@ export function withFiltering(list, filterer = identity) {
  * import { modelList, withGrouping } from '@paychex/core/models';
  * import { getClientList } from '../models/client';
  *
+ * const lessThan = (max) => (num) => num < max;
+ *
  * // function that buckets by employeeCount
  * const employeeBuckets = cond([
  *   [ conforms({ employeeCount: lessThan(10) }), constant('small')  ],
- *   [ conforms({ employeeCount: lessThan(20) }), constant('medium') ],
+ *   [ conforms({ employeeCount: lessThan(50) }), constant('medium') ],
  *   [ stubTrue,                                  constant('large')  ]
  * ]);
  *
@@ -636,7 +635,7 @@ export function withFiltering(list, filterer = identity) {
  * const clients = await getBucketedClientList();
  * clients.groups(); // { small: [...], medium: [...], large: [...] }
  *
- * clients.groupBy('region');
+ * clients.groupBy(['region']);
  * clients.groups(); // { 'east': [...], 'north': [...], 'south': [...] }
  */
 
@@ -683,6 +682,8 @@ export function withFiltering(list, filterer = identity) {
  * import { modelList, withGrouping } from '@paychex/core/models';
  * import { getClientList } from '../models/client';
  *
+ * const lessThan = (max) => (num) => num < max;
+ *
  * // function that buckets by employeeCount
  * const employeeBuckets = cond([
  *   [ conforms({ employeeCount: lessThan(10) }), constant('small')  ],
@@ -699,7 +700,7 @@ export function withFiltering(list, filterer = identity) {
  * const clients = await getBucketedClientList();
  * clients.groups(); // { small: [...], medium: [...], large: [...] }
  *
- * clients.groupBy('region');
+ * clients.groupBy(['region']);
  * clients.groups(); // { 'east': [...], 'north': [...], 'south': [...] }
  */
 export function withGrouping(list, grouper = identity) {
@@ -850,6 +851,12 @@ export function withGrouping(list, grouper = identity) {
  * import { modelList, withActive } from '@paychex/core/models';
  *
  * const list = withActive(modelList(1, 2, 3));
+ *
+ * list.on('active-change', (current, previous) => {
+ *   console.log('activating', current);
+ *   console.log('deactivating', previous);
+ * });
+ *
  * list.active(); // 1
  * list.next(); // 2
  * list.prev(); // 1
@@ -1448,7 +1455,7 @@ export function withUnique(list, selector = identity) {
 /**
  * Adds methods to update the underlying collection based on a new collection.
  *
- * **NOTE:** This wrapper also invoked {@link module:models.withUnique withUnique}
+ * **NOTE:** This wrapper uses {@link module:models.withUnique withUnique}
  * to ensure that only 1 instance of an item is present in the underlying collection.
  *
  * @function

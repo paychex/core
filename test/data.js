@@ -768,8 +768,8 @@ describe('data', () => {
                 retry.throws(new Error('ignored'));
                 fetch.throws(Object.assign(new Error('not found'), { response }));
                 wrapper(request).catch((e) => {
-                    expect(e.retryCount).toBe(1);
                     expect(e.message).toBe('not found');
+                    expect(e.response.meta.retryCount).toBe(1);
                     expect(retries.has(request)).toBe(false);
                     done();
                 });
