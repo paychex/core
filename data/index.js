@@ -64,8 +64,8 @@ export { createProxy } from './proxy';
  * // it and returning a function with the same signature
  * // that proxies to the real fetch while adding custom
  * // error handling logic
- * async function customErrors(fetch) {
- *   return async function custom(request) {
+ * function withCustomErrors(fetch) {
+ *   return async function useCustomErrors(request) {
  *     return await fetch(request)
  *       .catch(rethrow({ app: 'my app' }));
  *   };
@@ -73,7 +73,7 @@ export { createProxy } from './proxy';
  *
  * let pipeline = fetch;
  * // add custom error handling
- * pipeline = customErrors(pipeline);
+ * pipeline = withCustomErrors(pipeline);
  * // add default request headers
  * pipeline = withHeaders(pipeline, {
  *   'x-app-name': 'my-app'

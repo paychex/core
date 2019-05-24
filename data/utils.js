@@ -42,8 +42,8 @@ import { error } from '../errors';
  * // it and returning a function with the same signature
  * // that proxies to the real fetch while adding custom
  * // error handling logic
- * async function customErrors(fetch) {
- *   return async function custom(request) {
+ * function withCustomErrors(fetch) {
+ *   return async function useCustomErrors(request) {
  *     return await fetch(request)
  *       .catch(rethrow({ app: 'my app' }));
  *   };
@@ -51,7 +51,7 @@ import { error } from '../errors';
  *
  * let pipeline = fetch;
  * // add custom error handling
- * pipeline = customErrors(pipeline);
+ * pipeline = withCustomErrors(pipeline);
  * // add default request headers
  * pipeline = withHeaders(pipeline, {
  *   'x-app-name': 'my-app'
@@ -121,9 +121,11 @@ const replacer = params => (token, key) => {
  * **NOTE:** different falsy values are treated differently when
  * appending to the querystring:
  *
- *  - {key: false} => 'key=false'
- *  - {key: null} => 'key'
- *  - {key: undefined} => ''
+ * input params | result string
+ * :-- | :--
+ * `{ key: false }` | `key=false`
+ * `{ key: null }` | `key`
+ * `{ key: undefined }` | (no output)
  *
  * @function
  * @param {string} [url=''] A URL that may contain tokens in the `:name` format. Any
@@ -746,11 +748,12 @@ export function withDiagnostics(fetch, diagnostics) {
  * @throws Argument `reauthenticate` must be a function.
  * @example
  * import { withAuthentication } from '@paychex/core/data/utils';
- * import { fetch, proxy, createRequest } from '~/path/to/datalayer';
+ * import { fetch, createRequest } from '~/path/to/datalayer';
  *
  * const getUserToken = {
  *   base: 'auth',
- *   path: '/refreshToken'
+ *   path: '/refreshToken',
+ *   withCredentials: true,
  * };
  *
  * // a 401 has occurred; get a new JWT token
@@ -762,7 +765,7 @@ export function withDiagnostics(fetch, diagnostics) {
  *   return await fetch(createRequest(getUserToken));
  * }
  *
- * export const pipeline = withAuthentication(fetch, proxy);
+ * export const pipeline = withAuthentication(fetch, reauthenticate);
  */
 export function withAuthentication(fetch, reauthenticate) {
 
