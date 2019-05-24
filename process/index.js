@@ -1026,7 +1026,7 @@ export function transitions(criteria = []) {
  * const transition =  ['from step', 'to step', 'property'];
  * @example
  * // transition if the machine's current conditions have a 'property' key with a 'value' value
- * const transition =  ['from step', 'to step', ['property', 'value'];
+ * const transition =  ['from step', 'to step', ['property', 'value']];
  * @example
  * // transition if the function returns true
  * const transition =  ['from step', 'to step', function(conditions) {
@@ -1040,7 +1040,7 @@ export function transitions(criteria = []) {
  * // transition if the current condition values match the corresponding predicates
  * import { conforms, isNil, isNumber } from 'lodash';
  *
- * const transition =  ['from step', 'to step', conforms({
+ * const transition = ['from step', 'to step', conforms({
  *   'error': isNil,
  *   'value': isNumber,
  *   'property': (value) => value > 0 && value < 100
@@ -1068,7 +1068,7 @@ export function transitions(criteria = []) {
  *   ['from step', 'to step', 'property'],
  *
  *   // transition if the machine's current conditions have a 'property' key with a 'value' value
- *   ['from step', 'to step', ['property', 'value'],
+ *   ['from step', 'to step', ['property', 'value']],
  *
  *   // transition if the function returns true
  *   ['from step', 'to step', function(conditions) {
