@@ -416,9 +416,9 @@ export function run(action, context, initialize = true) {
 
 /**
  * Returns an array of {@link Action actions} to run. This method is
- * called whenever {@link ExecutionUpdate update} is invoked as well as
- * whenever the previous set of actions resolves. Return an empty array
- * if the process should not do anything.
+ * called when {@link ExecutionUpdate update} is invoked (if no actions
+ * are currently running) as well as whenever the previous set of actions
+ * resolves. Return an empty array if the process should not do anything.
  *
  * @method ProcessLogic#getNextActions
  * @param {ModelList} actions The actions available for the process.
@@ -681,9 +681,10 @@ export function process(name, actions, logic) {
     const threads = withUnique(actions, 'name').items();
     const { getInitialActions, getNextActions, contextFromArgs = noop } = logic;
 
-    function runActions(actions, context, runtimeInfo) {
-        if (runtimeInfo.cancelled) return Promise.resolve();
-        return Promise.all(actions.map(runAction, { context, runtimeInfo }));
+    function runActions(actions, ctx) {
+        return ctx.runtimeInfo.cancelled ?
+            Promise.resolve() :
+            Promise.all(actions.map(runAction, ctx));
     }
 
     function runAction(action) {
@@ -695,7 +696,7 @@ export function process(name, actions, logic) {
             .then(() => context.completed.push(name))
             .then(() => {
                 const next = getNextActions(threads, context);
-                return runActions(next, context, runtimeInfo);
+                return runActions(next, this);
             })
             .then(() => runtimeInfo.active = false);
     }
@@ -748,7 +749,7 @@ export function process(name, actions, logic) {
                 Object.assign(context.conditions, conditions);
                 if (!runtimeInfo.active) {
                     const next = getNextActions(threads, context);
-                    runActions(next, context, runtimeInfo).catch(reject);
+                    runActions(next, { context, runtimeInfo }).catch(reject);
                 }
             };
 
@@ -767,7 +768,7 @@ export function process(name, actions, logic) {
 
             const startActions = getInitialActions(threads, context);
 
-            return runActions(startActions, context, runtimeInfo).catch(reject);
+            return runActions(startActions, { context, runtimeInfo }).catch(reject);
 
         })
             .catch(callRollback)
