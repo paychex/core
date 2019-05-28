@@ -1,7 +1,27 @@
 /**
- * Provide utilities for handling application errors.
+ * Provide utilities for creating application errors with
+ * certain severities and optional custom information.
  *
  * @module errors
+ * @example
+ * import { rethrow, fatal } from '@paychex/core/errors';
+ * import { tracker } from '../path/to/tracker';
+ * import { fetch, createRequest } from '../path/to/datalayer';
+ *
+ * const operation = {
+ *   base: 'my-app',
+ *   path: '/settings',
+ *   headers: {
+ *     accept: 'application/json'
+ *   }
+ * };
+ *
+ * export async function loadAppSettings() {
+ *   const request = createRequest(operation);
+ *   const response = await fetch(request)
+ *     .catch(rethrow(fatal({ app: 'my-app' })));
+ *   return response.data;
+ * }
  */
 
 import curry from 'lodash/curry';
