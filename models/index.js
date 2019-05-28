@@ -32,8 +32,8 @@ import { eventBus } from '../index';
  *
  * export async function getReports(user) {
  *   const request = createRequest(getUserReports, { user });
- *   const reports = await fetch(request).data;
- *   const reportList = modelList(...reports);
+ *   const response = await fetch(request);
+ *   const reportList = modelList(...response.data);
  *   // order reports newest first and then by name
  *   return withOrdering(reportList, ['date', 'name'], ['desc', 'asc']);
  * }
@@ -346,8 +346,8 @@ function readonly(getter) {
  * @example
  * import { modelList } from '@paychex/core/models';
  *
- * export const emptyModel = createModelList();
- * export const filledModel = createModelList(1, 2, 3);
+ * export const emptyModel = modelList();
+ * export const filledModel = modelList(1, 2, 3);
  * @example
  * import { modelList } from '@paychex/core/models';
  * import { createRequest, fetch } from '~/path/to/data';
@@ -457,7 +457,7 @@ export function modelList(...elements) {
  * export async function getClientList() {
  *   const clients = await getClientData();
  *   const list = modelList(...clients);
- *   const date = (client) => new Date(moment.dateModified);
+ *   const date = (client) => Date.parse(client.dateModified);
  *   // order by branch name ascending and then date modified descending...
  *   // NOTE: we can use lodash iteratee shortcuts for our accessors; see
  *   // https://lodash.com/docs/4.17.11#iteratee for more information.
@@ -666,7 +666,7 @@ export function withFiltering(list, filterer = identity) {
  *
  * @function
  * @param {ModelList} list The ModelList instance to adapt.
- * @param {Function} [grouper=identity] The filter logic to apply.
+ * @param {Function} [grouper=identity] The grouping logic to apply.
  * @returns {ModelList~GroupedModelList} A ModelList with added filtering logic.
  * @example
  * import { withGrouping } from '@paychex/core/models';
@@ -1407,7 +1407,7 @@ export function withUnique(list, selector = identity) {
  *
  * @method ModelList~UpdatingModelList#upsert
  * @param {...any} [items] The items to add or update in the underlying collection.
- * @fires ModelList~UpdatingModelList~items-add
+ * @fires ModelList~items-add
  * @fires ModelList~UpdatingModelList~items-update
  * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee}
  * @example

@@ -110,7 +110,7 @@ import sessionStore from './sessionStore';
  * should be provided on subsequent store instantiations, so a
  * value that is unique to the user (such as a GUID) is recommended.
  * @example
- * import { memoryStore } from '@paychex/core/stores';
+ * import { withEncryption, memoryStore } from '@paychex/core/stores';
  *
  * const iv = window.crypto.getRandomBytes(new UintArray(16));
  * const key = window.crypto.getRandomBytes(new UintArray(8));
@@ -364,10 +364,11 @@ export {
      * import { withPrefix, sessionStore } from '@paychex/core/stores';
      * import { user } from '~/currentUser';
      *
-     * const sessionData = withPrefix(sessionStore(), user.guid);
+     * const store = sessionStore();
+     * const data = withPrefix(store, user.guid);
      *
      * export async function loadSomeData() {
-     *   return await sessionData.get('some.key');
+     *   return await data.get('some.key');
      * }
      */
     sessionStore,
@@ -419,14 +420,17 @@ export {
      * const operation = {
      *   base: 'reports',
      *   path: 'jobs/:id',
-     *   adapter: '@paychex/rest',
-     *   cache: asDataCache(memoryStore())
+     *   adapter: '@paychex/rest'
      * };
+     *
+     * const store = memoryStore();
+     * const cache = asDataCache(store);
+     * const pipeline = withCache(fetch, cache);
      *
      * export async function loadData(id) {
      *   const params = { id };
      *   const request = createRequest(operation, params);
-     *   const response = await fetch(request).catch(rethrow(params));
+     *   const response = await pipeline(request).catch(rethrow(params));
      *   return response.data;
      * }
      */
