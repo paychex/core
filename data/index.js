@@ -256,6 +256,7 @@ function isErrorResponse(response) {
  * // datalayer.js
  *
  * import { createDataLayer } from '@paychex/core/data';
+ * import { withHeaders } from '@paychex/core/data/utils';
  * import proxy from '~/path/to/my/proxy';
  *
  * const { fetch, createRequest } = createDataLayer(proxy);

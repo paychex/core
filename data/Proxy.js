@@ -125,16 +125,15 @@ export function createProxy() {
          * @example
          * import { rethrow, fatal } from '@paychex/core/errors';
          * import { proxy, createRequest, fetch } from '~/path/to/data';
-         * import switches from '../config/features';
+         * import switches from '../config/features.json';
          *
          * if (switches.useV2endpoint) {
          *   // switch from Remote to REST endpoint
          *   proxy.use({
          *     path: '/v2/endpoint',
-         *     adapter: '@paychex/rest',
          *     match: {
+         *       base: 'my-project',
          *       path: '/endpoint',
-         *       adapter: '@paychex/remote'
          *     }
          *   });
          * }
@@ -145,10 +144,9 @@ export function createProxy() {
          *   // Proxy rules, including the one above
          *   const request = createRequest({
          *     base: 'my-project',
-         *     adapter: '@paychex/remote',
+         *     path: '/endpoint',
          *     operation: 'someOperation',
          *     destination: 'myEndpointClass',
-         *     path: '/endpoint',
          *     method: 'POST'
          *   });
          *   const response = fetch(request)
