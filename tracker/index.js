@@ -298,7 +298,7 @@ export default function createTracker(subscriber) {
             const id = uuid();
             const now = Date.now();
             tryMark(message);
-            subscriber({
+            subscriber(Object.freeze({
                 id,
                 type: 'event',
                 label: message,
@@ -307,7 +307,7 @@ export default function createTracker(subscriber) {
                 duration: 0,
                 count: 1,
                 data: getContext(data)
-            });
+            }));
         },
 
         /**
@@ -329,7 +329,7 @@ export default function createTracker(subscriber) {
             const id = uuid();
             const now = Date.now();
             err.count = err.count || 0;
-            subscriber({
+            subscriber(Object.freeze({
                 id,
                 type: 'error',
                 label: err.message,
@@ -343,7 +343,7 @@ export default function createTracker(subscriber) {
                     // explicitly retrieved here
                     stack: err.stack
                 })
-            });
+            }));
         },
 
         /**
@@ -371,7 +371,7 @@ export default function createTracker(subscriber) {
                 const stop = Date.now();
                 const duration = stop - start;
                 tryMeasure(label, id);
-                subscriber({
+                subscriber(Object.freeze({
                     id,
                     label,
                     start,
@@ -380,7 +380,7 @@ export default function createTracker(subscriber) {
                     type: 'timer',
                     count: ++count,
                     data: getContext(data)
-                });
+                }));
             };
         }
 
@@ -533,10 +533,26 @@ export function withNesting(tracker) {
     let ref,
         tree = {};
 
-    function getUnstopped(node = tree, arr = []) {
-        if (!('end' in node)) arr.push(node.label);
-        node.children.forEach(child => getUnstopped(child, arr));
-        return arr;
+    function getUnstopped(node = tree) {
+        if (!('end' in node)) this.push(node.label);
+        node.children.forEach(getUnstopped, this);
+        return this;
+    }
+
+    function rootTiming(label) {
+        ref = tree.children = [];
+        const end = tracker.start(label);
+        return function stop(data = {}) {
+            const unstopped = getUnstopped.call([]).filter(Boolean);
+            if (!isEmpty(unstopped)) {
+                tree = {};
+                data.invalid = true;
+                data.message = 'Some nested timers were not stopped.';
+                data.timers = unstopped;
+            }
+            end(mergeWith(tree, data, customizer));
+            tree = {};
+        };
     }
 
     return {
@@ -544,21 +560,8 @@ export function withNesting(tracker) {
         ...tracker,
 
         start(label) {
-            if (isEmpty(tree)) {
-                ref = tree.children = [];
-                const end = tracker.start(label);
-                return function stop(data = {}) {
-                    const unstopped = getUnstopped().filter(Boolean);
-                    if (!isEmpty(unstopped)) {
-                        tree = {};
-                        data.invalid = true;
-                        data.message = 'Some nested timers were not stopped.';
-                        data.timers = unstopped;
-                    }
-                    end(mergeWith(tree, data, customizer));
-                    tree = {};
-                };
-            }
+            if (isEmpty(tree))
+                return rootTiming(label);
             const info = {
                 label,
                 parent: ref,
