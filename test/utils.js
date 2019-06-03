@@ -280,7 +280,14 @@ export function spy() {
     const calls = [];
     const behaviors = [];
 
-    behaviors.default = Behavior(calls, ReturnsBehavior());
+    function setDefaults() {
+        const empty = Object.freeze({
+            args: [],
+            context: undefined
+        });
+        calls.mostRecent = () => empty;
+        behaviors.default = Behavior(calls, ReturnsBehavior());
+    }
 
     function onCall(index) {
         const call = Object.create(null);
@@ -293,6 +300,8 @@ export function spy() {
         return behavior.apply(this, args);
     }
 
+    setDefaults();
+
     return Object.defineProperties(invoke, {
         onCall:     { value: onCall },
         callCount:  { get() { return calls.length; } },
@@ -303,7 +312,7 @@ export function spy() {
         reset:      { value() {
             calls.length = 0;
             behaviors.length = 0;
-            behaviors.default = Behavior(calls, ReturnsBehavior());
+            setDefaults();
         } },
         ...defineBehaviors(invoke, behaviors, 'default', calls)
     });
