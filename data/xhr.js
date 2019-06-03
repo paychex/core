@@ -32,29 +32,30 @@ export async function xhr(request) {
             data: null,
         };
 
-        function finish() {
+        function setHeaders() {
             const headers = http.getAllResponseHeaders() || '';
             response.meta.headers = headers.split(splitter)
                 .filter(Boolean)
                 .reduce(asHeaderMap, {});
-            resolve(response);
         }
 
         function success() {
+            setHeaders();
             response.data = http.response;
             response.status = http.status;
             response.statusText = http.statusText;
             if (get(request, 'headers.content-type', '').includes('json'))
                 attempt(() => response.data = JSON.parse(response.data));
-            finish();
+            resolve(response);
         }
 
         function abort() {
+            setHeaders();
             response.status = 0;
             response.meta.error = true;
             response.statusText = response.meta.timeout ?
                 'Timeout' : 'Aborted';
-            finish();
+            resolve(response);
         }
 
         function timeout() {
@@ -63,10 +64,11 @@ export async function xhr(request) {
         }
 
         function failure() {
+            setHeaders();
             response.meta.error = true;
             response.status = http.status;
             response.statusText = http.statusText;
-            finish();
+            resolve(response);
         }
 
         http.timeout = request.timeout;

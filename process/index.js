@@ -835,10 +835,9 @@ export function dependencies(deps = {}) {
     }
 
     function getActions(actions, context) {
-        const next = actions.filter(readyToRun, context);
         if (context.completed.length === actions.length)
-            context.stop();
-        return next;
+            return context.stop();
+        return actions.filter(readyToRun, context);
     }
 
     return {
