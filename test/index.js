@@ -67,11 +67,20 @@ describe('eventBus', () => {
             expect(() => bus.fire('does not exist')).not.toThrow();
         });
 
-        it('invokes subscriber with specified context', () => {
+        it('invokes "on" subscriber with specified context', () => {
             const handler = spy();
             const context = Object.create(null);
             bus = eventBus(context);
             bus.on('test', handler);
+            bus.fire('test');
+            expect(handler.context).toBe(context);
+        });
+
+        it('invokes "one" subscriber with specified context', () => {
+            const handler = spy();
+            const context = Object.create(null);
+            bus = eventBus(context);
+            bus.one('test', handler);
             bus.fire('test');
             expect(handler.context).toBe(context);
         });

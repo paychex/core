@@ -204,7 +204,7 @@ export function eventBus(context) {
     function one(event, subscriber) {
         function handler(...args) {
             off();
-            subscriber(...args);
+            subscriber.apply(this, args);
         }
         const off = on(event, handler);
         return off;
