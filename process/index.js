@@ -289,12 +289,8 @@ function findByName(name) {
 }
 
 function call(method, context, ...args) {
-    return new Promise((resolve, reject) => {
-        const result = method.apply(context, args);
-        if (isFunction(result && result.then))
-            return result.then(resolve, reject);
-        resolve(result);
-    });
+    return new Promise((resolve) =>
+        resolve(method.apply(context, args)));
 }
 
 function fork(action) {

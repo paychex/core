@@ -84,13 +84,13 @@ describe('process', () => {
 
     function sharedTests(getList, factory, method) {
 
-        let a, b, c;
+        let actions, a, b, c;
 
         beforeEach(() => {
-            const steps = getList().items();
-            a = steps[0];
-            b = steps[1];
-            c = steps[2];
+            actions = getList().items();
+            a = actions[0];
+            b = actions[1];
+            c = actions[2];
         });
 
         it('returns start function', () => {
@@ -121,7 +121,7 @@ describe('process', () => {
                     expect(typeof a.execute.context[method]).toBe('function'))));
         });
 
-        it('context includes unique step members', () => {
+        it('context includes action instance members', () => {
             a.instance = 1;
             b.instance = 2;
             a.execute = spy();
@@ -132,7 +132,7 @@ describe('process', () => {
             });
         });
 
-        it('promise rejects if state fails', (done) => {
+        it('promise rejects if action throws', (done) => {
             a.execute = spy().throws(new Error('failed'));
             factory()().catch((err) => {
                 expect(err.completed).toEqual([]);
@@ -144,7 +144,19 @@ describe('process', () => {
             });
         });
 
-        it('step resolves if retry resolves', () => {
+        it('promise rejects if action rejects', (done) => {
+            a.execute = spy().returns(Promise.reject(new Error('failed')));
+            factory()().catch((err) => {
+                expect(err.completed).toEqual([]);
+                expect(err.action).toBe('a');
+                expect(err.running).toContain('a');
+                expect(err.process).toBe('test');
+                expect(err.message).toBe('failed');
+                done();
+            });
+        });
+
+        it('promise resolves if retry resolves', () => {
             let count = 0;
             a.execute = spy().throws(new Error('failed'));
             a.retry = () => {
@@ -179,7 +191,7 @@ describe('process', () => {
                     }));
         });
 
-        it('rollback only called for executed states', (done) => {
+        it('rollback only called for executed actions', (done) => {
             const err = new Error('fail');
             a.execute = spy().throws(err);
             a.rollback = spy();
@@ -195,7 +207,7 @@ describe('process', () => {
             });
         });
 
-        it('success called on all states if resolved', (done) => {
+        it('success called on all actions if resolved', (done) => {
             a.success = spy();
             b.success = spy();
             c.success = spy();
@@ -207,7 +219,7 @@ describe('process', () => {
             });
         });
 
-        it('failure called on all states if rejected', (done) => {
+        it('failure called on all actions if rejected', (done) => {
             const err = new Error('fail');
             b.execute = spy().throws(err);
             a.failure = spy();
@@ -262,7 +274,7 @@ describe('process', () => {
 
     describe('dependencies', () => {
 
-        let steps, a, b, c;
+        let actions, a, b, c;
 
         const series = {
             b: ['a'],
@@ -275,29 +287,29 @@ describe('process', () => {
                 setTimeout(resolve, ms, value));
 
         beforeEach(() => {
-            steps = modelList();
+            actions = modelList();
             a = action('a', delay(10, 1));
             b = action('b', delay(10, 2));
             c = action('c', delay(10, 3));
-            steps.add(a, b, c);
+            actions.add(a, b, c);
         });
 
         sharedTests(
-            () => steps,
-            () => process('test', steps, dependencies(series)),
+            () => actions,
+            () => process('test', actions, dependencies(series)),
             () => process('test', modelList(), dependencies())
         );
 
         it('dispatch passes args through context', () => {
             a.execute = spy();
-            return process('test', steps, dependencies())(123, 'abc')
+            return process('test', actions, dependencies())(123, 'abc')
                 .then(() => expect(a.execute.context.args).toEqual([123, 'abc']));
         });
 
         describe('dependencies', () => {
 
             let d;
-            beforeEach(() => steps.add(d = action('d', delay(10, 4))));
+            beforeEach(() => actions.add(d = action('d', delay(10, 4))));
 
             beforeEach(() => {
                 a.execute = timestamp(a.execute, 'a');
@@ -307,7 +319,7 @@ describe('process', () => {
             });
 
             it('series', () => {
-                const dispatch = process('test', steps, dependencies(series));
+                const dispatch = process('test', actions, dependencies(series));
                 return dispatch().then(() => {
                     expect(time.b - time.a).not.toBeLessThan(5);
                     expect(time.c - time.b).not.toBeLessThan(5);
@@ -316,7 +328,7 @@ describe('process', () => {
             });
 
             it('parallel', () => {
-                const dispatch = process('test', steps, dependencies());
+                const dispatch = process('test', actions, dependencies());
                 return dispatch().then(() => {
                     expect(within(time.a, time.b, 5)).toBe(true);
                     expect(within(time.a, time.c, 5)).toBe(true);
@@ -325,7 +337,7 @@ describe('process', () => {
             });
 
             it('nested parallel', () => {
-                const dispatch = process('test', steps, dependencies({
+                const dispatch = process('test', actions, dependencies({
                     b: ['a'],
                     c: ['b'],
                     d: ['b']
@@ -339,7 +351,7 @@ describe('process', () => {
             });
 
             it('nested series', () => {
-                const dispatch = process('test', steps, dependencies({
+                const dispatch = process('test', actions, dependencies({
                     b: ['a'],
                     c: ['a'],
                     d: ['c']
@@ -358,14 +370,14 @@ describe('process', () => {
 
     describe('transitions', () => {
 
-        let states, a, b, c, criteria;
+        let actions, a, b, c, criteria;
 
         const delay = (ms, value) => () =>
             new Promise((resolve) =>
                 setTimeout(resolve, ms, value));
 
         beforeEach(() => {
-            states = modelList();
+            actions = modelList();
             a = action('a', delay(10, 1));
             b = action('b', delay(10, 2));
             c = action('c', function() {
@@ -375,19 +387,19 @@ describe('process', () => {
                 ['a', 'b'],
                 ['b', 'c']
             ];
-            states.add(a, b, c);
+            actions.add(a, b, c);
         });
 
         sharedTests(
-            () => states,
-            () => process('test', states, transitions(criteria)),
+            () => actions,
+            () => process('test', actions, transitions(criteria)),
             () => process('test', modelList(), transitions())
         );
 
         it('start passes conditions through context', () => {
             a.execute = spy();
             const conditions = { key: 'value' };
-            return process('test', states, transitions(criteria))('a', conditions)
+            return process('test', actions, transitions(criteria))('a', conditions)
                 .then(() => expect(a.execute.context.conditions).toMatchObject(conditions));
         });
 
@@ -402,7 +414,7 @@ describe('process', () => {
             it('merges conditions into context', () => {
                 b.execute = spy();
                 const conditions = { key: 'value' }
-                const promise = process('test', states, transitions(criteria))();
+                const promise = process('test', actions, transitions(criteria))();
                 promise.update(conditions);
                 return promise.then(() =>
                     expect(b.execute.context.conditions).toMatchObject(conditions))
@@ -411,14 +423,14 @@ describe('process', () => {
             it('handles empty conditions', () => {
                 b.execute = spy();
                 const conditions = { key: 'value' }
-                const promise = process('test', states, transitions(criteria))('a', conditions);
+                const promise = process('test', actions, transitions(criteria))('a', conditions);
                 promise.update();
                 return promise.then(() =>
                     expect(b.execute.context.conditions).toMatchObject(conditions))
             });
 
-            it('goes to next matching state at end of state', () => {
-                const promise = process('test', states, transitions([
+            it('goes to next matching action at end of action', () => {
+                const promise = process('test', actions, transitions([
                     ['a', 'b'],
                     ['b', 'c', { goTo: 'c' }]
                 ]))();
@@ -429,8 +441,8 @@ describe('process', () => {
                 });
             });
 
-            it('invokes next matching state if not in state', () => {
-                const promise = process('test', states, transitions([
+            it('invokes next matching action if not in action', () => {
+                const promise = process('test', actions, transitions([
                     ['a', 'b', 'goB'],
                     ['b', 'c', ['goTo', 'c']]
                 ]))();
@@ -442,8 +454,8 @@ describe('process', () => {
                 });
             });
 
-            it('does nothing if no matching state and not in state', () => {
-                const promise = process('test', states, transitions([
+            it('does nothing if no matching action and not in action', () => {
+                const promise = process('test', actions, transitions([
                     ['a', 'b'],
                     ['b', 'c', ['goTo', 'c']]
                 ]))();
@@ -462,7 +474,7 @@ describe('process', () => {
             it('resolves machine with results', () => {
                 c.execute = spy();
                 b.execute = function() { this.stop() };
-                return process('test', states, transitions([
+                return process('test', actions, transitions([
                     ['a', 'b'],
                     ['b', 'c']
                 ]))().then((results) => {
@@ -473,11 +485,11 @@ describe('process', () => {
                 });
             });
 
-            it('prevents executing next state on update', () => {
+            it('prevents executing next action on update', () => {
                 a.execute = function() { this.stop() };
                 b.execute = spy();
                 c.execute = spy();
-                const promise = process('test', states, transitions([
+                const promise = process('test', actions, transitions([
                     ['a', 'b', 'goB'],
                     ['b', 'c', 'goC']
                 ]))();
