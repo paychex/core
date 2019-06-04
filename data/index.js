@@ -12,6 +12,48 @@ import { error, fatal } from '../errors';
 export { createProxy } from './proxy';
 
 /**
+ * A Promise is an object representing the eventual completion or failure of an asynchronous operation.
+ * See the links above for more information.
+ *
+ * @global
+ * @external Promise
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise}
+ * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises Using Promises}
+ * @example
+ * import { rethrow } from '@paychex/core/errors';
+ * import { fetch, createRequest } from '../path/to/datalayer';
+ *
+ * const getProducts = {
+ *   base: 'my-app',
+ *   path: '/products/:id',
+ * };
+ *
+ * const getFeatures = {
+ *   base: 'my-app',
+ *   path: '/features/:id',
+ * };
+ *
+ * function combineResponses([ products, features ]) {
+ *   return {
+ *     products: products.data,
+ *     features: features.data
+ *   };
+ * }
+ *
+ * export function loadAllData(id) {
+ *   const params = { id };
+ *   const products = createRequest(getProducts, params);
+ *   const features = createRequest(getFeatures, params);
+ *   return Promise.all([
+ *     fetch(products),
+ *     fetch(features)
+ *   ])
+ *     .then(combineResponses)
+ *     .catch(rethrow(params));
+ * }
+ */
+
+/**
  * Provides methods for creating and configuring a data layer, providing applications
  * the ability to invoke data operations for various endpoints.
  *
@@ -20,6 +62,10 @@ export { createProxy } from './proxy';
  * A `proxy` is a runtime set of {@link ProxyRule rules} that will be applied (in order)
  * to transform {@link Request Requests} prior to sending them to an {@link Adapter}.
  * You can configure the proxy rules at any time.
+ *
+ * An `adapter` converts a Request into a {@link external:Promise Promise} resolved with
+ * a {@link Response}. It should never throw an Error; instead, if a failure occurs, it
+ * should set the appropriate properties on the Response.
  *
  * A `data pipeline` is a sequence of steps whose job is to retrieve data. For that
  * reason, even the simplest data pipeline requires these 3 steps:

@@ -19,17 +19,18 @@ import defaultsDeep from 'lodash/defaultsDeep';
  * export const tracker = createTracker(console.log);
  *
  * export async function bootstrap(appId) {
+ *   const child = tracker.child();
  *   try {
- *     tracker.context({ app: appId });
- *     const stop = tracker.start('bootstrap time');
+ *     child.context({ app: appId });
+ *     const stop = child.start('bootstrap time');
  *     const scripts = await loadScripts();
- *     tracker.event('app bootstrapped');
+ *     child.event('app bootstrapped');
  *     stop({
  *       tags: ['perf', 'ct-003'],
  *       scriptCount: scripts.length
  *     });
  *   } catch (e) {
- *     tracker.error(e);
+ *     child.error(e);
  *   }
  * }
  */
@@ -216,7 +217,7 @@ export default function createTracker(subscriber) {
          *     'x-session-id': tracker.uuid()
          *   },
          *   match: {
-         *     adapter: '^@paychex'
+         *     base: '^my\-app' // can use regular expression syntax
          *   }
          * });
          */
@@ -396,10 +397,9 @@ export default function createTracker(subscriber) {
  * different stopping points and durations. With a _nested_ tracker, calling
  * `stop()` more than once does nothing.
  *
- * **IMPORTANT:** However, forgetting to stop a nested timer before stopping
- * the root timer will result in an invalid timer entry. All child timers
- * should be stopped before stopping the root timer. See the examples for
- * more information.
+ * **IMPORTANT:** All child timers should be stopped before stopping the root
+ * timer. Forgetting to stop a child timer before stopping the root timer will
+ * result in an invalid timer entry. See the examples for more information.
  *
  * @function
  * @param {Tracker} tracker The Tracker to wrap to enable nested timings.

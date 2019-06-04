@@ -254,15 +254,15 @@ export function withPrefix(store, prefix) {
     return {
 
         async get(key) {
-            return store.get(prefixer(key));
+            return await store.get(prefixer(key));
         },
 
         async set(key, value) {
-            return store.set(prefixer(key), value);
+            return await store.set(prefixer(key), value);
         },
 
         async delete(key) {
-            return store.delete(prefixer(key));
+            return await store.delete(prefixer(key));
         }
 
     };
@@ -419,8 +419,7 @@ export {
      *
      * const operation = {
      *   base: 'reports',
-     *   path: 'jobs/:id',
-     *   adapter: '@paychex/rest'
+     *   path: 'jobs/:id'
      * };
      *
      * const store = memoryStore();

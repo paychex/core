@@ -19,7 +19,7 @@
     "nyc": "^14.1.1"
   },
   "scripts": {
-    "test": "mocha --require babel-register --recursive",
+    "test": "nyc mocha --require babel-register --recursive",
     "test:coverage": "nyc --reporter=lcov mocha --require babel-register --recursive",
     "docs": "jsdoc -c jsdoc.json"
   },
