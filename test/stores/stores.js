@@ -3,8 +3,7 @@ import { spy } from '../utils';
 import {
     withEncryption,
     withPrefix,
-    asDataCache,
-    asObservable
+    asDataCache
 } from '../../stores'
 import { randomBytes } from 'crypto';
 
@@ -34,6 +33,17 @@ describe('stores', () => {
             const cleartext = await wrapper.get('key');
             expect(cleartext).toBe(original);
             expect(hashed).not.toBe(cleartext);
+        });
+
+        it('salts using private key', async () => {
+            const value = 'value';
+            await Promise.all([
+                wrapper.set('key1', value),
+                wrapper.set('key2', value)
+            ]);
+            const enc1 = store.set.calls[0].args[1];
+            const enc2 = store.set.calls[1].args[1];
+            expect(enc1).not.toBe(enc2);
         });
 
         it('allows arbitrary key and iv length', async () => {
