@@ -1,6 +1,6 @@
 import expect from 'expect'
 import { spy } from '../utils';
-import indexedDB from '../../stores/indexedDB'
+import { indexedDB } from '../../stores/indexedDB'
 
 describe('indexedDB', () => {
 

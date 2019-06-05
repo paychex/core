@@ -3,7 +3,7 @@ import { spy } from '../utils';
 import {
     withEncryption,
     withPrefix,
-    asDataCache
+    asDataCache,
 } from '../../stores'
 import { randomBytes } from 'crypto';
 

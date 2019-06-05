@@ -19,7 +19,32 @@ function promisify(object, success, error) {
 
 const dbs = new Map();
 
-export default function indexedDB({
+/**
+ * A persistent store whose objects are retained between visits.
+ *
+ * **NOTE**: Objects are serialized to JSON during storage to ensure
+ * any modifications to the original object are not reflected in the
+ * cached copy as a side-effect. Retrieving the cached version will
+ * always reflect the object as it existed at the time of storage.
+ * _However_, some property types cannot be serialized to JSON. For
+ * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+ *
+ * @function module:stores.indexedDB
+ * @param {IndexedDBConfiguration} config Configures
+ * the IndexedDB store to be used.
+ * @returns {Store} A Store backed by IndexedDB.
+ * @example
+ * import { indexedDB } from '@paychex/core/stores'
+ *
+ * const reports = indexedDB({store: 'reports'});
+ *
+ * export async function loadReport(id) {
+ *   const result = await someDataCall(id);
+ *   await reports.set(id, result);
+ *   return result;
+ * }
+ */
+export function indexedDB({
     database = '@paychex',
     version = 1,
     store
