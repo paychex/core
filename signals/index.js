@@ -171,10 +171,10 @@ import isEmpty from 'lodash/isEmpty';
  */
 
 /**
- * Queues callers until signaled. While signaled, resolves all callers in
- * the order they were queued.
+ * Creates a signal that queues callers until signaled. While signaled, resolves
+ * all callers in the order they were queued.
  *
- * Think of the manual reset signal as a traffic light. While it is red, all cars
+ * Think of a manual reset signal as a traffic light. While it is red, all cars
  * are queued in the order they arrive. Once the light is signaled green, the cars
  * can proceed in the order they arrived. And as long as the light remains green,
  * any future cars can proceed.
@@ -252,7 +252,7 @@ export function manualReset(signaled = false) {
 /**
  * Releases 1 queued caller each time it is signaled.
  *
- * The auto reset signal can be used to create a critical section -- i.e. a block
+ * The auto reset signal can be used to create a `critical section` -- i.e. a block
  * of code that can only be executed by 1 caller at a time. Every other caller will
  * be queued in the order they arrive, and the next caller in the queue will only
  * be allowed to enter the critical section when the previous caller leaves the
@@ -353,10 +353,10 @@ export function manualReset(signaled = false) {
  */
 
 /**
- * Queues callers while not signaled. Only releases 1 queued caller each time it
- * is signaled.
+ * Creates a signal that queues callers until signaled. Releases only 1 queued
+ * caller each time it is signaled, then automatically resets into a blocked state.
  *
- * The auto reset signal can be used to create a critical section -- i.e. a block
+ * The auto reset signal can be used to create a `critical section` -- i.e. a block
  * of code that can only be executed by 1 caller at a time. Every other caller will
  * be queued in the order they arrive, and the next caller in the queue will only
  * be allowed to enter the critical section when the previous caller leaves the
@@ -436,7 +436,8 @@ export function autoReset(signaled = false) {
  * export function downloadAll(files = []) {
  *   const signal = countdown(files.length);
  *   files.forEach(file =>
- *     download(file).then(signal.decrement));
+ *     download(file).finally(() =>
+ *       signal.decrement()));
  *   return signal.ready();
  * }
  * @example
@@ -452,7 +453,7 @@ export function autoReset(signaled = false) {
  *     script.async = true;
  *     script.type = 'text/javascript';
  *     script.src = registry[component];
- *     script.onload = signal.decrement; // countdown
+ *     script.onload = () => signal.decrement(); // countdown
  *     document.body.appendChild(script);
  *   }
  *   return signal.ready();
@@ -473,7 +474,8 @@ export function autoReset(signaled = false) {
  * export function appendFilesToDownload(files = []) {
  *   signal.increment(files.length);
  *   files.forEach(file =>
- *     download(file).then(signal.decrement));
+ *     download(file).finally(() =>
+ *       signal.decrement()));
  *   return signal.ready();
  * }
  */
@@ -525,7 +527,8 @@ export function autoReset(signaled = false) {
  * export function downloadAll(files = []) {
  *   const signal = countdown(files.length);
  *   files.forEach(file =>
- *     download(file).then(signal.decrement));
+ *     download(file).finally(() =>
+ *       signal.decrement()));
  *   return signal.ready();
  * }
  */
@@ -543,28 +546,25 @@ export function autoReset(signaled = false) {
  * export function downloadAll(files = []) {
  *   const signal = countdown(files.length);
  *   files.forEach(file =>
- *     download(file).then(signal.decrement));
+ *     download(file).finally(() =>
+ *       signal.decrement()));
  *   return signal.ready();
  * }
  * @example
+ * // progress blocking
+ *
  * import { countdown } from '@paychex/core/signals';
  *
- * const counter = countdown(3);
+ * const counter = countdown();
  *
- * async function doTask1() {
- *   // do stuff
- *   counter.decrement();
+ * export function addBlockingTask(task) {
+ *   counter.increment();
+ *   return Promise.resolve()
+ *     .then(task)
+ *     .finally(counter.decrement);
  * }
  *
- * async function doTask2() {
- *   // do stuff
- *   counter.decrement();
- * }
- *
- * doTask1();
- * doTask2();
- *
- * export function ready() {
+ * export function tasksCompleted() {
  *   return counter.ready();
  * }
  */
