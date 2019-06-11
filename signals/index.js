@@ -465,7 +465,7 @@ export function autoReset(signaled = false) {
  * by a corresponding amount in order to unblock it.
  *
  * @function module:signals~CountdownSignal#increment
- * @param {number} [count=1] The number to add to the internal counter.
+ * @param {number} [count=1] The number to add to the internal counter. Must be a positive integer.
  * @example
  * import { countdown } from '@paychex/core/signals';
  *
@@ -485,7 +485,7 @@ export function autoReset(signaled = false) {
  * will be placed into an unblocked state, enabling any queued callers to proceed.
  *
  * @function module:signals~CountdownSignal#decrement
- * @param {number} [count=1] The number to subtract from the internal counter.
+ * @param {number} [count=1] The number to subtract from the internal counter. Must be a positive integer.
  * @example
  * import { countdown } from '@paychex/core/signals';
  *
@@ -538,7 +538,7 @@ export function autoReset(signaled = false) {
  * point, all callers will be invoked in the order they were queued.
  *
  * @function
- * @param {number} [initialCount=0] The initial count of the signal.
+ * @param {number} [initialCount=0] The initial count of the signal. Must be a non-negative integer.
  * @returns {module:signals~CountdownSignal} Queues callers until the counter reaches 0.
  * @example
  * import { countdown } from '@paychex/core/signals';
@@ -570,8 +570,8 @@ export function autoReset(signaled = false) {
  */
 export function countdown(initialCount = 0) {
 
-    const inner = manualReset(initialCount === 0);
     let counter = Math.max(0, Math.floor(initialCount));
+    const inner = manualReset(counter === 0);
 
     function increment(count = 1) {
         counter += Math.max(1, Math.floor(count));
