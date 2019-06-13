@@ -117,6 +117,16 @@ describe('tracker', () => {
                 expect(subscriber.args[0].count).toBe(3);
             });
 
+            it('warns on non-Errors', () => {
+                const warn = console.warn;
+                console.warn = spy();
+                ['non-error', null, undefined, 123].forEach(value =>
+                    tracker.error(value));
+                expect(subscriber.called).toBe(false);
+                expect(console.warn.callCount).toBe(4);
+                console.warn = warn;
+            });
+
         });
 
         describe('start', () => {

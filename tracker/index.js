@@ -4,6 +4,7 @@ import once from 'lodash/once';
 import invoke from 'lodash/invoke';
 import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
+import isError from 'lodash/isError';
 import mergeWith from 'lodash/mergeWith';
 import isFunction from 'lodash/isFunction';
 import defaultsDeep from 'lodash/defaultsDeep';
@@ -329,6 +330,8 @@ export default function createTracker(subscriber) {
         error(err) {
             const id = uuid();
             const now = Date.now();
+            if (!isError(err))
+                return console.warn('A non-Error was passed to tracker.error:', err);
             err.count = err.count || 0;
             subscriber(Object.freeze({
                 id,
