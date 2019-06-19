@@ -46,7 +46,7 @@ export async function xhr(request) {
             response.statusText = http.statusText;
             if (get(request, 'headers.content-type', '').includes('json'))
                 attempt(() => response.data = JSON.parse(response.data));
-            resolve(response);
+            resolve(Object.freeze(response));
         }
 
         function abort() {
@@ -55,7 +55,7 @@ export async function xhr(request) {
             response.meta.error = true;
             response.statusText = response.meta.timeout ?
                 'Timeout' : 'Aborted';
-            resolve(response);
+            resolve(Object.freeze(response));
         }
 
         function timeout() {
@@ -68,7 +68,7 @@ export async function xhr(request) {
             response.meta.error = true;
             response.status = http.status;
             response.statusText = http.statusText;
-            resolve(response);
+            resolve(Object.freeze(response));
         }
 
         http.timeout = request.timeout;

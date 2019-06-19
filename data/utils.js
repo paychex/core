@@ -561,7 +561,7 @@ export function withCache(fetch, cache) {
  *   const params = { id };
  *   const request = createRequest(saveUser, params, user);
  *   const response = await attempt(request);
- *   return response.headers['e-tag'];
+ *   return response.meta.headers['e-tag'];
  * }
  */
 export function withTransform(fetch, transformer) {

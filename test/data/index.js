@@ -542,6 +542,16 @@ describe('data', () => {
                 http.addEventListener.calls[0].args[1](); // load
             });
 
+            it('success returns frozen response', async () => {
+                http.status = 200;
+                http.statusText = 'OK';
+                http.response = { key: 'value' };
+                const promise = adapter(request);
+                http.addEventListener.calls[0].args[1](); // load
+                const response = await promise;
+                expect(Object.isFrozen(response)).toBe(true);
+            });
+
             it('parses JSON string', (done) => {
                 http.status = 200;
                 http.response = '{"key":"value"}';
