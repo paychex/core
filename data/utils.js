@@ -296,7 +296,7 @@ export function withRetry(fetch, retry, retries = new Map()) {
  *
  * @global
  * @interface Cache
- * @see {@link module:stores.asDataCache asDataCache()} in @paychex/core/stores
+ * @see {@link module:stores/utils.asDataCache asDataCache()} in @paychex/core/stores/utils
  * @see {@link module:data/utils.withCache withCache()} in @paychex/core/data/utils
  * @example
  * import { indexedDB } from '@paychex/core/stores'
@@ -376,18 +376,19 @@ export function withRetry(fetch, retry, retries = new Map()) {
  * Wraps the fetch method to cache successful Responses within a data pipeline.
  *
  * **NOTE:** You can easily create {@link Store}-backed data caches for this method
- * using {@link module:stores.asDataCache asDataCache()}.
+ * using {@link module:stores/utils.asDataCache asDataCache()}.
  *
  * @function
  * @param {DataLayer#fetch} fetch The fetch method to wrap.
  * @param {Cache} cache The cache used to store {@link Response Responses}.
  * @returns {DataLayer#fetch} The wrapped fetch method.
- * @see {@link module:stores.asDataCache asDataCache()} in @paychex/core/stores
+ * @see {@link module:stores/utils.asDataCache asDataCache()} in @paychex/core/stores
  * @throws An invalid cache was provided to withCache.
  * @example
  * import { rethrow } from '@paychex/core/errors';
  * import { withCache } from '@paychex/core/data/utils';
- * import { indexedDB, asDataCache } from '@paychex/core/stores';
+ * import { indexedDB } from '@paychex/core/stores';
+ * import { asDataCache } from '@paychex/core/stores/utils';
  * import { createRequest, fetch } from '~/path/to/datalayer';
  *
  * const getReportHistory = {

@@ -1,12 +1,3 @@
-import sjcl from 'sjcl';
-import isEmpty from 'lodash/isEmpty';
-import memoize from 'lodash/memoize';
-import identity from 'lodash/identity';
-import isFunction from 'lodash/isFunction';
-
-export * from './htmlStore';
-export * from './indexedDB';
-
 /**
  * Provides methods for storing information on the client's
  * machine. The persistence period will vary based on the
@@ -35,7 +26,8 @@ export * from './indexedDB';
  * the item does not exist), or rejected if an error occurs.
  * @example
  * import { rethrow } from '@paychex/core/errors';
- * import { withPrefix, localStore } from '@paychex/core/stores';
+ * import { localStore } from '@paychex/core/stores';
+ * import { withPrefix } from '@paychex/core/stores/utils';
  * import { user } from '../data/user';
  *
  * const store = withPrefix(localStore(), user.guid);
@@ -62,7 +54,8 @@ export * from './indexedDB';
  * item is stored, or rejected if the storage operation fails.
  * @example
  * import { rethrow } from '@paychex/core/errors';
- * import { withPrefix, localStore } from '@paychex/core/stores';
+ * import { localStore } from '@paychex/core/stores';
+ * import { withPrefix } from '@paychex/core/stores/utils';
  * import { user } from '../data/user';
  *
  * const store = withPrefix(localStore(), user.guid);
@@ -84,7 +77,8 @@ export * from './indexedDB';
  * This promise should only be rejected if the delete operation fails.
  * @example
  * import { rethrow } from '@paychex/core/errors';
- * import { withPrefix, localStore } from '@paychex/core/stores';
+ * import { localStore } from '@paychex/core/stores';
+ * import { withPrefix } from '@paychex/core/stores/utils';
  * import { user } from '../data/user';
  *
  * const store = withPrefix(localStore(), user.guid);
@@ -95,219 +89,277 @@ export * from './indexedDB';
  * }
  */
 
-/**
- * @global
- * @typedef {Object} EncryptionConfiguration
- * @property {string} key The private key to use to encrypt
- * values in the store. The same key will need to be provided
- * on subsequent encrypted store instantiations, so a value
- * that is unique to the user (and unguessable by other users)
- * is recommended. Any string of any length can be used.
- * @property {string} iv The initialization vector to use when
- * encrypting. Must be at least 7 characters long. The same value
- * should be provided on subsequent store instantiations, so a
- * value that is unique to the user (such as a GUID) is recommended.
- * @example
- * import { withEncryption, memoryStore } from '@paychex/core/stores';
- *
- * const iv = window.crypto.getRandomBytes(new UintArray(16));
- * const key = window.crypto.getRandomBytes(new UintArray(8));
- *
- * export const lockbox = withEncryption(memoryStore(), { key, iv });
- */
+export function htmlStore(provider) {
+
+    return {
+
+        async get(key) {
+            const value = provider.getItem(key);
+            return typeof value === 'string' ? JSON.parse(value) : value;
+        },
+
+        async set(key, value) {
+            provider.setItem(key, JSON.stringify(value));
+            return key;
+        },
+
+        async delete(key) {
+            provider.removeItem(key);
+        }
+
+    };
+}
 
 /**
- * Wraps a {@link Store} instance so values are encrypted and
- * decrypted transparently when get and set. For increased security,
- * the key used to store a value will also be used to salt the given
- * private key, ensuring each object is stored with a unique key.
+ * A persistent store that keeps data between site visits.
  *
- * @param {Store} store Underlying Store instance whose values will
- * be encrypted during `set` calls and decrypted during `get` calls.
- * @param {EncryptionConfiguration} config Indicates which encryption
- * method and encryption key to use.
- * @returns {Store} A Store instance that will encrypt and decrypt
- * values in the underlying store transparently.
+ * **NOTE**: Objects are serialized to JSON during storage to ensure
+ * any modifications to the original object are not reflected in the
+ * cached copy as a side-effect. Retrieving the cached version will
+ * always reflect the object as it existed at the time of storage.
+ * _However_, some property types cannot be serialized to JSON. For
+ * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+ *
+ * @function module:stores.localStore
+ * @returns {Store} A Store backed by the browser's
+ * localStorage Storage provider.
  * @example
- * // random private key and initialization vector
+ * import { localStore } from '@paychex/core/stores';
+ * import { withPrefix } from '@paychex/core/stores/utils';
+ * import { user } from '~/currentUser';
  *
- * import { memoryStore } from '@paychex/core/stores';
+ * const persistentData = withPrefix(localStore(), user.guid);
  *
- * const iv = window.crypto.getRandomBytes(new UintArray(16));
- * const key = window.crypto.getRandomBytes(new UintArray(8));
- *
- * export const lockbox = withEncryption(memoryStore(), { key, iv });
- * @example
- * // user-specific private key and initialization vector
- *
- * import { proxy } from 'path/to/proxy';
- * import { indexedDB, withEncryption } from '@paychex/core/stores'
- * import { getUserPrivateKey, getUserGUID } from '../data/user';
- *
- * const database = indexedDB({ store: 'my-store' });
- *
- * export async function loadData(id) {
- *   const iv = await getUserGUID();
- *   const key = await getUserPrivateKey();
- *   const encrypted = withEncryption(database, { key, iv });
- *   try {
- *     return await encrypted.get(id);
- *   } catch (e) {
- *     return await someDataCall(...)
- *       .then(value => {
- *          encrypted.set(id, value);
- *          return value;
- *       });
- *   }
+ * export async function loadSomeData() {
+ *   return await persistentData.get('some.key');
  * }
  */
-export function withEncryption(store, { key, iv }) {
-
-    const vector = sjcl.codec.utf8String.toBits(iv);
-    const secret = memoize(function generateKey(salt) {
-        return sjcl.misc.pbkdf2(key, salt);
-    });
-
-    async function encrypt(value, salt) {
-        const json = JSON.stringify(value);
-        const bits = sjcl.codec.utf8String.toBits(json);
-        const aes = new sjcl.cipher.aes(secret(salt));
-        const bytes = sjcl.mode.ccm.encrypt(aes, bits, vector);
-        return sjcl.codec.hex.fromBits(bytes);
-    }
-
-    async function decrypt(value, salt) {
-        const bytes = sjcl.codec.hex.toBits(value);
-        const aes = new sjcl.cipher.aes(secret(salt));
-        const bits = sjcl.mode.ccm.decrypt(aes, bytes, vector);
-        const json = sjcl.codec.utf8String.fromBits(bits);
-        return JSON.parse(json);
-    }
-
-    return {
-
-        async get(key) {
-            const cleartext = data => decrypt(data, key);
-            return await store.get(key).then(cleartext);
-        },
-
-        async set(key, value) {
-            const setInStore = data => store.set(key, data);
-            return await encrypt(value, key).then(setInStore);
-        },
-
-        async delete(key) {
-            return await store.delete(key);
-        }
-
-    };
-
+export function localStore(provider = localStorage) {
+    return htmlStore(provider);
 }
 
 /**
- * Method used to modify a key for use in a Store. Used primarily by
- * {@link module:stores.withPrefix|withPrefix}.
+ * A persistent store whose data will be deleted when the browser
+ * window is closed. However, the data will remain during normal
+ * navigation and refreshes.
  *
- * @global
- * @callback Prefixer
- * @param {string} key The key to modify before passing to a Store.
- * @returns {string} The modified key to use in a Store.
+ * **NOTE**: Objects are serialized to JSON during storage to ensure
+ * any modifications to the original object are not reflected in the
+ * cached copy as a side-effect. Retrieving the cached version will
+ * always reflect the object as it existed at the time of storage.
+ * _However_, some property types cannot be serialized to JSON. For
+ * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+ *
+ * @function module:stores.sessionStore
+ * @returns {Store} A Store backed by the browser's
+ * sessionStorage Storage provider.
  * @example
- * import { localStore, withPrefix } from '@paychex/core/stores';
- * import { user } from '../data/user';
+ * import { sessionStore } from '@paychex/core/stores';
+ * import { withPrefix } from '@paychex/core/stores/utils';
+ * import { user } from '~/currentUser';
  *
- * const store = withPrefix(localStore(), function(key) {
- *   return `${key}|${user.guid}`;
- * });
+ * const store = sessionStore();
+ * const data = withPrefix(store, user.guid);
+ *
+ * export async function loadSomeData() {
+ *   return await data.get('some.key');
+ * }
  */
-
-/**
- * Wraps a Store so any keys are transparently modified before access.
- * This can be useful when storing data on a machine that will have
- * more than 1 user, to ensure different users don't access each other's
- * stored information.
- *
- * @param {Store} store The store whose keys should be modified before access.
- * @param {string|Prefixer} prefix A string to prepend to any keys _or_ a
- * function that will modify a key.
- * @example
- * import { localStore, withPrefix } from '@paychex/core/stores';
- * import { user } from '../data/user';
- *
- * const store = withPrefix(localStore(), user.guid);
- * @example
- * import { localStore, withPrefix } from '@paychex/core/stores';
- * import { user } from '../data/user';
- *
- * const store = withPrefix(localStore(), function(key) {
- *   return `${key}|${user.guid}`;
- * });
- */
-export function withPrefix(store, prefix) {
-
-    const prefixer = isFunction(prefix) ?
-        prefix : isEmpty(prefix) ?
-        identity : (key) => `${prefix}:${key}`;
-
-    return {
-
-        async get(key) {
-            return await store.get(prefixer(key));
-        },
-
-        async set(key, value) {
-            return await store.set(prefixer(key), value);
-        },
-
-        async delete(key) {
-            return await store.delete(prefixer(key));
-        }
-
-    };
-
+export function sessionStore(provider = sessionStorage) {
+    return htmlStore(provider);
 }
 
 /**
- * Utility method to wrap a {@link Store} implementation as a {@link Cache}
- * instance. Uses the {@link Request} url as the cache key.
+ * An in-memory store whose contents will be cleared each time the
+ * user navigates away from the page or refreshes their browser.
  *
- * @param {Store} store The Store implementation to use as the Cache backing.
- * @returns {Cache} A Cache implementation backed by the specified Store.
+ * **NOTE**: Objects are serialized to JSON during storage to ensure
+ * any modifications to the original object are not reflected in the
+ * cached copy as a side-effect. Retrieving the cached version will
+ * always reflect the object as it existed at the time of storage.
+ * _However_, some property types cannot be serialized to JSON. For
+ * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+ *
+ * @function module:stores.memoryStore
+ * @returns {Store} A Store that is not persisted. The store will
+ * be cleared when the site is refreshed or navigated away from.
  * @example
  * import { rethrow } from '@paychex/core/errors';
- * import { withCache } from '@paychex/core/data/utils';
- * import { indexedDB, asDataCache } from '@paychex/core/stores';
- * import { createRequest, fetch } from '~/path/to/datalayer';
+ * import { fetch, createRequest } from '~/path/to/datalayer';
+ * import { memoryStore } from '@paychex/core/stores';
+ * import { asDataCache } from '@paychex/core/stores/utils';
  *
- * const dataCall = {
- *   method: 'GET',
- *   base: 'server',
- *   path: '/values/:key'
+ * const operation = {
+ *   base: 'reports',
+ *   path: 'jobs/:id'
  * };
  *
- * // NOTE: use withEncryption(store, options) if the response
- * // might contain personal or sensitive information that you
- * // wish to keep secret
- * const store = indexedDB({ store: 'myDataValues' });
- * const attempt = withCache(fetch, asDataCache(store));
+ * const store = memoryStore();
+ * const cache = asDataCache(store);
+ * const pipeline = withCache(fetch, cache);
  *
- * export async function loadData(key) {
- *   const params = { key };
- *   const request = createRequest(dataCall, params);
- *   const response = await attempt(request).catch(rethrow(params));
+ * export async function loadData(id) {
+ *   const params = { id };
+ *   const request = createRequest(operation, params);
+ *   const response = await pipeline(request).catch(rethrow(params));
  *   return response.data;
  * }
  */
-export function asDataCache(store) {
+export function memoryStore(cache = new Map()) {
+
+    const provider = {
+        getItem: (key) => cache.get(key),
+        setItem: (key, value) => cache.set(key, value),
+        removeItem: (key) => cache.delete(key)
+    };
+
+    // NOTE: we wrap the Map in an htmlStore so we
+    // are forced to store a JSON serialized copy of
+    // the data rather than an object reference; this
+    // ensures stored values cannot be modified as
+    // side effects of other code
+
+    return htmlStore(provider);
+
+}
+
+/**
+ * @global
+ * @typedef {Object} IndexedDBConfiguration
+ * @property {string} [database='@paychex'] The database to
+ * open. Will be created if it doesn't exist.
+ * @property {number} [version=1] The version of the store
+ * to access. You can overwrite a previously created store
+ * by increasing the version number.
+ * @property {string} store The store name to use. Will be
+ * created if it doesn't exist in the database.
+ */
+
+function promisify(object, success, error) {
+    return new Promise((resolve, reject) => {
+        object[error] = reject;
+        object[success] = resolve;
+    });
+}
+
+const dbs = new Map();
+
+/**
+ * A persistent store whose objects are retained between visits.
+ *
+ * **NOTE**: Objects are serialized to JSON during storage to ensure
+ * any modifications to the original object are not reflected in the
+ * cached copy as a side-effect. Retrieving the cached version will
+ * always reflect the object as it existed at the time of storage.
+ * _However_, some property types cannot be serialized to JSON. For
+ * more information, [read this](https://abdulapopoola.com/2017/02/27/what-you-didnt-know-about-json-stringify/).
+ *
+ * @function module:stores.indexedDB
+ * @param {IndexedDBConfiguration} config Configures
+ * the IndexedDB store to be used.
+ * @returns {Store} A Store backed by IndexedDB.
+ * @example
+ * import { indexedDB } from '@paychex/core/stores'
+ *
+ * const reports = indexedDB({store: 'reports'});
+ *
+ * export async function loadReport(id) {
+ *   const result = await someDataCall(id);
+ *   await reports.set(id, result);
+ *   return result;
+ * }
+ */
+export function indexedDB({
+    database = '@paychex',
+    version = 1,
+    store
+}, databases = dbs) {
+
+    let dbVersion = 1;
+    const prefix = `${store}@`;
+    const table = `${prefix}${version}`;
+
+    function closePreviousVersion(e) {
+        e.currentTarget.close()
+    }
+
+    function isLowerVersion(storeName) {
+        return storeName.startsWith(prefix) &&
+            Number(storeName.replace(prefix, '')) < version;
+    }
+
+    function increment() {
+        dbVersion++;
+        return openDatabase();
+    }
+
+    function handleVersionChange(e) {
+        const db = e.target.result;
+        db.onversionchange = closePreviousVersion;
+        return db;
+    }
+
+    function handleOpenError(e) {
+        if (e.target.error.name === 'VersionError') {
+            return increment();
+        }
+        throw e.target.error;
+    }
+
+    function openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = window.indexedDB.open(database, dbVersion);
+            request.onupgradeneeded = createStore;
+            promisify(request, 'onsuccess', 'onerror')
+                .then(handleVersionChange, handleOpenError)
+                .then(resolve, reject);
+        });
+    }
+
+    function createStore(e) {
+        const db = e.target.result;
+        db.createObjectStore(table);
+        const stores = db.objectStoreNames;
+        Array.prototype.filter.call(stores, isLowerVersion)
+            .forEach(db.deleteObjectStore, db);
+    }
+
+    function upgradeIfStoreNotFound(db) {
+        const stores = db.objectStoreNames;
+        if (Array.prototype.includes.call(stores, table)) {
+            databases.set(database, db);
+        } else {
+            return increment().then(upgradeIfStoreNotFound);
+        }
+    }
+
+    async function performOperation(operation, args, mode = 'readonly') {
+        await ready;
+        const db = databases.get(database);
+        const tx = db.transaction(table, mode);
+        const os = tx.objectStore(table);
+        const req = os[operation].apply(os, args);
+        return new Promise((resolve, reject) => {
+            tx.onerror = () => reject(tx.error);
+            req.onsuccess = () => resolve(req.result);
+        });
+    }
+
+    const ready = openDatabase()
+        .then(upgradeIfStoreNotFound);
 
     return {
 
-        async get(request) {
-            return await store.get(request.url);
+        async get(key) {
+            return performOperation('get', [key]);
         },
 
-        async set(request, response) {
-            return await store.set(request.url, response);
+        async set(key, value) {
+            return performOperation('put', [value, key], 'readwrite');
+        },
+
+        async delete(key) {
+            return performOperation('delete', [key], 'readwrite');
         }
 
     };
