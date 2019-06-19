@@ -30,6 +30,7 @@ name | description
 [process]{@link module:process} | Provides utilities for running complex, asynchronous processes.
 [signals]{@link module:signals} | Provides utilities for synchronizing blocks of code.
 [stores]{@link module:stores} | Provides client-side storage. How long data is persisted for depends on the store type and configuration options.
+[stores/utils]{@link module:stores/utils} | Utility methods for working with Stores.
 [tracker]{@link module:tracker} | Provides event, error, and performance logging for applications.
 [test]{@link module:test} | Provides functionality useful during unit testing.
 
