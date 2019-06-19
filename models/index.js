@@ -1484,28 +1484,30 @@ export function withUnique(list, selector = identity) {
  */
 export function withUpdating(list, selector = identity) {
 
+    const inner = withUnique(list, selector);
+
     function merge(...items) {
-        const toRemove = differenceBy(list.items(), items, selector);
-        list.remove(...toRemove);
+        const toRemove = differenceBy(inner.items(), items, selector);
+        inner.remove(...toRemove);
         upsert(...items);
     }
 
     function upsert(...items) {
-        const toAdd = differenceBy(items, list.items(), selector);
-        const toUpdate = intersectionBy(list.items(), items, selector);
-        list.add(...toAdd);
+        const toAdd = differenceBy(items, inner.items(), selector);
+        const toUpdate = intersectionBy(inner.items(), items, selector);
+        inner.add(...toAdd);
         if (!isEmpty(toUpdate)) {
-            list.pause();
+            inner.pause();
             const modified = intersectionBy(items, toUpdate, selector);
-            list.remove(...toUpdate);
-            list.add(...modified);
-            list.resume();
-            list.fire('items-update', modified);
+            inner.remove(...toUpdate);
+            inner.add(...modified);
+            inner.resume();
+            inner.fire('items-update', modified);
         }
     }
 
     return {
-        ...withUnique(list, selector),
+        ...inner,
         merge,
         upsert
     };
