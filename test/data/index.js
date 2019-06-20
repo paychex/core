@@ -553,12 +553,13 @@ describe('data', () => {
             });
 
             it('parses JSON string', (done) => {
+                const data = { key: 'value' };
                 http.status = 200;
-                http.response = '{"key":"value"}';
-                request.headers = { 'content-type': 'application/json' };
+                http.response = JSON.stringify(data);
+                http.getAllResponseHeaders.returns('content-type: application/json');
                 adapter(request).then(response => {
                     expect(response.status).toBe(200);
-                    expect(response.data).toMatchObject({ key: 'value' });
+                    expect(response.data).toMatchObject(data);
                     done();
                 });
                 http.addEventListener.calls[0].args[1](); // load

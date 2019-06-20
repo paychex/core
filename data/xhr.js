@@ -44,7 +44,7 @@ export async function xhr(request) {
             response.data = http.response;
             response.status = http.status;
             response.statusText = http.statusText;
-            if (get(request, 'headers.content-type', '').includes('json'))
+            if (get(response, 'meta.headers.content-type', '').includes('json'))
                 attempt(() => response.data = JSON.parse(response.data));
             resolve(Object.freeze(response));
         }
