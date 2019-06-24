@@ -383,10 +383,11 @@ describe('data', () => {
                 dataLayer.createRequest(definition);
                 const object = proxy.apply.args[0];
                 expect(object).toMatchObject({
+                    body: null,
                     method: 'GET',
                     adapter: 'xhr',
                     withCredentials: false,
-                    headers: { accept: 'application/json' }
+                    headers: { accept: 'application/json, text/plain, */*' }
                 });
             });
 
@@ -463,7 +464,7 @@ describe('data', () => {
 
             beforeEach(() => {
                 adapter = adapters.get('xhr');
-                request = { method: 'GET', url: 'test.com' };
+                request = { method: 'GET', url: 'test.com', body: null };
                 headers = 'content-type: application/json\r\ncontent-length: 412';
                 http = {
                     open: spy(),
@@ -488,8 +489,14 @@ describe('data', () => {
                 expect(http.open.called).toBe(true);
                 expect(http.open.args).toEqual(['GET', 'test.com']);
                 expect(http.send.called).toBe(true);
-                expect(http.send.args).toEqual([undefined]);
+                expect(http.send.args).toEqual([null]);
                 expect(http.addEventListener.callCount).toBe(4);
+            });
+
+            it('changes "json" responseType to "text"', () => {
+                request.responseType = 'json';
+                adapter(request);
+                expect(http.responseType).toBe('text');
             });
 
             it('sets request headers', () => {
@@ -568,6 +575,19 @@ describe('data', () => {
                 const data = { key: 'value' };
                 http.status = 200;
                 http.response = JSON.stringify(data);
+                http.getAllResponseHeaders.returns('content-type: application/json');
+                adapter(request).then(response => {
+                    expect(response.status).toBe(200);
+                    expect(response.data).toMatchObject(data);
+                    done();
+                });
+                http.addEventListener.calls[0].args[1](); // load
+            });
+
+            it('strips XSSI prefix from JSON string', (done) => {
+                const data = { key: 'value' };
+                http.status = 200;
+                http.response = ')]}\'\n' + JSON.stringify(data);
                 http.getAllResponseHeaders.returns('content-type: application/json');
                 adapter(request).then(response => {
                     expect(response.status).toBe(200);

@@ -5,6 +5,12 @@ import forEach from 'lodash/forEach';
 import isString from 'lodash/isString';
 
 const splitter = /[\r\n]+/;
+const XSSI = /^\)]\}',?\n/;
+
+function safeParseJSON(response) {
+    const json = String(response.data);
+    response.data = JSON.parse(json.replace(XSSI, ''));
+}
 
 function asHeaderMap(map, header) {
     const parts = header.split(': ');
@@ -12,6 +18,12 @@ function asHeaderMap(map, header) {
     const value = String(parts.join(': '));
     map[key.trim().toLowerCase()] = value.trim();
     return map;
+}
+
+function setResponseType(request, http) {
+    http.responseType = request.responseType;
+    if (request.responseType === 'json')
+        http.responseType = 'text';
 }
 
 function setStatus(response, http) {
@@ -29,7 +41,7 @@ function setHeaders(response, http) {
 function setResponse(response, http) {
     response.data = http.response;
     if (get(response, 'meta.headers.content-type', '').includes('json'))
-        attempt(() => response.data = JSON.parse(response.data));
+        attempt(safeParseJSON, response);
 }
 
 function setCached(response, sendDate) {
@@ -97,6 +109,8 @@ export async function xhr(request) {
         http.addEventListener('timeout', timeout);
 
         http.open(request.method, request.url);
+
+        setResponseType(request, http);
 
         forEach(request.headers, (value, name) => {
             if (!isString(value)) return;

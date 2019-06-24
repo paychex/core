@@ -204,9 +204,12 @@ function isErrorResponse(response) {
  * @property {string} base Used by the Proxy to determine a base path.
  * @property {string} path Combined with the base path to construct a full URL.
  * @property {string} [adapter='xhr'] The adapter to use to complete the request.
- * @property {HeadersMap} [headers={accept: 'application/json'}] The HTTP headers to use on the request.
+ * @property {HeadersMap} [headers={accept: 'application/json, text/plain, *∕*'}] The HTTP headers to use on the request.
  * @property {object} [ignore={}] Can be used to skip certain behaviors. See documentation for details.
  * @property {string} [method='GET'] The HTTP verb to use.
+ * @property {string} [responseType=''] The desired response type. Can be one of `''` (the default),
+ * `'text'`, `'json'`, `'arraybuffer'`, `'blob'` or `'document'`. See {@link https://xhr.spec.whatwg.org/#response-body the XHR spec}
+ * for more information. Setting this will change the {@link Response Response.data} type.
  * @property {number} [timeout=0] The number of milliseconds to wait before aborting the data call.
  * @property {boolean} [withCredentials=false] Whether to send Cookies with the request.
  */
@@ -269,7 +272,9 @@ function isErrorResponse(response) {
  *
  * @global
  * @typedef {object} Response
- * @property {*} data The response payload; may be `null`.
+ * @property {*} data The response payload; may be `null`. Can be modified by setting `'responseType`'
+ * on the {@link DataDefinition} object. See {@link https://xhr.spec.whatwg.org/#the-response-attribute the spec}
+ * for more information on the types that can be returned.
  * @property {number} status A standard status code the {@link DataLayer.fetch} method will
  * examine to determine how to proceed. For example, a status code of 0 indicates an aborted
  * request and may prompt network diagnostics or a dialog prompting the user to restore their
@@ -391,7 +396,7 @@ export function createDataLayer(proxy, adapters = new Map()) {
      * @function DataLayer#createRequest
      * @param {DataDefinition} definition The DataDefinition to convert into a Request using ProxyRules.
      * @param {object} [params={}] Optional parameters used to tokenize the URL or to append to the QueryString.
-     * @param {*} [body=undefined] Optional data to send with the request.
+     * @param {*} [body=null] Optional data to send with the request.
      * @returns {Request} A fully formed Request that can be passed to {@link DataLayer#fetch fetch}.
      * @throws A valid DataDefinition object must be passed to createRequest.
      * @example
@@ -413,7 +418,7 @@ export function createDataLayer(proxy, adapters = new Map()) {
      *   return response.data;
      * }
      */
-    function createRequest(definition, params = {}, body = undefined) {
+    function createRequest(definition, params = {}, body = null) {
 
         if (!conformsTo(definition, DDO_SCHEMA))
             throw error('A valid DataDefinition object must be passed to createRequest.');
@@ -424,8 +429,9 @@ export function createDataLayer(proxy, adapters = new Map()) {
             timeout: 0,
             method: 'GET',
             adapter: 'xhr',
+            responseType: '',
             withCredentials: false,
-            headers: { accept: 'application/json' },
+            headers: { accept: 'application/json, text/plain, */*' },
         });
 
         proxy.apply(request);
