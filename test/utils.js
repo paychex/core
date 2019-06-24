@@ -80,6 +80,7 @@
  * @typedef {object} Spy~SpyCall
  * @property {any[]} args The arguments passed to this invocation of the spy.
  * @property {any} context The `this` context used for this invocation of the spy.
+ * @property {Date} callTime When the spy was invoked.
  * @example
  * import { spy } from '@paychex/core/test/utils';
  *
@@ -90,6 +91,7 @@
  *
  * method.args; // ["def"]
  * method.calls[0].args; // ["abc"]
+ * method.calls[0].callTime; // Date
  *
  * method.call(window, "ghi");
  * method.calls.mostRecent().context; // Window
@@ -154,6 +156,7 @@
  *
  * method.calls(2).args; // ['abc']
  * method.calls(2).context; // {}
+ * method.calls(2).callTime; // Date
  *
  * method('def');
  * method.calls.mostRecent().args; // ['def']
@@ -177,11 +180,12 @@ function Behavior(calls, delegate) {
     return function behavior(...args) {
         const call = Object.freeze({
             args,
-            context: this
+            context: this,
+            callTime: new Date()
         });
         calls.push(call);
         calls.mostRecent = () => call;
-        return delegate(...args);
+        return delegate.apply(this, args);
     };
 }
 
@@ -198,8 +202,8 @@ function ReturnsBehavior(value) {
 }
 
 function InvokesBehavior(fn) {
-    return function invokes(...args) {
-        return fn(...args);
+    return function invokes() {
+        return fn.apply(this, arguments);
     };
 }
 
@@ -283,7 +287,8 @@ export function spy() {
     function setDefaults() {
         const empty = Object.freeze({
             args: [],
-            context: undefined
+            context: undefined,
+            callTime: undefined,
         });
         calls.mostRecent = () => empty;
         behaviors.default = Behavior(calls, ReturnsBehavior());
@@ -309,6 +314,7 @@ export function spy() {
         calls:      { get() { return Object.freeze(calls); } },
         args:       { get() { return calls.mostRecent().args; } },
         context:    { get() { return calls.mostRecent().context; } },
+        callTime:   { get() { return calls.mostRecent().callTime; } },
         reset:      { value() {
             calls.length = 0;
             behaviors.length = 0;

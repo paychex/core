@@ -11,8 +11,9 @@ import {
 
 describe('process', () => {
 
-    let time;
-    beforeEach(() => time = {});
+    const delay = (ms, value) => spy().invokes(() =>
+        new Promise((resolve) =>
+            setTimeout(resolve, ms, value)));
 
     describe('action', () => {
 
@@ -261,13 +262,6 @@ describe('process', () => {
 
     }
 
-    function timestamp(method, key) {
-        return function (...args) {
-            time[key] = Date.now();
-            return method.apply(this, args);
-        };
-    }
-
     function within(value1, value2, delta) {
         return Math.abs(value1 - value2) <= delta;
     }
@@ -281,10 +275,6 @@ describe('process', () => {
             c: ['b'],
             d: ['c']
         };
-
-        const delay = (ms, value) => () =>
-            new Promise((resolve) =>
-                setTimeout(resolve, ms, value));
 
         beforeEach(() => {
             actions = modelList();
@@ -311,28 +301,21 @@ describe('process', () => {
             let d;
             beforeEach(() => actions.add(d = action('d', delay(10, 4))));
 
-            beforeEach(() => {
-                a.execute = timestamp(a.execute, 'a');
-                b.execute = timestamp(b.execute, 'b');
-                c.execute = timestamp(c.execute, 'c');
-                d.execute = timestamp(d.execute, 'd');
-            });
-
             it('series', () => {
                 const dispatch = process('test', actions, dependencies(series));
                 return dispatch().then(() => {
-                    expect(time.b - time.a).not.toBeLessThan(5);
-                    expect(time.c - time.b).not.toBeLessThan(5);
-                    expect(time.d - time.c).not.toBeLessThan(5);
+                    expect(b.execute.callTime > a.execute.callTime).toBe(true);
+                    expect(c.execute.callTime > b.execute.callTime).toBe(true);
+                    expect(d.execute.callTime > c.execute.callTime).toBe(true);
                 });
             });
 
             it('parallel', () => {
                 const dispatch = process('test', actions, dependencies());
                 return dispatch().then(() => {
-                    expect(within(time.a, time.b, 5)).toBe(true);
-                    expect(within(time.a, time.c, 5)).toBe(true);
-                    expect(within(time.a, time.d, 5)).toBe(true);
+                    expect(within(a.execute.callTime, b.execute.callTime, 5)).toBe(true);
+                    expect(within(a.execute.callTime, c.execute.callTime, 5)).toBe(true);
+                    expect(within(a.execute.callTime, d.execute.callTime, 5)).toBe(true);
                 });
             });
 
@@ -343,10 +326,10 @@ describe('process', () => {
                     d: ['b']
                 }));
                 return dispatch().then(() => {
-                    expect(time.b - time.a).not.toBeLessThan(5);
-                    expect(time.c - time.b).not.toBeLessThan(5);
-                    expect(time.d - time.b).not.toBeLessThan(5);
-                    expect(within(time.c, time.d, 10)).toBe(true);
+                    expect(within(b.execute.callTime, a.execute.callTime, 5)).toBe(false);
+                    expect(within(c.execute.callTime, b.execute.callTime, 5)).toBe(false);
+                    expect(within(d.execute.callTime, b.execute.callTime, 5)).toBe(false);
+                    expect(within(c.execute.callTime, d.execute.callTime, 10)).toBe(true);
                 });
             });
 
@@ -357,10 +340,10 @@ describe('process', () => {
                     d: ['c']
                 }));
                 return dispatch().then(() => {
-                    expect(time.b - time.a).not.toBeLessThan(5);
-                    expect(time.c - time.a).not.toBeLessThan(5);
-                    expect(time.d - time.c).not.toBeLessThan(5);
-                    expect(within(time.c, time.b, 10)).toBe(true);
+                    expect(b.execute.callTime - a.execute.callTime).not.toBeLessThan(5);
+                    expect(c.execute.callTime - a.execute.callTime).not.toBeLessThan(5);
+                    expect(d.execute.callTime - c.execute.callTime).not.toBeLessThan(5);
+                    expect(within(c.execute.callTime, b.execute.callTime, 10)).toBe(true);
                 });
             });
 
@@ -372,17 +355,13 @@ describe('process', () => {
 
         let actions, a, b, c, criteria;
 
-        const delay = (ms, value) => () =>
-            new Promise((resolve) =>
-                setTimeout(resolve, ms, value));
-
         beforeEach(() => {
             actions = modelList();
             a = action('a', delay(10, 1));
             b = action('b', delay(10, 2));
-            c = action('c', function() {
+            c = action('c', spy().invokes(function() {
                 this.stop();
-            });
+            }));
             criteria = [
                 ['a', 'b'],
                 ['b', 'c']
@@ -404,12 +383,6 @@ describe('process', () => {
         });
 
         describe('update', () => {
-
-            beforeEach(() => {
-                a.execute = timestamp(a.execute, 'a');
-                b.execute = timestamp(b.execute, 'b');
-                c.execute = timestamp(c.execute, 'c');
-            });
 
             it('merges conditions into context', () => {
                 b.execute = spy();
@@ -436,8 +409,8 @@ describe('process', () => {
                 ]))();
                 setTimeout(promise.update, 20, { goTo: 'c' });
                 return promise.then(() => {
-                    expect(within(time.a, time.b, 20)).toBe(true);
-                    expect(within(time.b, time.c, 20)).toBe(true);
+                    expect(a.execute.callTime < b.execute.callTime).toBe(true);
+                    expect(b.execute.callTime < c.execute.callTime).toBe(true);
                 });
             });
 
@@ -449,8 +422,8 @@ describe('process', () => {
                 setTimeout(promise.update, 20, { goB: true });
                 setTimeout(promise.update, 40, { goTo: 'c' });
                 return promise.then(() => {
-                    expect(within(time.a, time.b, 15)).toBe(false);
-                    expect(within(time.b, time.c, 15)).toBe(false);
+                    expect(within(a.execute.callTime, b.execute.callTime, 15)).toBe(false);
+                    expect(within(b.execute.callTime, c.execute.callTime, 15)).toBe(false);
                 });
             });
 
@@ -462,8 +435,8 @@ describe('process', () => {
                 setTimeout(promise.update, 20, { goTo: 'd' });
                 setTimeout(promise.update, 40, { goTo: 'c' });
                 return promise.then(() => {
-                    expect(within(time.b, time.c, 25)).toBe(false);
-                    expect(within(time.b, time.c, 45)).toBe(true);
+                    expect(within(b.execute.callTime, c.execute.callTime, 25)).toBe(false);
+                    expect(within(b.execute.callTime, c.execute.callTime, 45)).toBe(true);
                 });
             });
 
