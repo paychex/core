@@ -13,7 +13,8 @@ import {
     withConnectivity,
     withDiagnostics,
     withAuthentication,
-    withHeaders
+    withHeaders,
+    withXSRF
 } from '../../data/utils';
 
 describe('data', () => {
@@ -494,6 +495,89 @@ describe('data', () => {
                     expect(headers).not.toBe(request.headers);
                     expect(headers).toMatchObject(request.headers);
                 });
+            });
+
+        });
+
+        describe('withXSRF', () => {
+
+            let wrapper, fetch, a1, a2, document;
+
+            beforeEach(() => {
+                fetch = spy();
+                a1 = {
+                    port: 80,
+                    hostname: 'test',
+                    protocol: 'http',
+                    setAttribute: spy()
+                };
+                a2 = {
+                    port: 8080,
+                    hostname: 'test',
+                    protocol: 'http',
+                    setAttribute: spy()
+                };
+                document = {
+                    cookie: {},
+                    createElement: spy().returns(a1)
+                };
+                document.createElement.onCall(1).returns(a2);
+                set(global, 'window.location.href', '');
+                set(global, 'window.document', document);
+            });
+
+            beforeEach(() => {
+                wrapper = withXSRF(fetch);
+            });
+
+            afterEach(() => {
+                unset(global, 'window');
+            });
+
+            it('does nothing if cookie not set', async () => {
+                const request = {};
+                await wrapper(request);
+                expect(fetch.args[0]).toBe(request);
+            });
+
+            it('does nothing if different origin', async () => {
+                const request = {};
+                set(document.cookie, 'XSRF-TOKEN', 'token');
+                await wrapper(request);
+                expect(fetch.args[0]).toBe(request);
+            });
+
+            it('sets correct xsrf header value', async () => {
+                set(a2, 'port', a1.port);
+                set(document.cookie, 'XSRF-TOKEN', 'token');
+                await wrapper(Object.create(null));
+                expect(fetch.args[0]).toMatchObject({
+                    headers: { 'x-xsrf-token': 'token' }
+                });
+            });
+
+            it('uses alternative values', async () => {
+                document.createElement.reset();
+                document.createElement.onCall(0).returns(a1);
+                document.createElement.onCall(1).returns(a2);
+                wrapper = withXSRF(fetch, {
+                    cookie: 'custom-cookie',
+                    header: 'another-header'
+                });
+                set(a2, 'port', a1.port);
+                set(document.cookie, 'custom-cookie', 'token');
+                await wrapper(Object.create(null));
+                expect(fetch.args[0]).toMatchObject({
+                    headers: { 'another-header': 'token' }
+                });
+            });
+
+            it('does not modify original request', async () => {
+                const request = {};
+                set(a2, 'port', a1.port);
+                set(document.cookie, 'XSRF-TOKEN', 'token');
+                await wrapper(request);
+                expect(fetch.args[0]).not.toBe(request);
             });
 
         });

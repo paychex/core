@@ -6,6 +6,8 @@ import set from 'lodash/set';
 import noop from 'lodash/noop';
 import merge from 'lodash/merge';
 import invoke from 'lodash/invoke';
+import isEqual from 'lodash/isEqual';
+import memoize from 'lodash/memoize';
 import cloneDeep from 'lodash/cloneDeep';
 import conformsTo from 'lodash/conformsTo';
 import isFunction from 'lodash/isFunction';
@@ -821,6 +823,93 @@ export function withHeaders(fetch, headers = {}) {
     return async function useHeaders(request) {
         const clone = cloneDeep(request);
         merge(clone.headers, headers);
+        return await fetch(clone);
+    };
+}
+
+function cookieProvider(name) {
+    return get(window, `document.cookie.${name}`);
+}
+
+function getUrlProperties(url) {
+    const a = window.document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('href', a.href); // set twice to force parsing
+    return {
+        port: a.port,
+        hostname: a.hostname,
+        protocol: a.protocol,
+    };
+}
+
+/**
+ * Provides optional overrides for XSRF cookie and header names. Can be passed to
+ * {@link module:data/utils.withXSRF withXSRF} when wrapping a fetch operation.
+ *
+ * @global
+ * @typedef {object} XSRFOptions
+ * @property {string} [cookie=XSRF-TOKEN] The name of the cookie sent by the server
+ * that has the user's XSRF token value.
+ * @property {string} [header=x-xsrf-token] The name of the request header to set.
+ * The server should ensure this value matches the user's expected XSRF token.
+ * @example
+ * import { withXSRF } from '@paychex/core/data/utils';
+ * import { fetch } from '~/path/to/datalayer';
+ *
+ * export const safeFetch = withXSRF(fetch, {
+ *   cookie: 'XSRF-MY-APP',
+ *   header: 'X-XSRF-MY-APP'
+ * });
+ */
+
+/**
+ * Adds Cross-Site Request Forgery protection to {@link Request Requests} made
+ * to the same origin where the app is hosted. For this to work, the server and
+ * client agree on a unique token to identify the user and prevent cross-site
+ * requests from being sent without the user's knowledge.
+ *
+ * By default, this method reads the `XSRF-TOKEN` cookie value sent by the server
+ * and adds it as the `X-XSRF-TOKEN` request header on any requests sent to the
+ * same origin. You can configure the cookie and/or the header name by passing your
+ * own values in the `options` argument.
+ *
+ * Read more about XSRF and implementation best practices {@link https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md here}.
+ *
+ * @function
+ * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {XSRFOptions} [options] Optional overrides for cookie and header names.
+ * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @see {@link https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md OWASP XSRF Cheat Sheet}
+ * @example
+ * import { withXSRF } from '@paychex/core/data/utils';
+ * import { fetch } from '~/path/to/datalayer';
+ *
+ * export const safeFetch = withXSRF(fetch);
+ * @example
+ * import { withXSRF } from '@paychex/core/data/utils';
+ * import { fetch } from '~/path/to/datalayer';
+ *
+ * export const safeFetch = withXSRF(fetch, {
+ *   cookie: 'XSRF-MY-APP',
+ *   header: 'X-XSRF-MY-APP'
+ * });
+ */
+export function withXSRF(fetch, options = {}) {
+    const {
+        cookie = 'XSRF-TOKEN',
+        header = 'x-xsrf-token',
+        provider = cookieProvider
+    } = options;
+    const urlProps = memoize(getUrlProperties);
+    const origin = urlProps(window.location.href);
+    return async function useXSRF(request) {
+        const token = provider(cookie);
+        const target = urlProps(request.url);
+        if (!token || !isEqual(target, origin)) {
+            return await fetch(request);
+        }
+        const clone = cloneDeep(request);
+        set(clone, `headers.${header}`, token);
         return await fetch(clone);
     };
 }
