@@ -552,6 +552,18 @@ describe('data', () => {
                 expect(Object.isFrozen(response)).toBe(true);
             });
 
+            it('sets meta.cached based on Date response header', (done) => {
+                const past = new Date(Date.now() - 1000);
+                http.status = 200;
+                http.response = '';
+                http.getAllResponseHeaders.returns(`date: ${ past.toGMTString() }`);
+                adapter(request).then(response => {
+                    expect(response.meta.cached).toBe(true);
+                    done();
+                });
+                http.addEventListener.calls[0].args[1](); // load
+            });
+
             it('parses JSON string', (done) => {
                 const data = { key: 'value' };
                 http.status = 200;

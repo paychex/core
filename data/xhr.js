@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import set from 'lodash/set';
 import attempt from 'lodash/attempt';
 import forEach from 'lodash/forEach';
 import isString from 'lodash/isString';
@@ -13,10 +14,35 @@ function asHeaderMap(map, header) {
     return map;
 }
 
+function setStatus(response, http) {
+    response.status = http.status;
+    response.statusText = http.statusText;
+}
+
+function setHeaders(response, http) {
+    const headers = http.getAllResponseHeaders() || '';
+    response.meta.headers = headers.split(splitter)
+        .filter(Boolean)
+        .reduce(asHeaderMap, {});
+}
+
+function setResponse(response, http) {
+    response.data = http.response;
+    if (get(response, 'meta.headers.content-type', '').includes('json'))
+        attempt(() => response.data = JSON.parse(response.data));
+}
+
+function setCached(response, sendDate) {
+    const date = new Date(get(response, 'meta.headers.date'));
+    if (!isNaN(date)) // determines if Date is valid
+        set(response, 'meta.cached', date < sendDate)
+}
+
 export async function xhr(request) {
 
     return new Promise(function XHRPromise(resolve) {
 
+        const sendDate = new Date();
         const http = new XMLHttpRequest();
 
         const response = {
@@ -32,25 +58,16 @@ export async function xhr(request) {
             data: null,
         };
 
-        function setHeaders() {
-            const headers = http.getAllResponseHeaders() || '';
-            response.meta.headers = headers.split(splitter)
-                .filter(Boolean)
-                .reduce(asHeaderMap, {});
-        }
-
         function success() {
-            setHeaders();
-            response.data = http.response;
-            response.status = http.status;
-            response.statusText = http.statusText;
-            if (get(response, 'meta.headers.content-type', '').includes('json'))
-                attempt(() => response.data = JSON.parse(response.data));
+            setStatus(response, http);
+            setHeaders(response, http);
+            setResponse(response, http);
+            setCached(response, sendDate);
             resolve(Object.freeze(response));
         }
 
         function abort() {
-            setHeaders();
+            setHeaders(response, http);
             response.status = 0;
             response.meta.error = true;
             response.statusText = response.meta.timeout ?
@@ -64,7 +81,7 @@ export async function xhr(request) {
         }
 
         function failure() {
-            setHeaders();
+            setHeaders(response, http);
             response.meta.error = true;
             response.status = http.status;
             response.statusText = http.statusText;
