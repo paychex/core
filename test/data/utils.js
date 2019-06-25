@@ -547,6 +547,23 @@ describe('data', () => {
                 expect(fetch.args[0]).toBe(request);
             });
 
+            it('sets header for different origin if whitelisted', async () => {
+                document.createElement.reset();
+                document.createElement.onCall(0).returns(a1);
+                document.createElement.onCall(1).returns(a2);
+                set(a1, 'hostname', 'domain.com');
+                set(a2, 'port', a1.port);
+                set(a2, 'hostname', 'sub.test.domain.com');
+                wrapper = withXSRF(fetch, {
+                    hosts: ['*.domain.com']
+                });
+                set(document.cookie, 'XSRF-TOKEN', 'token');
+                await wrapper(Object.create(null));
+                expect(fetch.args[0]).toMatchObject({
+                    headers: { 'x-xsrf-token': 'token' }
+                });
+            });
+
             it('sets correct xsrf header value', async () => {
                 set(a2, 'port', a1.port);
                 set(document.cookie, 'XSRF-TOKEN', 'token');

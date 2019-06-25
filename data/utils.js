@@ -839,6 +839,22 @@ function getUrlProperties(url) {
     return pick(a, ['port', 'hostname', 'protocol']);
 }
 
+function rxMatches(rx) {
+    return rx.test(String(this));
+}
+
+function asRegExp(wildcard) {
+    return new RegExp(wildcard.replace('*', '.*'), 'i');
+}
+
+function isAllowed(target, origin, hosts) {
+    return isEqual(target, origin) || (
+        target.port === origin.port &&
+        target.protocol === origin.protocol &&
+        hosts.some(rxMatches, target.hostname)
+    );
+}
+
 /**
  * Provides optional overrides for XSRF cookie and header names. Can be passed to
  * {@link module:data/utils.withXSRF withXSRF} when wrapping a fetch operation.
@@ -849,13 +865,21 @@ function getUrlProperties(url) {
  * that has the user's XSRF token value.
  * @property {string} [header=x-xsrf-token] The name of the request header to set.
  * The server should ensure this value matches the user's expected XSRF token.
+ * @property {string[]} [hosts] A whitelist of patterns used to determine which host
+ * names the XSRF token will be sent to even when making a cross-origin request. For
+ * example, a site running on `www.server.com` would not normally include the XSRF
+ * token header on any requests to the `api.server.com` subdomain since the hostnames
+ * don't exactly match. However, if you added `api.server.com` or `*.server.com` to
+ * the hosts array (and if the port and protocol both still matched the origin's port
+ * and protocol), the header would be sent.
  * @example
  * import { withXSRF } from '@paychex/core/data/utils';
  * import { fetch } from '~/path/to/datalayer';
  *
  * export const safeFetch = withXSRF(fetch, {
  *   cookie: 'XSRF-MY-APP',
- *   header: 'X-XSRF-MY-APP'
+ *   header: 'X-XSRF-MY-APP',
+ *   hosts: ['*.my-app.com']
  * });
  */
 
@@ -868,7 +892,9 @@ function getUrlProperties(url) {
  * By default, this method reads the `XSRF-TOKEN` cookie value sent by the server
  * and adds it as the `X-XSRF-TOKEN` request header on any requests sent to the
  * same origin. You can configure the cookie and/or the header name by passing your
- * own values in the `options` argument.
+ * own values in the `options` argument. You can also specify a whitelist of cross-origin
+ * hostnames the header should be sent to (e.g. to subdomains of the host domain).
+ * See {@link XSRFOptions} for details.
  *
  * Read more about XSRF and implementation best practices {@link https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md here}.
  *
@@ -888,21 +914,24 @@ function getUrlProperties(url) {
  *
  * export const safeFetch = withXSRF(fetch, {
  *   cookie: 'XSRF-MY-APP',
- *   header: 'X-XSRF-MY-APP'
+ *   header: 'X-XSRF-MY-APP',
+ *   hosts: ['*.my-app.com']
  * });
  */
 export function withXSRF(fetch, options = {}) {
     const {
+        hosts = [],
         cookie = 'XSRF-TOKEN',
         header = 'x-xsrf-token',
         provider = cookieProvider
     } = options;
+    const whitelist = hosts.map(asRegExp);
     const urlProps = memoize(getUrlProperties);
     const origin = urlProps(get(window, 'location.href'));
     return async function useXSRF(request) {
         const token = provider(cookie);
         const target = urlProps(request.url);
-        if (!token || !isEqual(target, origin)) {
+        if (!token || !isAllowed(target, origin, whitelist)) {
             return await fetch(request);
         }
         const clone = cloneDeep(request);
