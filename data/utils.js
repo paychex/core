@@ -4,6 +4,7 @@ import has from 'lodash/has';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import noop from 'lodash/noop';
+import pick from 'lodash/pick';
 import merge from 'lodash/merge';
 import invoke from 'lodash/invoke';
 import isEqual from 'lodash/isEqual';
@@ -832,14 +833,10 @@ function cookieProvider(name) {
 }
 
 function getUrlProperties(url) {
-    const a = window.document.createElement('a');
-    a.setAttribute('href', url);
-    a.setAttribute('href', a.href); // set twice to force parsing
-    return {
-        port: a.port,
-        hostname: a.hostname,
-        protocol: a.protocol,
-    };
+    const a = invoke(window, 'document.createElement', 'a');
+    invoke(a, 'setAttribute', 'href', url);
+    invoke(a, 'setAttribute', 'href', get(a, 'href')); // set twice to force parsing
+    return pick(a, ['port', 'hostname', 'protocol']);
 }
 
 /**
@@ -901,7 +898,7 @@ export function withXSRF(fetch, options = {}) {
         provider = cookieProvider
     } = options;
     const urlProps = memoize(getUrlProperties);
-    const origin = urlProps(window.location.href);
+    const origin = urlProps(get(window, 'location.href'));
     return async function useXSRF(request) {
         const token = provider(cookie);
         const target = urlProps(request.url);
