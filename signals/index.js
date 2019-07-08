@@ -224,11 +224,13 @@ export function manualReset(signaled = false) {
     const queue = [];
     let active = signaled;
 
+    function enqueueIfNeeded(resolve) {
+        if (active) resolve();
+        else queue.push(resolve);
+    }
+
     function ready() {
-        return active ?
-            Promise.resolve() :
-            new Promise(resolve =>
-                queue.push(resolve));
+        return new Promise(enqueueIfNeeded);
     }
 
     function reset() {
@@ -395,20 +397,21 @@ export function autoReset(signaled = false) {
     const queue = [];
     let active = signaled;
 
+    function enqueueIfNeeded(resolve) {
+        if (active) {
+            reset();
+            resolve();
+        } else {
+            queue.push(resolve);
+        }
+    }
+
     function reset() {
         active = false;
     }
 
     function ready() {
-        let promise;
-        if (active) {
-            promise = Promise.resolve();
-            reset();
-        } else {
-            promise = new Promise(resolve =>
-                queue.push(resolve));
-        }
-        return promise;
+        return new Promise(enqueueIfNeeded);
     }
 
     function set() {
