@@ -1,8 +1,20 @@
 import expect from 'expect';
-import createTracker, { withNesting } from '../tracker';
+import set from 'lodash/set';
+import unset from 'lodash/unset';
 import { spy } from './utils';
+import createTracker, { withNesting } from '../tracker';
 
 describe('tracker', () => {
+
+    let mark, measure;
+
+    beforeEach(() => {
+        mark = spy();
+        measure = spy();
+        set(global, 'window.performance', { mark, measure });
+    });
+
+    afterEach(() => unset(global, 'window'));
 
     describe('createTracker', () => {
 
@@ -181,60 +193,201 @@ describe('tracker', () => {
             tracker = withNesting(createTracker(subscriber));
         });
 
-        it('creates child entries', async () => {
-            const root = tracker.start('root');
-            await delay(15);
-            const childA = tracker.start('child a');
-            await delay(15);
-            childA({ key: 'brother' });
-            const childB = tracker.start('child b');
-            await delay(15);
-            const grandchild = tracker.start('child c');
-            await delay(15);
-            grandchild({ key: 'grandchild' });
-            childB({ key: 'sister' });
-            await delay(15);
-            root({ key: 'root' });
-            const timer = subscriber.args[0];
-            expect(timer).toMatchObject({
-                type: 'timer',
-                label: 'root',
-                data: { key: 'root' }
+        it('has tracker methods', () => {
+            ['child', 'context', 'event', 'error', 'start'].forEach(method =>
+                expect(typeof tracker[method]).toBe('function'));
+        });
+
+        it('creates tree correctly', async () => {
+
+            async function loadSecurity(start, clientId) {
+                const [stop] = start('load user roles');
+                await delay(15, clientId); // pretend data call
+                stop({ role: 'admin' });
+            }
+
+            async function loadFeatures(start, product) {
+                const [stop] = start(`load ${product} features`);
+                await delay(15, product);
+                stop({ features: [
+                    `${product}-feat-a`,
+                    `${product}-feat-b`
+                ]});
+            }
+
+            async function loadProducts(start, clientId) {
+                const [stop, nest] = start('loading products');
+                await delay(15, clientId);
+                await Promise.all([
+                    loadFeatures(nest, 'prod-a'),
+                    loadFeatures(nest, 'prod-b')
+                ]);
+                stop({ products: ['prod-a', 'prod-b'] });
+            }
+
+            async function loadClientData(clientId) {
+                const [stop, nest] = tracker.start('load client data');
+                await loadProducts(nest, clientId);
+                await loadSecurity(nest, clientId);
+                stop({ clientId });
+            }
+
+            await loadClientData('client-123');
+
+            expect(subscriber.args[0]).toMatchObject({
+                "count": 1,
+                "type": "timer",
+                "label": "load client data",
+                "id": expect.any(String),
+                "start": expect.any(Number),
+                "stop": expect.any(Number),
+                "duration": expect.any(Number),
+                "data": {
+                    "children": [
+                        {
+                            "count": 1,
+                            "label": "loading products",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": [
+                                    {
+                                        "count": 1,
+                                        "label": "load prod-a features",
+                                        "start": expect.any(Number),
+                                        "stop": expect.any(Number),
+                                        "duration": expect.any(Number),
+                                        "data": {
+                                            "children": [],
+                                            "features": [
+                                                "prod-a-feat-a",
+                                                "prod-a-feat-b"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "count": 1,
+                                        "label": "load prod-b features",
+                                        "start": expect.any(Number),
+                                        "stop": expect.any(Number),
+                                        "duration": expect.any(Number),
+                                        "data": {
+                                            "children": [],
+                                            "features": [
+                                                "prod-b-feat-a",
+                                                "prod-b-feat-b"
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "products": [
+                                    "prod-a",
+                                    "prod-b"
+                                ]
+                            }
+                        },
+                        {
+                            "count": 1,
+                            "label": "load user roles",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": [],
+                                "role": "admin"
+                            }
+                        }
+                    ],
+                    "clientId": "client-123"
+                }
             });
-            expect(timer.data.children.length).toBe(2);
-            expect(timer.data.children[0]).toMatchObject({
-                label: 'child a',
-                key: 'brother'
-            });
-            expect(timer.data.children[1]).toMatchObject({
-                label: 'child b',
-                key: 'sister'
-            });
-            expect(timer.data.children[1].children[0]).toMatchObject({
-                label: 'child c',
-                key: 'grandchild'
+
+        });
+
+        it('only completed timings are tracked', () => {
+            const [stop, startChild] = tracker.start('root');
+            const [stop_child1] = startChild('child 1');
+            const [] = startChild('child 2'); // not stopped
+            stop_child1();
+            stop();
+            expect(subscriber.args[0]).toMatchObject({
+                "count": 1,
+                "label": "root",
+                "type": "timer",
+                "id": expect.any(String),
+                "start": expect.any(Number),
+                "stop": expect.any(Number),
+                "duration": expect.any(Number),
+                "data": {
+                    "children": [
+                        {
+                            "count": 1,
+                            "label": "child 1",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": []
+                            }
+                        }
+                    ]
+                }
             });
         });
 
-        it('sets invalid if start called more than stop', () => {
-            const root = tracker.start('root');
-            tracker.start('child');
-            tracker.start('grandchild');
-            root();
-            expect(subscriber.args[0].data).toMatchObject({
-                invalid: true,
-                message: 'Some nested timers were not stopped.',
-                timers: ['child', 'grandchild']
+        it('creates siblings if stopped twice', () => {
+            const [stop, startChild] = tracker.start('root');
+            const [stop_child] = startChild('child');
+            stop_child({ value: 'abc' });
+            stop_child({ value: 'def' });
+            stop();
+            expect(subscriber.args[0]).toMatchObject({
+                "count": 1,
+                "label": "root",
+                "type": "timer",
+                "id": expect.any(String),
+                "start": expect.any(Number),
+                "stop": expect.any(Number),
+                "duration": expect.any(Number),
+                "data": {
+                    "children": [
+                        {
+                            "count": 1,
+                            "label": "child",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": [],
+                                "value": "abc"
+                            }
+                        },
+                        {
+                            "count": 2,
+                            "label": "child",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": [],
+                                "value": "def"
+                            }
+                        }
+                    ]
+                }
             });
         });
 
-        it('ignores multiple calls to stop', () => {
-            const root = tracker.start('root');
-            const child = tracker.start('child');
-            child();
-            child();
-            root();
-            expect(subscriber.args[0].data).not.toMatchObject({ invalid: true });
+        it('tracks root twice if stopped twice', () => {
+            const [stop, start] = tracker.start('root');
+            const [stop_child] = start('child');
+            stop_child();
+            stop();
+            stop();
+            expect(subscriber.callCount).toBe(2);
+            expect(subscriber.calls[0].args[0].count).toBe(1);
+            expect(subscriber.calls[1].args[0].count).toBe(2);
         });
 
     });

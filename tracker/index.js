@@ -1,8 +1,6 @@
 import uuid from 'uuid/v4';
 import noop from 'lodash/noop';
-import once from 'lodash/once';
 import invoke from 'lodash/invoke';
-import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
 import isError from 'lodash/isError';
 import mergeWith from 'lodash/mergeWith';
@@ -393,169 +391,305 @@ export default function createTracker(subscriber) {
 }
 
 /**
+ * **NOTE:** The only difference between this class and the normal {@link Tracker}
+ * is how the {@link NestedTimingTracker#start start} method works.
+ *
+ * @global
+ * @interface NestedTimingTracker
+ * @augments Tracker
+ */
+
+/**
+ * Starts a timing tree. Unlike the normal {@link Tracker#start start} method, this
+ * method does _not_ return a stop function. Instead, it returns an array. The first
+ * value in the array is the stop function; the second argument is another start function
+ * you can invoke to begin a new nested timing.
+ *
+ * @override
+ * @function NestedTimingTracker#start
+ * @returns {Array.<TimerStopFunction, NestedTimingTracker#start>} The `[stop, start]` methods you can use to
+ * end the current timing or start a nested timing. The first function
+ * is a normal {@link TimerStopFunction} and the second function is
+ * another {@link NestedTimingTracker#start} function.
+ * @example
+ * import { tracker } from '~/tracking';
+ * import { withNesting } from '@paychex/core/tracker';
+ * import { someDataCall, someOtherDataCall } from '~/data/operations';
+ *
+ * const nested = withNesting(tracker);
+ *
+ * export async function loadData(id) {
+ *   const child = nested.child();
+ *   const [stop, start] = child.start('load data');
+ *   const data = await someDataCall(id);
+ *   const results = await loadNestedData(start, data);
+ *   child.context({ id });
+ *   stop({ results });
+ *   return results;
+ * }
+ *
+ * async function loadNestedData(start, data) {
+ *   const [stop, ] = start('load nested data');
+ *   const results = await someOtherDataCall(data);
+ *   stop();
+ *   return results;
+ * }
+ */
+
+/**
  * Enables nested timings for the given Tracker instance.
  *
- * **NOTE:** In a normal Tracker, calling `stop()` multiple times creates
- * multiple timer entries, each with the same starting point but having
- * different stopping points and durations. With a _nested_ tracker, calling
- * `stop()` more than once does nothing.
+ * **NOTE:** Calling `stop()` multiple times will create multiple timing entries,
+ * incrementing `count` for each one. See the example.
  *
- * **IMPORTANT:** All child timers should be stopped before stopping the root
- * timer. Forgetting to stop a child timer before stopping the root timer will
- * result in an invalid timer entry. See the examples for more information.
+ * **IMPORTANT:** Only completed timers will be included in the timing tree. This
+ * means if you forget to stop a nested timer before stopping the root timer, the
+ * nested timer will not appear at all in the tracked timing entry. See the example.
  *
  * @function
  * @param {Tracker} tracker The Tracker to wrap to enable nested timings.
- * @returns {Tracker} A Tracker instance that will create a nested timing
- * tree for each time start() is invoked.
+ * @returns {NestedTimingTracker} A Tracker instance that can create nested timings.
  * @example
- * // invalid timing entry
+ * // calling stop() multiple times
+ * //  - multiple sibling entries created
+ * //  - increment `count` each time stop is called
  *
  * import { tracker } from '~/tracking';
- * import { withNesting } from '@paychex/core/tracking';
+ * import { withNesting } from '@paychex/core/tracker';
  *
  * const nested = withNesting(tracker);
- * const stop = nested.start('root timing');
  *
- * nested.start('child timing #1'); // notice that we aren't invoking
- * nested.start('child timing #2'); // the stop methods returned by start()
+ * const [stop, startChild] = nested.start('root');
+ * const [stop_child] = startChild('child');
  *
- * stop(); // stop the root timing while children are still running
+ * stop_child({ value: 'abc' });
+ * stop_child({ value: 'def' });
  *
- * // because we called start 3 times and stop 1 time, the timing
- * // entry created for this operation will look like the following:
+ * // timing entry:
  * {
- *   "id": "80f3fccb-e0fd-4320-bae5-a0bc2077a0d2",
+ *   "id": "0598770e-2398-4173-a9a8-347244301cf6",
  *   "label": "root",
- *   "start": 1553783595834,
- *   "stop": 1553783595834,
- *   "duration": 0,
+ *   "start": 1562871459063,
+ *   "stop": 1562871459079,
+ *   "duration": 16,
  *   "type": "timer",
  *   "count": 1,
  *   "data": {
- *     "invalid": true,
- *     "message": "Some nested timers were not stopped.",
- *     "timers": ["child timing #1", "child timing #2"]
+ *     "children": [
+ *       {
+ *         "label": "child",
+ *         "count": 1,
+ *         "start": 1562871459063,
+ *         "stop": 1562871459074,
+ *         "duration": 11,
+ *         "data": {
+ *           "children": [],
+ *           "value": "abc"
+ *         }
+ *       },
+ *       {
+ *         "label": "child",
+ *         "count": 2,
+ *         "start": 1562871459063,
+ *         "stop": 1562871459079,
+ *         "duration": 16,
+ *         "data": {
+ *           "children": [],
+ *           "value": "def"
+ *         }
+ *       }
+ *     ]
+ *   }
+ * }
+ * @example
+ * // forgetting to stop a nested timer will exclude
+ * // it from the resulting timing tree
+ *
+ * import { tracker } from '~/tracking';
+ * import { withNesting } from '@paychex/core/tracker';
+ *
+ * const nested = withNesting(tracker);
+ *
+ * const [stop, startChild] = nested.start('root');
+ * const [stop_child1] = startChild('child 1');
+ * const [stop_child2] = startChild('child 2'); // never invoked
+ *
+ * stop_child1();
+ * stop(); // but child2 is still running...
+ *
+ * // ...so the timing entry will look like this:
+ * {
+ *   "id": "aac3a9da-fb33-436e-808e-ad0054121db7",
+ *   "label": "root",
+ *   "start": 1562871031757,
+ *   "stop": 1562871031762,
+ *   "duration": 5,
+ *   "type": "timer",
+ *   "count": 1,
+ *   "data": {
+ *     "children": [
+ *       {
+ *         "label": "child 1",
+ *         "count": 1,
+ *         "start": 1562871031757,
+ *         "stop": 1562871031762,
+ *         "duration": 5,
+ *         "data": {
+ *           "children": []
+ *         }
+ *       }
+ *     ]
  *   }
  * }
  * @example
  * // nested timings
  *
  * import { tracker } from '~/tracking';
- * import { withNesting } from '@paychex/core/tracking';
+ * import { withNesting } from '@paychex/core/tracker';
  *
  * const nested = withNesting(tracker);
  *
- * async function loadSecurity(clientId) {
- *   const security = {};
- *   const stop = nested.start('load client security');
- *   // ... data operation
- *   stop();
- *   return security;
+ * async function loadSecurity(start, clientId) {
+ *     const [stop] = start('load user roles');
+ *     await fakeDataCall(clientId); // pretend data call
+ *     stop({ role: 'admin' });
  * }
  *
- * async function loadFeatures(product) {
- *   product.features = [];
- *   const stop = nested.start('load product features');
- *   // ... data operation
- *   stop();
+ * async function loadFeatures(start, product) {
+ *     const [stop] = start(`load ${product} features`);
+ *     await fakeDataCall(product); // pretend data call
+ *     stop({ features: [
+ *         `${product}-feat-a`,
+ *         `${product}-feat-b`
+ *     ]});
  * }
  *
- * async function loadProducts(clientId) {
- *   const products = [];
- *   const stop = nested.start('load client products');
- *   // ... data operation
- *   await Promise.all(products.map(loadFeatures));
- *   stop();
- *   return products;
+ * async function loadProducts(start, clientId) {
+ *     const [stop, nest] = start('loading products');
+ *     await fakeDataCall(clientId); // pretend data call
+ *     await Promise.all([
+ *         loadFeatures(nest, 'prod-a'),
+ *         loadFeatures(nest, 'prod-b')
+ *     ]);
+ *     stop({ products: ['prod-a', 'prod-b'] });
  * }
  *
- * export async function loadClientData(clientId) {
- *   const result = {};
- *   const stop = nested.start('load client data');
- *   result.security = await loadSecurity(clientId);
- *   result.products = await loadProducts(clientId);
- *   stop({ clientId });
- *   return result;
+ * async function loadClientData(clientId) {
+ *     const [stop, nest] = nested.start('load client data');
+ *     await loadProducts(nest, clientId);
+ *     await loadSecurity(nest, clientId);
+ *     stop({ clientId });
  * }
  *
- * // the above function produces a TrackingInfo entry like this:
- * // note that parallel calls produce nested timings but sequential
- * // calls produce sibling timings
+ * await loadClientData('client-123');
+ *
+ * // timing tree:
  * {
- *  "id": "44a61275-a331-47eb-a214-f455bae00f87",
- *  "label": "load client data",
- *  "start": 1553783025026,
- *  "stop": 1553783025398,
- *  "duration": 372,
- *  "type": "timer",
- *  "count": 1,
- *  "data": {
- *    "children": [
- *      {
- *        "label": "load client security",
- *        "children": [],
- *        "start": 1553783025026,
- *        "end": 1553783025226,
- *        "duration": 200
- *      },
- *      {
- *        "label": "load client products",
- *        "children": [
- *          {
- *            "label": "load product features",
- *            "children": [
- *              {
- *                "label": "load product features",
- *                "children": [],
- *                "start": 1553783025348,
- *                "end": 1553783025398,
- *                "duration": 50,
- *                "id": "prod-b",
- *                "features": []
- *              }
- *            ],
- *            "start": 1553783025348,
- *            "end": 1553783025398,
- *            "duration": 50,
- *            "id": "prod-a",
- *            "features": []
- *          }
- *        ],
- *        "start": 1553783025226,
- *        "end": 1553783025398,
- *        "duration": 172
- *      }
- *    ],
- *    "clientId": "abc123"
- *  }
+ *   "id": "dfc21f25-42da-439f-8fd4-23ab02b70668",
+ *   "label": "load client data",
+ *   "start": 1562872496161,
+ *   "stop": 1562872496208,
+ *   "duration": 47,
+ *   "type": "timer",
+ *   "count": 1,
+ *   "data": {
+ *     "children": [
+ *       {
+ *         "label": "loading products",
+ *         "count": 1,
+ *         "start": 1562872496161,
+ *         "stop": 1562872496192,
+ *         "duration": 31,
+ *         "data": {
+ *           "children": [
+ *             {
+ *               "label": "load prod-a features",
+ *               "count": 1,
+ *               "start": 1562872496176,
+ *               "stop": 1562872496191,
+ *               "duration": 15,
+ *               "data": {
+ *                 "children": [],
+ *                 "features": [
+ *                   "prod-a-feat-a",
+ *                   "prod-a-feat-b"
+ *                 ]
+ *               }
+ *             },
+ *             {
+ *               "label": "load prod-b features",
+ *               "count": 1,
+ *               "start": 1562872496176,
+ *               "stop": 1562872496192,
+ *               "duration": 16,
+ *               "data": {
+ *                 "children": [],
+ *                 "features": [
+ *                   "prod-b-feat-a",
+ *                   "prod-b-feat-b"
+ *                 ]
+ *               }
+ *             }
+ *           ],
+ *           "products": [
+ *             "prod-a",
+ *             "prod-b"
+ *           ]
+ *         }
+ *       },
+ *       {
+ *         "label": "load user roles",
+ *         "count": 1,
+ *         "start": 1562872496192,
+ *         "stop": 1562872496208,
+ *         "duration": 16,
+ *         "data": {
+ *           "children": [],
+ *           "role": "admin"
+ *         }
+ *       }
+ *     ],
+ *     "clientId": "client-123"
+ *   }
  * }
  */
 export function withNesting(tracker) {
 
-    let ref,
-        tree = {};
+    function startChild(label, children) {
 
-    function getUnstopped(node = tree) {
-        if (!('end' in node)) this.push(node.label);
-        node.children.forEach(getUnstopped, this);
-        return this;
-    }
+        let count = 0;
 
-    function rootTiming(label) {
-        ref = tree.children = [];
-        const end = tracker.start(label);
-        return function stop(data = {}) {
-            const unstopped = getUnstopped.call([]).filter(Boolean);
-            if (!isEmpty(unstopped)) {
-                tree = {};
-                data.invalid = true;
-                data.message = 'Some nested timers were not stopped.';
-                data.timers = unstopped;
-            }
-            end(mergeWith(tree, data, customizer));
-            tree = {};
+        const info = {
+            label,
+            count: null,
+            start: Date.now(),
+            stop: null,
+            duration: null,
+            data: {
+                children: []
+            },
         };
+
+        const start = label => startChild(label, info.data.children);
+
+        function stop(data = {}) {
+            const stop = Date.now();
+            const copy = { ...info, data: {} };
+            children.push(mergeWith(
+                copy,
+                info,
+                {
+                    data,
+                    stop,
+                    count: ++count,
+                    duration: stop - info.start,
+                },
+                customizer
+            ));
+        }
+
+        return [stop, start];
+
     }
 
     return {
@@ -563,23 +697,11 @@ export function withNesting(tracker) {
         ...tracker,
 
         start(label) {
-            if (isEmpty(tree))
-                return rootTiming(label);
-            const info = {
-                label,
-                parent: ref,
-                children: [],
-                start: Date.now(),
-            };
-            ref.push(info);
-            ref = info.children;
-            return once(function stop(data) {
-                ref = info.parent;
-                delete info.parent;
-                info.end = Date.now();
-                info.duration = info.end - info.start;
-                mergeWith(info, data, customizer);
-            });
+            const tree = { children: [] };
+            const done = tracker.start(label);
+            const start = label => startChild(label, tree.children);
+            const stop = (data = {}) => done(mergeWith(tree, data, customizer));
+            return [stop, start];
         }
 
     };
