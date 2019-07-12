@@ -563,8 +563,8 @@ export default function createTracker(subscriber) {
  * }
  *
  * async function loadChildData(start) {
- *   const [stop, start] = start('nested timing');
- *   // now we can pass `start` to another function to
+ *   const [stop, nest] = start('nested timing');
+ *   // now we can pass `nest` to another function to
  *   // continue our pattern of creating nested timings
  *   await someDataCall();
  *   stop();
