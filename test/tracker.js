@@ -202,22 +202,24 @@ describe('tracker', () => {
 
             async function loadSecurity(start, clientId) {
                 const [stop] = start('load user roles');
-                await delay(15, clientId); // pretend data call
+                await delay(5, clientId); // pretend data call
                 stop({ role: 'admin' });
             }
 
             async function loadFeatures(start, product) {
                 const [stop] = start(`load ${product} features`);
-                await delay(15, product);
-                stop({ features: [
-                    `${product}-feat-a`,
-                    `${product}-feat-b`
-                ]});
+                await delay(5, product);
+                stop({
+                    features: [
+                        `${product}-feat-a`,
+                        `${product}-feat-b`
+                    ]
+                });
             }
 
             async function loadProducts(start, clientId) {
                 const [stop, nest] = start('loading products');
-                await delay(15, clientId);
+                await delay(5, clientId);
                 await Promise.all([
                     loadFeatures(nest, 'prod-a'),
                     loadFeatures(nest, 'prod-b')
@@ -305,16 +307,44 @@ describe('tracker', () => {
 
         });
 
-        it('only completed timings are tracked', () => {
-            const [stop, startChild] = tracker.start('root');
-            const [stop_child1] = startChild('child 1');
-            const [] = startChild('child 2'); // not stopped
-            stop_child1();
+        it('only completed timings are tracked', async () => {
+            const [stop, start] = tracker.start('load data');
+            start('child timing');
+            await delay(10);
             stop();
             expect(subscriber.args[0]).toMatchObject({
                 "count": 1,
-                "label": "root",
                 "type": "timer",
+                "label": "load data",
+                "id": expect.any(String),
+                "start": expect.any(Number),
+                "stop": expect.any(Number),
+                "duration": expect.any(Number),
+                "data": {
+                    "children": []
+                }
+            });
+        });
+
+        it('creates sibling for each stop', async () => {
+
+            async function makeParallelCalls(start) {
+                const [stop] = start('parallel calls');
+                await Promise.all([
+                    delay(10).then(() => stop()),
+                    delay(15).then(() => stop()),
+                    delay(20).then(() => stop())
+                ]);
+            }
+
+            const [stop, start] = tracker.start('load data');
+            await makeParallelCalls(start);
+            stop();
+
+            expect(subscriber.args[0]).toMatchObject({
+                "count": 1,
+                "type": "timer",
+                "label": "load data",
                 "id": expect.any(String),
                 "start": expect.any(Number),
                 "stop": expect.any(Number),
@@ -323,7 +353,27 @@ describe('tracker', () => {
                     "children": [
                         {
                             "count": 1,
-                            "label": "child 1",
+                            "label": "parallel calls",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": []
+                            }
+                        },
+                        {
+                            "count": 2,
+                            "label": "parallel calls",
+                            "start": expect.any(Number),
+                            "stop": expect.any(Number),
+                            "duration": expect.any(Number),
+                            "data": {
+                                "children": []
+                            }
+                        },
+                        {
+                            "count": 3,
+                            "label": "parallel calls",
                             "start": expect.any(Number),
                             "stop": expect.any(Number),
                             "duration": expect.any(Number),
@@ -334,49 +384,7 @@ describe('tracker', () => {
                     ]
                 }
             });
-        });
 
-        it('creates siblings if stopped twice', () => {
-            const [stop, startChild] = tracker.start('root');
-            const [stop_child] = startChild('child');
-            stop_child({ value: 'abc' });
-            stop_child({ value: 'def' });
-            stop();
-            expect(subscriber.args[0]).toMatchObject({
-                "count": 1,
-                "label": "root",
-                "type": "timer",
-                "id": expect.any(String),
-                "start": expect.any(Number),
-                "stop": expect.any(Number),
-                "duration": expect.any(Number),
-                "data": {
-                    "children": [
-                        {
-                            "count": 1,
-                            "label": "child",
-                            "start": expect.any(Number),
-                            "stop": expect.any(Number),
-                            "duration": expect.any(Number),
-                            "data": {
-                                "children": [],
-                                "value": "abc"
-                            }
-                        },
-                        {
-                            "count": 2,
-                            "label": "child",
-                            "start": expect.any(Number),
-                            "stop": expect.any(Number),
-                            "duration": expect.any(Number),
-                            "data": {
-                                "children": [],
-                                "value": "def"
-                            }
-                        }
-                    ]
-                }
-            });
         });
 
         it('tracks root twice if stopped twice', () => {

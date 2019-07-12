@@ -392,7 +392,184 @@ export default function createTracker(subscriber) {
 
 /**
  * **NOTE:** The only difference between this class and the normal {@link Tracker}
- * is how the {@link NestedTimingTracker#start start} method works.
+ * is how the {@link NestedTimingTracker#start start} method works. Creating nested
+ * timings introduces new edge cases that are important for you to understand:
+ *
+ * ### Edge Cases
+ * #### Calling stop() Multiple Times
+ *
+ * Normally, invoking the `stop()` function returned from `start()` multiple times
+ * will create a separate timing entry for each invocation and increase the entry's
+ * `count` property.
+ *
+ * With a nested timer, that only holds true for the root timing. For _nested_ timings,
+ * calling `stop()` multiple times creates _sibling_ entries, incrementing `count`
+ * with each invocation:
+ *
+ * ```javascript
+ * import { tracker } from '~/tracker';
+ * import { withNesting } from '@paychex/core/tracker';
+ *
+ * const logger = withNesting(tracker);
+ *
+ * async function makeParallelDataCalls(start) {
+ *     const [stop] = start('parallel calls');
+ *     await Promise.all([
+ *         someDataCall().then(() => stop()),
+ *         someOtherDataCall().then(() => stop()),
+ *         someLastDataCall().then(() => stop())
+ *     ]);
+ * }
+ *
+ * export async function loadData() {
+ *     const [stop, start] = logger.start('load data');
+ *     await makeParallelDataCalls(start);
+ *     stop();
+ * }
+ *
+ * // timing tree:
+ * {
+ *   "id": "9c6f8a25-5003-4b17-b3d6-838144c54a7d",
+ *   "label": "load data",
+ *   "start": 1562933463457,
+ *   "stop": 1562933463490,
+ *   "duration": 33,
+ *   "type": "timer",
+ *   "count": 1,
+ *   "data": {
+ *     "children": [
+ *       {
+ *         "label": "parallel calls",
+ *         "count": 1,
+ *         "start": 1562933463458,
+ *         "stop": 1562933463488,
+ *         "duration": 30,
+ *         "data": {
+ *           "children": []
+ *         }
+ *       },
+ *       {
+ *         "label": "parallel calls",
+ *         "count": 2,
+ *         "start": 1562933463458,
+ *         "stop": 1562933463490,
+ *         "duration": 32,
+ *         "data": {
+ *           "children": []
+ *         }
+ *       },
+ *       {
+ *         "label": "parallel calls",
+ *         "count": 3,
+ *         "start": 1562933463458,
+ *         "stop": 1562933463490,
+ *         "duration": 32,
+ *         "data": {
+ *           "children": []
+ *         }
+ *       }
+ *     ]
+ *   }
+ * }
+ * ```
+ *
+ * #### Stopping Parents Before Children
+ *
+ * It is okay for nested timings to stop _after_ an ancestor timing stops. However,
+ * when the _root_ timing is stopped, only completed timings will appear in the timing
+ * tree. In other words, any nested timings that are still running will _not_ appear
+ * in the timing tree.
+ *
+ * ```javascript
+ * import { tracker } from '~/tracker';
+ * import { withNesting } from '@paychex/core/tracker';
+ *
+ * const logger = withNesting(tracker);
+ *
+ * async function childData(start) {
+ *     const [stop] = start('child timing');
+ *     await someDataCall();
+ *     stop();
+ * }
+ *
+ * export async function loadData() {
+ *     const [stop, start] = logger.start('load data');
+ *     childData(start); // BUG! we forgot to await this async function!
+ *     // because we didn't wait for childData to complete, the next line
+ *     // will invoke stop WHILE the async function is still running...
+ *     stop();
+ * }
+ *
+ * // timing tree:
+ * {
+ *   "id": "ca0f72ad-eb9a-4b07-96ec-6292b8d2317f",
+ *   "label": "load data",
+ *   "start": 1562936590429,
+ *   "stop": 1562936590440,
+ *   "duration": 11,
+ *   "type": "timer",
+ *   "count": 1,
+ *   "data": {
+ *     "children": []
+ *   }
+ * }
+ * ```
+ * #### Creating Child Trackers
+ *
+ * Even on a NestedTimingTracker, calling {@link Tracker#child child()} creates
+ * a normal {@link Tracker} instance. So, if you call `start()` on a child Tracker,
+ * it will not use nested timings. If you want to combine child Trackers with
+ * nested timings, you should change your call order:
+ *
+ * ```javascript
+ * import { tracker } from '~/tracker';
+ * import { withNesting } from '@paychex/core/tracker';
+ *
+ * // INCORRECT ✘
+ * const logger = withNesting(tracker);
+ * const child = logger.child();
+ *
+ * // CORRECT ✓
+ * const child = tracker.child();
+ * const logger = withNesting(child);
+ * ```
+ *
+ * ### Best Practices
+ *
+ * If you need to create a nested timing, that is a good indication that the
+ * code should exist in a separate function. When you call this function, you
+ * should pass the nested `start` function so that function can continue the
+ * pattern by creating any nested timings it needs (now or in the future):
+ *
+ * ```javascript
+ * import { tracker } from '~/tracker';
+ * import { withNesting } from '@paychex/core/tracker';
+ *
+ * const logger = withNesting(tracker);
+ *
+ * // INCORRECT ✘
+ * export async function loadData() {
+ *   const [stop, start] = logger.start('load data');
+ *   start('nested timing');
+ *   await someDataCall();
+ *   stop();
+ * }
+ *
+ * // CORRECT ✓
+ * export async function loadData() {
+ *   const [stop, start] = logger.start('load data');
+ *   await loadChildData(start);
+ *   stop();
+ * }
+ *
+ * async function loadChildData(start) {
+ *   const [stop, start] = start('nested timing');
+ *   // now we can pass `start` to another function to
+ *   // continue our pattern of creating nested timings
+ *   await someDataCall();
+ *   stop();
+ * }
+ * ```
  *
  * @global
  * @interface NestedTimingTracker
@@ -416,16 +593,19 @@ export default function createTracker(subscriber) {
  * import { withNesting } from '@paychex/core/tracker';
  * import { someDataCall, someOtherDataCall } from '~/data/operations';
  *
- * const nested = withNesting(tracker);
+ * const child = tracker.child();
+ * const logger = withNesting(child);
  *
  * export async function loadData(id) {
- *   const child = nested.child();
- *   const [stop, start] = child.start('load data');
- *   const data = await someDataCall(id);
- *   const results = await loadNestedData(start, data);
- *   child.context({ id });
- *   stop({ results });
- *   return results;
+ *   try {
+ *     const [stop, start] = logger.start('load data');
+ *     const data = await someDataCall(id);
+ *     const results = await loadloggerData(start, data);
+ *     stop({ id, results });
+ *     return results;
+ *   } catch (e) {
+ *     logger.error(e);
+ *   }
  * }
  *
  * async function loadNestedData(start, data) {
@@ -439,115 +619,19 @@ export default function createTracker(subscriber) {
 /**
  * Enables nested timings for the given Tracker instance.
  *
- * **NOTE:** Calling `stop()` multiple times will create multiple timing entries,
- * incrementing `count` for each one. See the example.
- *
- * **IMPORTANT:** Only completed timers will be included in the timing tree. This
- * means if you forget to stop a nested timer before stopping the root timer, the
- * nested timer will not appear at all in the tracked timing entry. See the example.
+ * **IMPORTANT:** Enabling nested timings introduces edge cases and best practices
+ * you should understand before using. See the {@link NestedTimingTracker} documentation
+ * for more information.
  *
  * @function
  * @param {Tracker} tracker The Tracker to wrap to enable nested timings.
  * @returns {NestedTimingTracker} A Tracker instance that can create nested timings.
  * @example
- * // calling stop() multiple times
- * //  - multiple sibling entries created
- * //  - increment `count` each time stop is called
- *
  * import { tracker } from '~/tracking';
  * import { withNesting } from '@paychex/core/tracker';
  *
- * const nested = withNesting(tracker);
- *
- * const [stop, startChild] = nested.start('root');
- * const [stop_child] = startChild('child');
- *
- * stop_child({ value: 'abc' });
- * stop_child({ value: 'def' });
- *
- * // timing entry:
- * {
- *   "id": "0598770e-2398-4173-a9a8-347244301cf6",
- *   "label": "root",
- *   "start": 1562871459063,
- *   "stop": 1562871459079,
- *   "duration": 16,
- *   "type": "timer",
- *   "count": 1,
- *   "data": {
- *     "children": [
- *       {
- *         "label": "child",
- *         "count": 1,
- *         "start": 1562871459063,
- *         "stop": 1562871459074,
- *         "duration": 11,
- *         "data": {
- *           "children": [],
- *           "value": "abc"
- *         }
- *       },
- *       {
- *         "label": "child",
- *         "count": 2,
- *         "start": 1562871459063,
- *         "stop": 1562871459079,
- *         "duration": 16,
- *         "data": {
- *           "children": [],
- *           "value": "def"
- *         }
- *       }
- *     ]
- *   }
- * }
- * @example
- * // forgetting to stop a nested timer will exclude
- * // it from the resulting timing tree
- *
- * import { tracker } from '~/tracking';
- * import { withNesting } from '@paychex/core/tracker';
- *
- * const nested = withNesting(tracker);
- *
- * const [stop, startChild] = nested.start('root');
- * const [stop_child1] = startChild('child 1');
- * const [stop_child2] = startChild('child 2'); // never invoked
- *
- * stop_child1();
- * stop(); // but child2 is still running...
- *
- * // ...so the timing entry will look like this:
- * {
- *   "id": "aac3a9da-fb33-436e-808e-ad0054121db7",
- *   "label": "root",
- *   "start": 1562871031757,
- *   "stop": 1562871031762,
- *   "duration": 5,
- *   "type": "timer",
- *   "count": 1,
- *   "data": {
- *     "children": [
- *       {
- *         "label": "child 1",
- *         "count": 1,
- *         "start": 1562871031757,
- *         "stop": 1562871031762,
- *         "duration": 5,
- *         "data": {
- *           "children": []
- *         }
- *       }
- *     ]
- *   }
- * }
- * @example
- * // nested timings
- *
- * import { tracker } from '~/tracking';
- * import { withNesting } from '@paychex/core/tracker';
- *
- * const nested = withNesting(tracker);
+ * const child = tracker.child();
+ * const logger = withNesting(child);
  *
  * async function loadSecurity(start, clientId) {
  *     const [stop] = start('load user roles');
@@ -565,7 +649,7 @@ export default function createTracker(subscriber) {
  * }
  *
  * async function loadProducts(start, clientId) {
- *     const [stop, nest] = start('loading products');
+ *     const [stop, nest] = start('load products');
  *     await fakeDataCall(clientId); // pretend data call
  *     await Promise.all([
  *         loadFeatures(nest, 'prod-a'),
@@ -575,7 +659,7 @@ export default function createTracker(subscriber) {
  * }
  *
  * async function loadClientData(clientId) {
- *     const [stop, nest] = nested.start('load client data');
+ *     const [stop, nest] = logger.start('load client data');
  *     await loadProducts(nest, clientId);
  *     await loadSecurity(nest, clientId);
  *     stop({ clientId });
@@ -595,7 +679,7 @@ export default function createTracker(subscriber) {
  *   "data": {
  *     "children": [
  *       {
- *         "label": "loading products",
+ *         "label": "load products",
  *         "count": 1,
  *         "start": 1562872496161,
  *         "stop": 1562872496192,
