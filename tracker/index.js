@@ -600,7 +600,7 @@ export default function createTracker(subscriber) {
  *   try {
  *     const [stop, start] = logger.start('load data');
  *     const data = await someDataCall(id);
- *     const results = await loadloggerData(start, data);
+ *     const results = await loadNestedData(start, data);
  *     stop({ id, results });
  *     return results;
  *   } catch (e) {
