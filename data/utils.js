@@ -438,10 +438,11 @@ export function withCache(fetch, cache) {
 /**
  * Map of strings representing either {@link Request} headers
  * or {@link Response} {@link MetaData meta} headers. The header name is the key
- * and the header data is the value.
+ * and the header data is the value. If you pass an array of strings as the value,
+ * the strings will be combined and separated by commas.
  *
  * @global
- * @typedef {Object.<string, string>} HeadersMap
+ * @typedef {Object.<string, string|string[]>} HeadersMap
  * @example
  * import { fetch, createRequest } from '~/path/to/datalayer';
  *
@@ -450,7 +451,12 @@ export function withCache(fetch, cache) {
  *     base: 'my-app',
  *     path: '/path/to/data',
  *     headers: {
- *       'content-type': 'application/json'
+ *       'content-type': 'application/json',
+ *       'accept': [
+ *         'application/json',
+ *         'text/plain',
+ *         '*∕*'
+ *       ]
  *     }
  *   });
  *   const response = await fetch(request);

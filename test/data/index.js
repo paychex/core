@@ -506,6 +506,13 @@ describe('data', () => {
                 expect(http.setRequestHeader.args).toEqual(['key', 'value']);
             });
 
+            it('sets request headers from array', () => {
+                request.headers = { key: ['value1', 'value2'] };
+                adapter(request);
+                expect(http.setRequestHeader.called).toBe(true);
+                expect(http.setRequestHeader.args).toEqual(['key', 'value1, value2']);
+            });
+
             it('ignores non-string headers', () => {
                 request.headers = {
                     key: 123,

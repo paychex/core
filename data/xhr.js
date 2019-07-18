@@ -1,11 +1,18 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
+import filter from 'lodash/filter';
+import flatten from 'lodash/flatten';
 import attempt from 'lodash/attempt';
-import forEach from 'lodash/forEach';
+import isEmpty from 'lodash/isEmpty';
 import isString from 'lodash/isString';
 
 const splitter = /[\r\n]+/;
 const XSSI = /^\)]\}',?\n/;
+const empty = Object.create(null);
+
+function toStringArray(value) {
+    return filter(flatten([value]), isString).join(', ');
+}
 
 function safeParseJSON(response) {
     const json = String(response.data);
@@ -48,6 +55,18 @@ function setCached(response, sendDate) {
     const date = new Date(get(response, 'meta.headers.date'));
     if (!isNaN(date)) // determines if Date is valid
         set(response, 'meta.cached', date < sendDate)
+}
+
+function toKeyValuePair(name) {
+    return [name, toStringArray(this[name])];
+}
+
+function hasHeaderValue([, values]) {
+    return !isEmpty(values);
+}
+
+function setRequestHeader([name, value]) {
+    this.setRequestHeader(name, value);
 }
 
 export async function xhr(request) {
@@ -112,10 +131,10 @@ export async function xhr(request) {
 
         setResponseType(request, http);
 
-        forEach(request.headers, (value, name) => {
-            if (!isString(value)) return;
-            http.setRequestHeader(name, value);
-        });
+        Object.keys(get(request, 'headers', empty))
+            .map(toKeyValuePair, request.headers)
+            .filter(hasHeaderValue)
+            .forEach(setRequestHeader, http);
 
         http.send(request.body);
 
