@@ -1,9 +1,12 @@
+import attempt from 'lodash/attempt';
 import isEmpty from 'lodash/isEmpty';
+
+const readonly = (get) => ({ get, enumerable: true });
 
 /**
  * Provides utilities for synchronizing blocks of code.
  *
- * There are 3 types of signals provided in this module:
+ * There are 4 types of signals provided in this module:
  *
  * **Manual Reset Signal**
  *
@@ -40,6 +43,17 @@ import isEmpty from 'lodash/isEmpty';
  *
  * - disable the UI until a group of downloads have finished
  * - wait for a set of child components to load before stopping a timer
+ *
+ * **Semaphore**
+ *
+ * Think of a semaphore as a bouncer at a club who ensures that only a certain
+ * number of people are allowed in at one time. In other words, semaphores are
+ * used to control access to a limited pool of resources.
+ *
+ * Use cases:
+ *
+ * - limit file uploads to a maximum of 5 at a time
+ * - limit in-progress data calls on a slow network
  *
  * @module signals
  */
@@ -597,5 +611,221 @@ export function countdown(initialCount = 0) {
         increment,
         decrement,
     };
+
+}
+
+/**
+ * Limits access to a pool of resources by restricting how many callers can run at a time.
+ * Any callers above the allowed amount will be queued until a spot is released.
+ *
+ * **Best Practices**
+ *
+ * - Whether your operation succeeds or fails, _always_ call {@link module:signals~Semaphore#release release()}
+ * to ensure the next caller can proceed. Calling `release()` inside a `finally` block makes this easy.
+ * See the example below.
+ *
+ * @interface Semaphore
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ * import { fetch, createRequest } from '~/path/to/datalayer';
+ * import { tracker } from '~/path/to/tracker';
+ *
+ * const uploadSpots = semaphore(5);
+ * const operation = {
+ *   base: 'files',
+ *   method: 'POST',
+ *   path: '/save/:id'
+ * };
+ *
+ * export async function uploadFile(blob) {
+ *   const data = new FormData();
+ *   const params = { id: tracker.uuid() };
+ *   data.append('file', blob, params.id);
+ *   try {
+ *     await uploadSpots.ready();
+ *     await fetch(createRequest(operation, params, data));
+ *     return params.id;
+ *   } finally {
+ *     uploadSpots.release(); // always release
+ *   }
+ * }
+ */
+
+/**
+ * The number of spots currently available for callers before they will be queued.
+ *
+ * @member module:signals~Semaphore#available
+ * @type {number}
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore(10);
+ *
+ * spots.ready().then(doSomething).finally(spots.release);
+ *
+ * console.log(spots.queued); // 0
+ * console.log(spots.running); // 1
+ * console.log(spots.available); // 9
+ */
+
+/**
+ * The number of callers currently running. Callers must always remember to call
+ * {@link module:signals~Semaphore#release release()} when done to ensure this number
+ * is decremented appropriately.
+ *
+ * @member module:signals~Semaphore#running
+ * @type {number}
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore(10);
+ *
+ * spots.ready().then(doSomething).finally(spots.release);
+ *
+ * console.log(spots.queued); // 0
+ * console.log(spots.running); // 1
+ * console.log(spots.available); // 9
+ */
+
+/**
+ * The number of callers that are still waiting to run.
+ *
+ * @member module:signals~Semaphore#queued
+ * @type {number}
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore(2);
+ *
+ * spots.ready().then(doSomething).finally(spots.release);
+ * spots.ready().then(doSomethingElse).finally(spots.release);
+ * spots.ready().then(doAnotherThing).finally(spots.release);
+ *
+ * console.log(spots.queued); // 1
+ * console.log(spots.running); // 2
+ * console.log(spots.available); // 0
+ */
+
+/**
+ * Notifies the semaphore that the given number of slots have become available.
+ * If any callers have been queued, they will be run in the newly available slots.
+ *
+ * @function module:signals~Semaphore#release
+ * @param {number} [count=1] The number to spots to make available.
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore(2);
+ *
+ * spots.ready()
+ *   .then(doSomething)
+ *   .finally(spots.release);
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore();
+ *
+ * Promise.all([
+ *   spots.ready().then(firstOperation),
+ *   spots.ready().then(secondOperation)
+ * ]).finally(() => spots.release(2));
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore(10);
+ *
+ * export async function doSomething() {
+ *   await spots.ready();
+ *   try {
+ *     // code
+ *   } finally {
+ *     spots.release();
+ *   }
+ * }
+ */
+
+/**
+ * Queues the caller until a spot is available.
+ *
+ * @function module:signals~Semaphore#ready
+ * @returns {Promise} A Promise that will be resolved when a slot is available.
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ *
+ * const spots = semaphore(2);
+ *
+ * export async function doSomething() {
+ *   await spots.ready();
+ *   try {
+ *     // do stuff
+ *   } finally {
+ *     spots.release();
+ *   }
+ * }
+ */
+
+/**
+ * Limits access to a pool of resources by restricting how many callers can run at a time.
+ * Any callers above the allowed amount will be queued until a spot is released.
+ *
+ * @function
+ * @param {number} [maxConcurrency=5] The maximum number of parallel callers to allow.
+ * @returns {module:signals~Semaphore} Limits access to a pool of resources by restricting how many callers can run at a time.
+ * @example
+ * import { semaphore } from '@paychex/core/signals';
+ * import { fetch, createRequest } from '~/path/to/datalayer';
+ * import { tracker } from '~/path/to/tracker';
+ *
+ * const uploadSpots = semaphore(5);
+ * const operation = {
+ *   base: 'files',
+ *   method: 'POST',
+ *   path: '/save/:id'
+ * };
+ *
+ * export async function uploadFile(blob) {
+ *   const data = new FormData();
+ *   const params = { id: tracker.uuid() };
+ *   data.append('file', blob, params.id);
+ *   try {
+ *     await uploadSpots.ready();
+ *     await fetch(createRequest(operation, params, data));
+ *     return params.id;
+ *   } finally {
+ *     uploadSpots.release(); // always release
+ *   }
+ * }
+ */
+export function semaphore(maxConcurrency = 5) {
+
+    let counter = 0;
+    const queue = [];
+
+    function enqueueIfNeeded(resolve) {
+        if (++counter <= maxConcurrency)
+            resolve();
+        else
+            queue.push(resolve);
+    }
+
+    function ready() {
+        return new Promise(enqueueIfNeeded);
+    }
+
+    function release(count = 1) {
+        const min = Math.max(1, Math.floor(count));
+        const amount = Math.min(counter - queue.length, min);
+        queue.splice(0, amount).forEach(attempt);
+        counter -= amount;
+    }
+
+    return Object.defineProperties({
+        ready,
+        release,
+    }, {
+        queued: readonly(() => queue.length),
+        running: readonly(() => counter - queue.length),
+        available: readonly(() => Math.max(0, maxConcurrency - counter)),
+    });
 
 }

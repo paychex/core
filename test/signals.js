@@ -2,8 +2,9 @@ import expect from 'expect';
 import { spy } from './utils';
 import {
     autoReset,
-    countdown,
     manualReset,
+    countdown,
+    semaphore,
 } from '../signals';
 
 describe('signals', () => {
@@ -256,6 +257,84 @@ describe('signals', () => {
                 expect(nextFrame.called).toBe(false);
             });
 
+        });
+
+    });
+
+    describe('semaphore', () => {
+
+        let signal;
+        beforeEach(() => signal = semaphore(2));
+
+        it('has expected methods', () => {
+            ['ready', 'release'].forEach(method =>
+                expect(typeof signal[method]).toBe('function'));
+        });
+
+        it('has expected properties', () => {
+            ['available', 'queued', 'running'].forEach(prop =>
+                expect(typeof signal[prop]).toBe('number'));
+        });
+
+        it('queues above limit', async () => {
+            const handler = spy();
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            expect(signal.queued).toBe(2);
+            expect(signal.running).toBe(2);
+            expect(signal.available).toBe(0);
+            await new Promise(setTimeout); // next tick
+            expect(handler.callCount).toBe(2);
+        });
+
+        it('uses default limit if none provided', () => {
+            signal = semaphore();
+            expect(signal.queued).toBe(0);
+            expect(signal.running).toBe(0);
+            expect(signal.available).toBe(5);
+        });
+
+        it('runs queued tasks on release', async () => {
+            const handler = spy().invokes(signal.release);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            await new Promise(setTimeout); // next tick
+            expect(handler.callCount).toBe(4);
+        });
+
+        it('runs subset of queued tasks on partial release', async () => {
+            const handler = spy();
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            signal.ready().then(handler);
+            expect(signal.queued).toBe(2);
+            expect(signal.running).toBe(2);
+            expect(signal.available).toBe(0);
+            await new Promise(setTimeout); // next tick
+            signal.release(1);
+            expect(signal.queued).toBe(1);
+            expect(signal.running).toBe(2);
+            expect(signal.available).toBe(0);
+            signal.ready().then(handler);
+            expect(signal.queued).toBe(2);
+            await new Promise(setTimeout); // next tick
+            expect(handler.callCount).toBe(3);
+            signal.release();
+            signal.release();
+            expect(signal.queued).toBe(0);
+            expect(signal.running).toBe(2);
+            expect(signal.available).toBe(0);
+            await new Promise(setTimeout); // next tick
+            expect(handler.callCount).toBe(5);
+            signal.release(50);
+            expect(signal.queued).toBe(0);
+            expect(signal.running).toBe(0);
+            expect(signal.available).toBe(2);
         });
 
     });
