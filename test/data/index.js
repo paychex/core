@@ -357,6 +357,44 @@ describe('data', () => {
                 });
             });
 
+            it('uses status lookup if no statusText provided', (done) => {
+                const response = {
+                    status: 402,
+                    statusText: '',
+                    meta: { error: true }
+                };
+                const adapter = spy().returns(response);
+                const request = {
+                    method: 'GET',
+                    adapter: 'test',
+                    url: 'www.test.com'
+                };
+                adapters.set('test', adapter);
+                dataLayer.fetch(request).catch(e => {
+                    expect(e.message).toBe('Payment Required');
+                    done();
+                });
+            });
+
+            it('uses default message if unknown status provided', (done) => {
+                const response = {
+                    status: 88,
+                    statusText: '',
+                    meta: { error: true }
+                };
+                const adapter = spy().returns(response);
+                const request = {
+                    method: 'GET',
+                    adapter: 'test',
+                    url: 'www.test.com'
+                };
+                adapters.set('test', adapter);
+                dataLayer.fetch(request).catch(e => {
+                    expect(e.message).toBe('Unknown HTTP Error');
+                    done();
+                });
+            });
+
         });
 
         describe('createRequest', () => {
