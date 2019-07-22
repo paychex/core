@@ -1,43 +1,40 @@
 {
   "name": "@paychex/core",
   "version": "0.3.0",
-  "description": "Common components for Paychex Flex.",
+  "description": "Provides framework-agnostic functionality for use in applications.",
   "main": "index.js",
   "author": "Dan Barnes",
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-3": "^6.24.1",
-    "babel-register": "^6.26.0",
+    "@babel/core": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/register": "^7.5.5",
     "docdash": "^1.1.1",
     "expect": "^24.8.0",
     "jsdoc": "^3.6.2",
     "mocha": "^6.1.4",
     "nyc": "^14.1.1"
   },
+  "engines": {
+    "node": ">= 7.6.0"
+  },
   "scripts": {
-    "test": "nyc mocha --require babel-register --recursive",
-    "test:coverage": "nyc --reporter=lcov mocha --require babel-register --recursive",
+    "test": "nyc mocha --require @babel/register --recursive",
+    "test:coverage": "nyc --reporter=lcov mocha --require @babel/register --recursive",
     "docs": "jsdoc -c jsdoc.json"
   },
   "babel": {
     "presets": [
       [
-        "env",
+        "@babel/env",
         {
-          "targets": {
-            "node": "7.6.0"
-          },
+          "targets": "node 7.6.0",
           "modules": "commonjs"
         }
-      ],
-      "stage-3"
+      ]
     ],
     "plugins": [
-      "transform-es2015-modules-commonjs"
+      "@babel/plugin-transform-modules-commonjs"
     ]
   },
   "dependencies": {
