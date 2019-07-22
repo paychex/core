@@ -3,8 +3,22 @@
   "version": "0.3.0",
   "description": "Provides framework-agnostic functionality for use in applications.",
   "main": "index.js",
-  "author": "Dan Barnes",
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "author": "Paychex, Inc.",
+  "contributors": [
+    {
+      "name": "Dan Barnes",
+      "email": "dbarnes1@paychex.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/paychex/core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/paychex/core/issues"
+  },
+  "homepage": "https://github.com/paychex/core",
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",

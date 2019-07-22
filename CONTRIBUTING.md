@@ -4,6 +4,60 @@ Thank you for wanting to contribute to the `@paychex/core` library!
 
 Please read this entire file before pushing any code to the repository.
 
+## Pull Requests
+
+Please ensure you do the following before submitting any code for review:
+
+- Reach out to at least one repository maintainer early in development to assist with design decisions.
+- Use [Gitflow](https://nvie.com/posts/a-successful-git-branching-model/) to name your branches. For normal contributions, that means creating a `feature/<name>` or `bugfix/<name>` branch off of the `develop` branch.
+- Ensure your test coverage is at 100%.
+- Write documentation for any public methods.
+- Use [conventional commit](https://www.conventionalcommits.org/en/v1.0.0-beta.3/#summary) messages on all commits.
+
+Finally, because your code will be consumed by many other developers, please allow enough time for the maintainers to review your proposed changes thoroughly.
+
+## Commit Messages
+
+Try to follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4) standard. The following commit types should be used:
+
+type | description
+:--- | :---
+feat | The commit adds a new feature.
+fix | The commit fixes a bug.
+perf | The commit is solely to improve performance.
+docs | The commit only updates or improves documentation.
+test | The commit only modifies tests.
+refactor | The commit changes code but does not fix a bug or modify public methods.
+chore | The commit modifies builds, publishing, source control, or other non-code functionality.
+
+### Example Commit Messages
+
+```text
+perf(signals): reuse constructor function
+
+Rather than create a new constructor function on each invocation of
+ready(), we now reuse an existing function. This also makes the logic in
+autoReset() a bit more readable.
+```
+
+```text
+feat(stores): remove asObservable wrapper
+
+This functionality can be provided by Store implementers more simply,
+and likely better aligned with feature use cases. It also removes a
+significant size dependency on RxJS.
+
+BREAKING
+```
+
+## Documentation
+
+Make sure your public methods and types are all documented. Use [jsDocs](http://usejsdoc.org/index.html) and run `npm run docs` to ensure your documentation compiles. Include examples of typical use cases.
+
+## Unit Tests
+
+This repository contains code that will be used by many developers. Accordingly, **you should aim for 100% code coverage** of any features you write. Each conditional branch should be tested, edge cases should be considered, and errors should be propagated appropriately.
+
 ## Design Principles
 
 Code written for a library is different from application code. A library provides a toolbox for other developers. And much like a screwdriver or a hammer, library code is completely unaware of how it will be used. Also like a tool, each feature in a library should serve a single well-defined purpose.
@@ -171,27 +225,3 @@ export function withFeature( delegate:IDelegate [, options:{[string]: any}] ): I
 ### Patterns & Principles Summary
 
 Apply single-responsibility and open-closed principles to our code allows us to provide new features easily through `proxy`, `adapter`, and `decorator` wrapper methods.
-
-## Commit Messages
-
-Try to follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.3/#summary) standard. See [this wiki page](https://wiki.paychex.com/display/ENTAPPS/Git+Commit+Standards) for more information.
-
-## Documentation
-
-Make sure your public methods and types are all documented. Use [jsDocs](http://usejsdoc.org/index.html) and run `npm run docs` to ensure your documentation compiles. Include examples of typical use cases.
-
-## Unit Tests
-
-This repository contains code that will be used by many developers. Accordingly, you should aim for 100% code coverage of any features you write. Each conditional branch should be tested, edge cases should be considered, and errors should be propagated appropriately.
-
-## Pull Requests
-
-Please ensure you do the following before submitting any code for review:
-
-- Use [Paychex Gitflow standards](https://wiki.paychex.com/display/ENTAPPS/GitFlow+for+SSO) to name your branches correctly.
-- Use [conventional commit](https://www.conventionalcommits.org/en/v1.0.0-beta.3/#summary) messages on all commits.
-- Reach out to at least one repository maintainer early in development to assist with design decisions.
-- Ensure your test coverage is at 100%.
-- Write documentation for any public methods.
-
-Finally, because your code will be consumed by many other developers, please allow enough time for the maintainers to review your proposed changes thoroughly.
