@@ -53,8 +53,13 @@ function setResponse(response, http) {
 
 function setCached(response, sendDate) {
     const date = new Date(get(response, 'meta.headers.date'));
-    if (!isNaN(date)) // determines if Date is valid
-        set(response, 'meta.cached', date < sendDate)
+    if (!isNaN(date)) { // determines if Date is valid
+        // Date header is only accurate to the nearest second
+        // so we round both down to the second before comparing
+        const responseTime = Math.floor(date.getTime() / 1000);
+        const requestTime = Math.floor(sendDate.getTime() / 1000);
+        set(response, 'meta.cached', responseTime < requestTime);
+    }
 }
 
 function toKeyValuePair(name) {
