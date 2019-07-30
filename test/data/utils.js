@@ -26,27 +26,26 @@ describe('data', () => {
             it('resolves after period when below failure count', async () => {
                 const request = {};
                 const delays = [200, 400, 800, 1600, 3200];
-                const timeout = (fn, delay) => {
-                    expect(delay).toBe(delays.shift());
-                    fn();
+                const scheduler = spy().invokes(fn => fn());
+                const retry = falloff(5, 200, { scheduler });
+                async function verify(ms, i) {
+                    await retry(request);
+                    expect(scheduler.calls[i].args[1]).toBe(ms);
                 }
-                const retry = falloff(5, 200, { scheduler: timeout });
-                await retry(request);
-                await retry(request);
-                await retry(request);
-                await retry(request);
-                await retry(request);
+                await Promise.all(delays.map(verify));
             });
 
             it('rejects after period when reaches failure count', async () => {
                 const request = {};
-                const timeout = fn => fn();
-                const retry = falloff(2, 200, { scheduler: timeout });
+                const scheduler = spy().invokes(fn => fn());
+                const retry = falloff(2, 200, { scheduler });
                 await retry(request);
                 await retry(request);
                 try {
                     await retry(request);
+                    expect.fail('retry should fail');
                 } catch (e) {
+                    expect(scheduler.callCount).toBe(2);
                     expect(e).toBeUndefined();
                 }
             });
@@ -54,12 +53,13 @@ describe('data', () => {
             it('counts different requests separately', async () => {
                 const request1 = {};
                 const request2 = {};
-                const timeout = fn => fn();
-                const retry = falloff(2, 200, { scheduler: timeout });
+                const scheduler = spy().invokes(fn => fn());
+                const retry = falloff(2, 200, { scheduler });
                 await retry(request1);
                 await retry(request2);
                 await retry(request1);
                 await retry(request2);
+                expect(scheduler.callCount).toBe(4);
             });
 
             it('uses default arguments when necessary', async () => {
@@ -68,7 +68,7 @@ describe('data', () => {
                 const retry = falloff();
                 retry({});
                 expect(timeout.called).toBe(true);
-                expect(timeout.args[1]).toBe(200);
+                expect(timeout.args).toEqual([expect.any(Function), 200]);
                 timeout.args[0]();
                 global.setTimeout = original.bind(global);
             });
