@@ -54,6 +54,53 @@ describe('process', () => {
 
     });
 
+    describe('process', () => {
+
+        let a, b, c;
+        beforeEach(() => {
+            a = spy();
+            b = spy();
+            c = spy();
+        });
+
+        it('allows iterable actions - Set', async () => {
+            process('test', new Set([
+                action('a', a),
+                action('b', b),
+                action('c', c),
+            ]), dependencies())();
+            await new Promise(setTimeout);
+            expect(a.called).toBe(true);
+            expect(b.called).toBe(true);
+            expect(c.called).toBe(true);
+        });
+
+        it('allows iterable actions - array', async () => {
+            process('test', [
+                action('a', a),
+                action('b', b),
+                action('c', c),
+            ], dependencies())();
+            await new Promise(setTimeout);
+            expect(a.called).toBe(true);
+            expect(b.called).toBe(true);
+            expect(c.called).toBe(true);
+        });
+
+        it('allows iterable actions - ModelList', async () => {
+            process('test', modelList(
+                action('a', a),
+                action('b', b),
+                action('c', c),
+            ), dependencies())();
+            await new Promise(setTimeout);
+            expect(a.called).toBe(true);
+            expect(b.called).toBe(true);
+            expect(c.called).toBe(true);
+        });
+
+    });
+
     describe('dependencies', () => {
 
         it('uses empty object if none provided', () => {

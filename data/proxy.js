@@ -13,10 +13,12 @@ function arrayConcat(lhs, rhs) {
     }
 }
 
+/** @this {ProxyRule} */
 function patternMatches([key, pattern]) {
     return new RegExp(pattern, 'i').test(this[key]);
 }
 
+/** @this {ProxyRule} */
 function ruleMatches(rule) {
     const { match = {} } = rule;
     return Object.entries(match).every(patternMatches, this);
@@ -32,7 +34,7 @@ function withoutMatchObject(rule) {
  * instance that must match in order for the rule to be applied.
  *
  * @global
- * @typedef {Object} ProxyRule
+ * @typedef {{}} ProxyRule
  * @alias ProxyRule
  * @mixes Request
  * @property {string} [protocol] 'http', 'https', 'file', etc.
@@ -54,7 +56,7 @@ function withoutMatchObject(rule) {
 * Creates a new proxy instance.
 *
 * @function module:data.createProxy
-* @returns {Proxy}
+* @returns {Proxy} A Proxy instance.
 * @example
 * import {createProxy} from '@paychex/data'
 * import rules from '~/config/proxy'
@@ -71,7 +73,7 @@ export function createProxy() {
          * Uses the current proxy rules to construct a URL based on the given arguments.
          *
          * @param {string} base A base value, e.g. 'payroll' or 'party'.
-         * @param {(...string|string[])} paths One or more URL paths to combine into the final URL.
+         * @param {...string} paths One or more URL paths to combine into the final URL.
          * @returns {string} A URL with the appropriate protocol, host, port, and paths
          * given the currently configured proxy rules.
          * @example
@@ -164,7 +166,7 @@ export function createProxy() {
         /**
          * Add rules to the proxy instance. The order rules are added determines
          * the order they are applied.
-         * @param {(...ProxyRule|ProxyRule[])} rules The rules to use to configure this proxy instance.
+         * @param {...ProxyRule} rules The rules to use to configure this proxy instance.
          * @example
          * import { proxy } from '~/path/to/data';
          *

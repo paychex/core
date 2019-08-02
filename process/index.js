@@ -3,6 +3,7 @@ import find from 'lodash/find';
 import last from 'lodash/last';
 import omit from 'lodash/omit';
 import keys from 'lodash/keys';
+import uniqBy from 'lodash/uniqBy';
 import without from 'lodash/without';
 import iteratee from 'lodash/iteratee';
 import isEmpty from 'lodash/isEmpty';
@@ -10,7 +11,6 @@ import isString from 'lodash/isString';
 import isFunction from 'lodash/isFunction';
 import isPlainObject from 'lodash/isPlainObject';
 
-import { withUnique } from '../models';
 import { rethrow, error } from '../errors';
 
 /**
@@ -508,7 +508,7 @@ export function run(action, context, initialize = true) {
  *
  * @function
  * @param {string} name The name of the process to run.
- * @param {ModelList} actions A {@link ModelList} containing {@link Action}s to run.
+ * @param {Iterable<Action>} actions An interable collection (e.g. Set, array, or {@link ModelList}) of {@link Action}s to run.
  * @param {ProcessLogic} logic The logic that determines how to start and continue a process.
  * @returns {ProcessStart} A method you can invoke to begin the process. The arguments will
  * depend in part on the {@link ProcessLogic} object you passed.
@@ -557,14 +557,13 @@ export function run(action, context, initialize = true) {
  * @example
  * // state machine
  * import { tracker } from '~/tracking';
- * import { modelList } from '@paychex/core/models';
  * import { action, process, transitions } from '@paychex/core/process';
  * import { rethrow, fatal, ignore } from '@paychex/core/errors';
  *
  * import { showDialog } from '../some/dialog';
  * import { dispatch } from '../some/workflow';
  *
- * const actions = modelList();
+ * const actions = new Set();
  *
  * // if no start state is explicitly passed to the start()
  * // method then this first action will be used automatically
@@ -627,14 +626,13 @@ export function run(action, context, initialize = true) {
  * import { call, takeEvery } from 'redux-saga/effects';
  *
  * import { addSaga } from '~/store';
- * import { modelList } from '@paychex/core/models';
  * import { action, process, dependencies } from '@paychex/core/process';
  *
- * const actions = modelList(
+ * const actions = [
  *   action('a', () => console.log('a')),
  *   action('b', () => console.log('b')),
  *   action('c', () => console.log('c')),
- * );
+ * ];
  *
  * const dispatch = process('saga handler', actions, dependencies({
  *   b: ['a'],
@@ -651,14 +649,13 @@ export function run(action, context, initialize = true) {
  * import { call, takeEvery } from 'redux-saga/effects';
  *
  * import { addSaga } from '~/store';
- * import { modelList } from '@paychex/core/models';
  * import { action, process, transitions } from '@paychex/core/process';
  *
- * const actions = modelList(
+ * const actions = [
  *   action('a', () => console.log('a')),
  *   action('b', () => console.log('b')),
  *   action('c', function() { this.stop(); }),
- * );
+ * ];
  *
  * const start = process('saga handler', actions, transitions([
  *   ['a', 'b'],
@@ -674,7 +671,7 @@ export function run(action, context, initialize = true) {
  */
 export function process(name, actions, logic) {
 
-    const threads = withUnique(actions, 'name').items();
+    const threads = uniqBy(Array.from(actions), 'name');
     const { getInitialActions, getNextActions, contextFromArgs = noop } = logic;
 
     function runActions(actions, ctx) {
@@ -927,7 +924,7 @@ export function transitions(criteria = []) {
  * A map of {@link Action action} names to their dependencies.
  *
  * @global
- * @typedef {Object} ProcessDependencyMap
+ * @typedef {Object.<string, string[]>} ProcessDependencyMap
  * @example
  * import { modelList } from '@paychex/core/models';
  * import { action, process, dependencies } from '@paychex/core/process';

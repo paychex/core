@@ -126,6 +126,7 @@ describe('tracker', () => {
                 tracker.error(err);
                 tracker.error(err);
                 expect(subscriber.callCount).toBe(3);
+                expect(err.count).toBe(3);
                 expect(subscriber.args[0].count).toBe(3);
             });
 

@@ -84,7 +84,7 @@ import defaults from 'lodash/defaults';
  *
  * @method EventBus#fire
  * @param {string} event The name of the event to fire.
- * @param {...*} [args] Optional arguments to pass to subscribers.
+ * @param {...any} [args] Optional arguments to pass to subscribers.
  * @example
  * import { eventBus } from '@paychex/core';
  * import { tracker } from '~/tracking';

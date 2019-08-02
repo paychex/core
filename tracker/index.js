@@ -1,4 +1,6 @@
 import uuid from 'uuid/v4';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import noop from 'lodash/noop';
 import invoke from 'lodash/invoke';
 import isArray from 'lodash/isArray';
@@ -62,7 +64,7 @@ function tryMeasure(label, start) {
  * @property {number} stop The number of milliseconds between January 1, 1970 00:00:00 UTC and when this entry was ended.
  * @property {number} duration The difference in milliseconds between start and stop.
  * @property {number} count The number of times this entry has been logged.
- * @property {object.<string, any>} data Optional additional data associated with this tracking entry.
+ * @property {Object.<string, any>} data Optional additional data associated with this tracking entry.
  */
 
 /**
@@ -98,7 +100,7 @@ function tryMeasure(label, start) {
  *
  * @global
  * @callback TimerStopFunction
- * @param {object.<string,any>} [data] Optional data to include in the timer entry.
+ * @param {Object.<string, any>} [data] Optional data to include in the timer entry.
  */
 
 /**
@@ -252,7 +254,7 @@ export default function createTracker(subscriber) {
          * by this Tracker or any child Trackers.
          *
          * @function
-         * @param {object.<string, any>} data The data to merge into any
+         * @param {Object.<string, any>} data The data to merge into any
          * {@link TrackingInfo} instances created by this (or child) Tracker
          * methods.
          * @example
@@ -278,7 +280,7 @@ export default function createTracker(subscriber) {
          *
          * @function
          * @param {string} message The name of the event to log.
-         * @param {object.<string, any>} [data] Optional information to associate with this {@link TrackingInfo}.
+         * @param {Object.<string, any>} [data] Optional information to associate with this {@link TrackingInfo}.
          * @example
          * import { tracker } from '~/tracking';
          *
@@ -330,7 +332,7 @@ export default function createTracker(subscriber) {
             const now = Date.now();
             if (!isError(err))
                 return console.warn('A non-Error was passed to tracker.error:', err);
-            err.count = err.count || 0;
+            set(err, 'count', get(err, 'count', 0) + 1);
             subscriber(Object.freeze({
                 id,
                 type: 'error',
@@ -338,7 +340,7 @@ export default function createTracker(subscriber) {
                 start: now,
                 stop: now,
                 duration: 0,
-                count: ++err.count,
+                count: get(err, 'count'),
                 data: getContext(err, {
                     // non-enumerable properties
                     // we want to track should be
@@ -577,6 +579,17 @@ export default function createTracker(subscriber) {
  */
 
 /**
+ * Array of functions returned by calling {@link NestedTimingTracker#start start}
+ * on a {@link NestedTimingTracker} instance. The first function stops the current
+ * timer. The second function starts a new nested timer.
+ *
+ * @global
+ * @typedef {function[]} NestedStartResult
+ * @property {TimerStopFunction} 0 Stop the nested timer.
+ * @property {NestedTimingTracker#start} 1 Start a nested timer.
+ */
+
+/**
  * Starts a timing tree. Unlike the normal {@link Tracker#start start} method, this
  * method does _not_ return a stop function. Instead, it returns an array. The first
  * value in the array is the stop function; the second argument is another start function
@@ -584,7 +597,7 @@ export default function createTracker(subscriber) {
  *
  * @override
  * @function NestedTimingTracker#start
- * @returns {Array.<TimerStopFunction, NestedTimingTracker#start>} The `[stop, start]` methods you can use to
+ * @returns {NestedStartResult} The `[stop, start]` methods you can use to
  * end the current timing or start a nested timing. The first function
  * is a normal {@link TimerStopFunction} and the second function is
  * another {@link NestedTimingTracker#start} function.

@@ -341,7 +341,7 @@ function readonly(getter) {
  * Creates a new {@link ModelList} instance.
  *
  * @function
- * @param {...any} [elements] Optional items to add to the collection.
+ * @param {...any} [items] Optional items to add to the collection.
  * @returns {ModelList} A new ModelList instance
  * @example
  * import { modelList } from '@paychex/core/models';
@@ -447,7 +447,7 @@ export function modelList(...elements) {
  *
  * @function
  * @param {ModelList} list The ModelList instance to adapt.
- * @param {...any[]} [args] Optional arguments to pass to lodash's orderBy method.
+ * @param {...any} [args] Optional arguments to pass to lodash's orderBy method.
  * @returns {ModelList~OrderedModelList} A ModelList with ordering functionality.
  * @see {@link https://lodash.com/docs/4.17.11#iteratee _.iteratee} and {@link https://lodash.com/docs/4.17.11#orderBy _.orderBy}
  * @example
