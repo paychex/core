@@ -139,11 +139,11 @@ describe('data', () => {
             it('rejects with original error if retry rejects', (done) => {
                 const request = {};
                 const response = {};
-                retry.throws(new Error('ignored'));
+                retry.onCall(2).throws(new Error('ignored'));
                 fetch.throws(Object.assign(new Error('not found'), { response }));
                 wrapper(request).catch((e) => {
                     expect(e.message).toBe('not found');
-                    expect(e.response.meta.retryCount).toBe(1);
+                    expect(e.response.meta.retryCount).toBe(3);
                     expect(retries.has(request)).toBe(false);
                     done();
                 });

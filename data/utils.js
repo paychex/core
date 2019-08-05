@@ -286,8 +286,9 @@ export function withRetry(fetch, retry, retries = new Map()) {
                 .then(() => retry(request, e.response))
                 .then(() => useRetry(request))
                 .catch(() => {
+                    if (retries.has(request))
+                        set(e, 'response.meta.retryCount', retries.get(request));
                     retries.delete(request);
-                    set(e, 'response.meta.retryCount', count + 1);
                     throw e;
                 });
         }
