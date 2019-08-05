@@ -1,5 +1,11 @@
+import cond from 'lodash/cond';
 import omit from 'lodash/omit';
+import isEmpty from 'lodash/isEmpty';
 import isArray from 'lodash/isArray';
+import isNumber from 'lodash/isNumber';
+import matches from 'lodash/matches';
+import constant from 'lodash/constant';
+import stubTrue from 'lodash/stubTrue';
 import mergeWith from 'lodash/mergeWith';
 
 const DOUBLE_SLASH = /\/\//g;
@@ -27,6 +33,27 @@ function ruleMatches(rule) {
 function withoutMatchObject(rule) {
     return omit(rule, 'match');
 }
+
+const equals = rhs => lhs => lhs === rhs;
+const suffix = after => value => `${value}${after}`;
+const prefix = before => value => `${before}${value}`;
+
+const format = {
+    protocol: cond([
+        [matches('file'), constant('file:///')],
+        [isEmpty, constant('//')],
+        [stubTrue, suffix('://')]
+    ]),
+    port: cond([
+        [equals(80), constant('')],
+        [isNumber, prefix(':')],
+        [stubTrue, constant('')]
+    ]),
+    path: cond([
+        [isEmpty, constant('')],
+        [stubTrue, prefix('/')]
+    ])
+};
 
 /**
  * Represents a single rule in a proxy instance. A Proxy rule looks like a normal Request
@@ -106,7 +133,12 @@ export function createProxy() {
             const { protocol = '', host = base, port = 80 } = config
                 .filter(ruleMatches, { base, path })
                 .reduce(merge, {});
-            return `${protocol}${protocol ? ':' : ''}//${protocol === 'file' ? '/' : ''}${host}${port === 80 ? '' : `:${port}`}${path ? `/${path}` : ''}`;
+            return [
+                format.protocol(protocol),
+                host,
+                format.port(port),
+                format.path(path)
+            ].join('');
         },
 
         /**
