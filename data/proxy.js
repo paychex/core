@@ -19,12 +19,18 @@ function arrayConcat(lhs, rhs) {
     }
 }
 
-/** @this {ProxyRule} */
+/**
+ * @ignore
+ * @this {ProxyRule}
+ */
 function patternMatches([key, pattern]) {
     return new RegExp(pattern, 'i').test(this[key]);
 }
 
-/** @this {ProxyRule} */
+/**
+ * @ignore
+ * @this {ProxyRule}
+ */
 function ruleMatches(rule) {
     const { match = {} } = rule;
     return Object.entries(match).every(patternMatches, this);
