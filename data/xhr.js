@@ -117,10 +117,9 @@ export async function xhr(request) {
         }
 
         function failure() {
-            setHeaders(response, http);
             response.meta.error = true;
-            response.status = http.status;
-            response.statusText = http.statusText;
+            setStatus(response, http);
+            setHeaders(response, http);
             resolve(Object.freeze(response));
         }
 
