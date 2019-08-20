@@ -477,7 +477,7 @@ export function withOrdering(list, ...args) {
 
     let orderArgs = args;
 
-    function _setOrderBy(...args) {
+    function setOrderBy(...args) {
         orderArgs = args;
         list.fire('order-change');
     }
@@ -489,7 +489,7 @@ export function withOrdering(list, ...args) {
     return {
         ...list,
         ...mixin(items),
-        orderBy: _setOrderBy,
+        orderBy: setOrderBy,
     };
 
 }
@@ -707,7 +707,7 @@ export function withGrouping(list, grouper = identity) {
 
     let groupFn = grouper;
 
-    function _setGroupBy(fn) {
+    function setGroupBy(fn) {
         groupFn = fn;
         list.fire('group-change');
     }
@@ -719,7 +719,7 @@ export function withGrouping(list, grouper = identity) {
     return {
         ...list,
         groups,
-        groupBy: _setGroupBy
+        groupBy: setGroupBy
     };
 
 }
@@ -1008,7 +1008,8 @@ export function withActive(list) {
  * list.toggle(); // [1, 2, 3]
  * list.toggle(2); // [1, 3]
  * list.toggle(); // [1, 2, 3]
- * list.toggle(1, 2); // [3]
+ * list.toggle(); // []
+ * list.toggle(1, 2); // [1, 2]
  */
 
 /**
