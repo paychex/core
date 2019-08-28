@@ -47,22 +47,22 @@ describe('data', () => {
             it('returns modified url if one rule matches', async () => {
                 proxy.use({
                     protocol: 'ftp',
-                    host: 'files.paychex.com',
+                    host: 'files.myserver.com',
                     port: 21,
                     match: {
                         base: 'test'
                     }
                 });
-                expect(proxy.url('test')).toBe('ftp://files.paychex.com:21');
+                expect(proxy.url('test')).toBe('ftp://files.myserver.com:21');
             });
 
             it('returns modified url if rule has no conditions', async () => {
                 proxy.use({
                     protocol: 'ftp',
-                    host: 'files.paychex.com',
+                    host: 'files.myserver.com',
                     port: 21
                 });
-                expect(proxy.url('test')).toBe('ftp://files.paychex.com:21');
+                expect(proxy.url('test')).toBe('ftp://files.myserver.com:21');
             });
 
             it('adds 3rd slash for file protocol', async () => {
@@ -76,37 +76,37 @@ describe('data', () => {
             it('returns correct url if multiple rules match', async () => {
                 proxy.use({
                     protocol: 'ftp',
-                    host: 'files.paychex.com',
+                    host: 'files.myserver.com',
                     port: 21,
                     match: {
                         base: 'test'
                     }
                 }, {
                         protocol: 'http',
-                        host: 'cache.paychex.com',
+                        host: 'cache.myserver.com',
                         match: {
                             base: 'test'
                         }
                     });
-                expect(proxy.url('test', 'file')).toBe('http://cache.paychex.com:21/file');
+                expect(proxy.url('test', 'file')).toBe('http://cache.myserver.com:21/file');
             });
 
             it('ignores non-matching rules', async () => {
                 proxy.use({
                     protocol: 'ftp',
-                    host: 'files.paychex.com',
+                    host: 'files.myserver.com',
                     port: 21,
                     match: {
                         base: 'test'
                     }
                 }, {
                         protocol: 'http',
-                        host: 'cache.paychex.com',
+                        host: 'cache.myserver.com',
                         match: {
                             base: 'does-not-match'
                         }
                     });
-                expect(proxy.url('test', 'file')).toBe('ftp://files.paychex.com:21/file');
+                expect(proxy.url('test', 'file')).toBe('ftp://files.myserver.com:21/file');
             });
 
         });

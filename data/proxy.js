@@ -71,10 +71,10 @@ const format = {
  * @alias ProxyRule
  * @mixes Request
  * @property {string} [protocol] 'http', 'https', 'file', etc.
- * @property {string} [host] 'myapps.paychex.com', 'localhost', etc.
+ * @property {string} [host] 'myapps.myserver.com', 'localhost', etc.
  * @property {number} [port] 80, 8080, etc.
  * @property {Object.<string, string>} match One or more keys in a request object whose values must match
- * the given regular expression patterns. E.g.: `{base: 'payroll'}` or `{base: 'party', path: 'load.+'}`
+ * the given regular expression patterns. E.g.: `{base: 'cdn'}` or `{base: 'myapp', path: 'load.+'}`
  */
 
 /**
@@ -105,7 +105,7 @@ export function createProxy() {
         /**
          * Uses the current proxy rules to construct a URL based on the given arguments.
          *
-         * @param {string} base A base value, e.g. 'payroll' or 'party'.
+         * @param {string} base A base value, e.g. 'cdn' or 'myapp'.
          * @param {...string} paths One or more URL paths to combine into the final URL.
          * @returns {string} A URL with the appropriate protocol, host, port, and paths
          * given the currently configured proxy rules.
@@ -116,19 +116,18 @@ export function createProxy() {
          * proxy.use({
          *   port: 8118,
          *   protocol: 'https',
-         *   host: 'ecs.cloud.paychex.com',
+         *   host: 'images.myserver.com',
          *   match: {
-         *     base: 'paychex-cloud'
+         *     base: 'images'
          *   }
          * });
          *
          * ```html
-         *   <img src="{{ getCloudImage('avatars', 'e13d429a') }}" alt="" />
-         *   <!-- https://ecs.cloud.paychex.com:8118/avatars/e13d429a -->
+         *   <img src="{{ getImageURL('avatars', 'e13d429a') }}" alt="" />
+         *   <!-- https://images.myserver.com:8118/avatars/e13d429a -->
          * ```
-         * export function getCloudImage(bucket, id) {
-         *   const url = proxy.url('paychex-cloud', '/:bucket', '/:id');
-         *   return tokenize(url, { bucket, id });
+         * export function getImageURL(bucket, id) {
+         *   return proxy.url('images', bucket, id);
          * }
          */
         url(base, ...paths) {
@@ -208,14 +207,14 @@ export function createProxy() {
          * @example
          * import { proxy } from '~/path/to/data';
          *
-         * // any {@link Request Requests} with base == 'paychex-cloud'
-         * // will be routed to https://ecs.cloud.paychex.com:8118
+         * // any {@link Request Requests} with base == 'files'
+         * // will be routed to https://files.myserver.com:8118
          * proxy.use({
          *   port: 8118,
          *   protocol: 'https',
-         *   host: 'ecs.cloud.paychex.com',
+         *   host: 'files.myserver.com',
          *   match: {
-         *     base: 'paychex-cloud'
+         *     base: 'files'
          *   }
          * });
          */
