@@ -139,11 +139,11 @@ describe('data', () => {
             it('rejects with original error if retry rejects', (done) => {
                 const request = {};
                 const response = {};
-                retry.throws(new Error('ignored'));
+                retry.onCall(2).throws(new Error('ignored'));
                 fetch.throws(Object.assign(new Error('not found'), { response }));
                 wrapper(request).catch((e) => {
                     expect(e.message).toBe('not found');
-                    expect(e.response.meta.retryCount).toBe(1);
+                    expect(e.response.meta.retryCount).toBe(3);
                     expect(retries.has(request)).toBe(false);
                     done();
                 });
@@ -578,11 +578,11 @@ describe('data', () => {
                 document.createElement.onCall(0).returns(a1);
                 document.createElement.onCall(1).returns(a2);
                 wrapper = withXSRF(fetch, {
-                    cookie: 'custom-cookie',
+                    cookie: 'custom.cookie',
                     header: 'another-header'
                 });
                 set(a2, 'port', a1.port);
-                set(document.cookie, 'custom-cookie', 'token');
+                set(document, ['cookie', 'custom.cookie'], 'token');
                 await wrapper(Object.create(null));
                 expect(fetch.args[0]).toMatchObject({
                     headers: { 'another-header': 'token' }

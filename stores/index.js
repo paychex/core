@@ -1,3 +1,5 @@
+import isString from 'lodash/isString';
+
 /**
  * Provides methods for storing information on the client's
  * machine. The persistence period will vary based on the
@@ -95,7 +97,7 @@ export function htmlStore(provider) {
 
         async get(key) {
             const value = provider.getItem(key);
-            return typeof value === 'string' ? JSON.parse(value) : value;
+            return isString(value) ? JSON.parse(value) : value;
         },
 
         async set(key, value) {

@@ -1,9 +1,11 @@
 import sjcl from 'sjcl';
-import isEmpty from 'lodash/isEmpty';
 import memoize from 'lodash/memoize';
 import identity from 'lodash/identity';
+import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 import conforms from 'lodash/conforms';
+import stubTrue from 'lodash/stubTrue';
+import cond from 'lodash/cond';
 
 /**
  * Contains utility methods for working with Stores.
@@ -123,6 +125,12 @@ export function withEncryption(store, { key, iv }) {
 
 }
 
+const getPrefixer = cond([
+    [isFunction, identity],
+    [isEmpty, () => identity],
+    [stubTrue, (prefix) => (key) => `${prefix}:${key}`],
+]);
+
 /**
  * Method used to modify a key for use in a Store. Used primarily by
  * {@link module:stores/utils.withPrefix withPrefix}.
@@ -167,9 +175,7 @@ export function withEncryption(store, { key, iv }) {
  */
 export function withPrefix(store, prefix) {
 
-    const prefixer = isFunction(prefix) ?
-        prefix : isEmpty(prefix) ?
-            identity : (key) => `${prefix}:${key}`;
+    const prefixer = getPrefixer(prefix);
 
     return {
 

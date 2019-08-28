@@ -34,7 +34,7 @@ import isPlainObject from 'lodash/isPlainObject';
  * @constant
  * @type {string}
  * @example
- * import { createTracker } from '@paychex/core/tracker';
+ * import createTracker from '@paychex/core/tracker';
  * import { ERROR, IGNORE, FATAL } from '@paychex/core/errors';
  *
  * export const tracker = createTracker((info) => {
@@ -61,7 +61,7 @@ export const FATAL = 'FATAL';
  * @constant
  * @type {string}
  * @example
- * import { createTracker } from '@paychex/core/tracker';
+ * import createTracker from '@paychex/core/tracker';
  * import { ERROR, IGNORE, FATAL } from '@paychex/core/errors';
  *
  * export const tracker = createTracker((info) => {
@@ -88,7 +88,7 @@ export const ERROR = 'ERROR';
  * @constant
  * @type {string}
  * @example
- * import { createTracker } from '@paychex/core/tracker';
+ * import createTracker from '@paychex/core/tracker';
  * import { ERROR, IGNORE, FATAL } from '@paychex/core/errors';
  *
  * export const tracker = createTracker((info) => {

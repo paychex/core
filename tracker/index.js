@@ -118,7 +118,7 @@ function tryMeasure(label, start) {
  * @example
  * // app/index.js
  *
- * import { createTracker } from '@paychex/core/tracker';
+ * import createTracker from '@paychex/core/tracker';
  *
  * export const tracker = createTracker();
  *
