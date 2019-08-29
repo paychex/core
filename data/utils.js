@@ -836,7 +836,7 @@ export function withHeaders(fetch, headers = {}) {
 }
 
 function cookieProvider(name) {
-    return get(window, `document.cookie.${name}`);
+    return get(window, ['document', 'cookie', name]);
 }
 
 function getUrlProperties(url) {

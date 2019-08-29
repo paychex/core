@@ -162,24 +162,28 @@ describe('stores', () => {
 
         ['get', 'set', 'delete'].forEach(method => {
 
-            it('invokes prefixer with key', () => {
-                prefixer.returns('prefix:key')
-                prefixed[method]('key');
-                expect(prefixer.called).toBe(true);
-                expect(prefixer.args[0]).toEqual('key');
-                expect(store[method].args[0]).toEqual('prefix:key');
-            });
+            describe(method, () => {
 
-            it('works with string', () => {
-                prefixed = withPrefix(store, 'prefix');
-                prefixed.get('key');
-                expect(store.get.args[0]).toBe('prefix:key');
-            });
+                it('invokes prefixer with key', () => {
+                    prefixer.returns('prefix:key')
+                    prefixed[method]('key');
+                    expect(prefixer.called).toBe(true);
+                    expect(prefixer.args[0]).toEqual('key');
+                    expect(store[method].args[0]).toEqual('prefix:key');
+                });
 
-            it('ignores empty string', () => {
-                prefixed = withPrefix(store, '');
-                prefixed.get('key');
-                expect(store.get.args[0]).toBe('key');
+                it('works with string', () => {
+                    prefixed = withPrefix(store, 'prefix');
+                    prefixed.get('key');
+                    expect(store.get.args[0]).toBe('prefix:key');
+                });
+
+                it('ignores empty string', () => {
+                    prefixed = withPrefix(store, '');
+                    prefixed.get('key');
+                    expect(store.get.args[0]).toBe('key');
+                });
+
             });
 
         });

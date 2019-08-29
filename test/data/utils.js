@@ -578,11 +578,11 @@ describe('data', () => {
                 document.createElement.onCall(0).returns(a1);
                 document.createElement.onCall(1).returns(a2);
                 wrapper = withXSRF(fetch, {
-                    cookie: 'custom-cookie',
+                    cookie: 'custom.cookie',
                     header: 'another-header'
                 });
                 set(a2, 'port', a1.port);
-                set(document.cookie, 'custom-cookie', 'token');
+                set(document, ['cookie', 'custom.cookie'], 'token');
                 await wrapper(Object.create(null));
                 expect(fetch.args[0]).toMatchObject({
                     headers: { 'another-header': 'token' }

@@ -52,6 +52,14 @@ describe('process', () => {
             expect(action('test', props)).toMatchObject(props);
         });
 
+        it('does not overwrite defaults', () => {
+            const a = action('a', spy());
+            const b = action('b', spy());
+            expect(a.retry).toBe(b.retry);
+            a.retry = spy();
+            expect(a.retry).not.toBe(b.retry);
+        });
+
     });
 
     describe('process', () => {

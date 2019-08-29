@@ -25,7 +25,7 @@
         "search": true,
         "menu": {
             "Source Code": {
-                "href": "https://code.paychex.com/projects/HTML5/repos/paychex-core/browse",
+                "href": "https://github.com/paychex/core",
                 "target": "_blank",
                 "class": "menu-item",
                 "id": "repository"

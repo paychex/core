@@ -278,10 +278,12 @@ const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
  * ), transitions());
  */
 export function action(name, api) {
-    const base = { name, ...DEFAULTS };
-    return isFunction(api) ?
-        { ...base, execute: api } :
-        { ...base, ...api };
+    const result = Object.assign({ name }, DEFAULTS);
+    if (isFunction(api))
+        result.execute = api;
+    else
+        Object.assign(result, api);
+    return result;
 }
 
 function findByName(name) {
