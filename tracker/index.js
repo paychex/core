@@ -131,18 +131,18 @@ function tryMeasure(label, start) {
  * // import the root tracker with 'app' defined
  * import { tracker } from '../index';
  *
- * import { rest, createRequest } from '../data';
+ * import { fetch, createRequest } from '../data';
  * import { rethrow } from '@paychex/core/errors';
  * import { withOrdering, modelList } from '@paychex/core/models';
  *
  * // create a child tracker for use
  * // only within this file
- * const child = tracker.child();
+ * const fileTracker = tracker.child();
  *
  * // all calls to child tracker methods
  * // will include this 'component', along
  * // with 'app' set by the root tracker
- * child.context({
+ * fileTracker.context({
  *   component: 'my-app-search'
  * });
  *
@@ -153,18 +153,23 @@ function tryMeasure(label, start) {
  *
  * export async function getSearchResults(query) {
  *
- *   // additional data for the child tracker
- *   child.context({ query });
+ *   // create a child tracker for use only within
+ *   // the lifetime of this function (ensures each
+ *   // call to this function gets its own context)
+ *   const methodTracker = fileTracker.child();
+ *
+ *   // set data specific to this invocation
+ *   methodTracker.context({ query });
  *
  *   // the following event will include 'query'
- *   // and 'component' from the child tracker
+ *   // and 'component' from ancestor trackers
  *   // as well as 'app' from the root tracker
- *   child.event('search');
+ *   methodTracker.event('search');
  *
  *   const params = { query };
- *   const stop = child.start('perform search');
+ *   const stop = methodTracker.start('perform search');
  *   const request = createRequest(operation, params);
- *   const response = await rest(request).catch(rethrow(params));
+ *   const response = await fetch(request).catch(rethrow(params));
  *   const results = response.data;
  *
  *   // the following timer will include 'query',
