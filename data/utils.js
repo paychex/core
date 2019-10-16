@@ -5,10 +5,10 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import noop from 'lodash/noop';
 import pick from 'lodash/pick';
-import merge from 'lodash/merge';
 import invoke from 'lodash/invoke';
 import isEqual from 'lodash/isEqual';
 import memoize from 'lodash/memoize';
+import defaults from 'lodash/defaults';
 import cloneDeep from 'lodash/cloneDeep';
 import conformsTo from 'lodash/conformsTo';
 import isFunction from 'lodash/isFunction';
@@ -804,7 +804,8 @@ export function withAuthentication(fetch, reauthenticate) {
  * @function
  * @param {DataLayer#fetch} fetch The fetch method to wrap.
  * @param {HeadersMap} headers The headers to apply to the {@link Request} headers
- * collection. If a header already exists it will *not* be overwritten.
+ * collection. Request headers with will override any default headers with the same
+ * names specified here.
  * @returns {DataLayer#fetch} The wrapped fetch method.
  * @example
  * import { withHeaders } from '@paychex/core/data/utils';
@@ -830,7 +831,7 @@ export function withAuthentication(fetch, reauthenticate) {
 export function withHeaders(fetch, headers = {}) {
     return async function useHeaders(request) {
         const clone = cloneDeep(request);
-        merge(clone.headers, headers);
+        defaults(clone.headers, headers);
         return await fetch(clone);
     };
 }

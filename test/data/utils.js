@@ -480,12 +480,15 @@ describe('data', () => {
                     expect(fetch.args[0].headers).toMatchObject(request.headers));
             });
 
-            it('merges in provided headers', () => {
+            it('request headers override default headers', () => {
                 const request = { headers: { abc: 123 } };
-                const incoming = { abc: 456, def: 789 };
-                wrapper = withHeaders(fetch, incoming);
+                const defaults = { abc: 456, def: 789 };
+                wrapper = withHeaders(fetch, defaults);
                 return wrapper(request).then(() =>
-                    expect(fetch.args[0].headers).toMatchObject(incoming));
+                    expect(fetch.args[0].headers).toMatchObject({
+                        abc: 123,
+                        def: 789
+                    }));
             });
 
             it('does not modify original request headers', () => {
