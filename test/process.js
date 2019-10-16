@@ -289,6 +289,27 @@ describe('process', () => {
             });
         });
 
+        it('rollback and failure errors have metadata', (done) => {
+            const error = new Error('fail');
+            const verify = spy().invokes((err) => {
+                expect(err).toBe(error);
+                expect(err).toMatchObject({
+                    message: 'fail',
+                    process: expect.any(String),
+                    completed: expect.any(Array),
+                    running: expect.any(Array)
+                });
+                if (verify.callCount === 4)
+                    done();
+            });
+            a.failure = verify;
+            b.failure = verify;
+            c.failure = verify;
+            b.rollback = verify;
+            b.execute = spy().throws(error);
+            factory()().catch(Function.prototype);
+        });
+
         it('cancel mixes in data', (done) => {
             const promise = factory()();
             promise.catch((err) => {

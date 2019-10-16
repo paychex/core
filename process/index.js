@@ -766,9 +766,9 @@ export function process(name, actions, logic) {
             return runActions(startActions, { context, runtimeInfo }).catch(reject);
 
         })
+            .catch(throwError)
             .catch(callRollback)
             .catch(callFailure)
-            .catch(throwError)
             .then(callSuccess);
 
         return Object.assign(promise, { cancel, update, stop } = context);
