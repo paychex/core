@@ -350,6 +350,7 @@ export default function createTracker(subscriber) {
                     // non-enumerable properties
                     // we want to track should be
                     // explicitly retrieved here
+                    name: err.name,
                     stack: err.stack
                 })
             }));

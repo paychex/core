@@ -115,7 +115,9 @@ describe('tracker', () => {
                     count: 1,
                     data: {
                         a: 1,
-                        key: 'value'
+                        key: 'value',
+                        name: expect.any(String),
+                        stack: expect.any(String)
                     }
                 });
             });
