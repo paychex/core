@@ -3,6 +3,7 @@ import set from 'lodash/set';
 import unset from 'lodash/unset';
 
 import { spy } from '../utils';
+import { manualReset, autoReset } from '../../signals';
 
 import {
     falloff,
@@ -14,7 +15,8 @@ import {
     withDiagnostics,
     withAuthentication,
     withHeaders,
-    withXSRF
+    withXSRF,
+    withSignal,
 } from '../../data/utils';
 
 describe('data', () => {
@@ -598,6 +600,64 @@ describe('data', () => {
                 set(document.cookie, 'XSRF-TOKEN', 'token');
                 await wrapper(request);
                 expect(fetch.args[0]).not.toBe(request);
+            });
+
+        });
+
+        describe('withSignal', () => {
+
+            let wrapper, fetch, signal;
+
+            beforeEach(() => {
+                fetch = spy();
+                signal = manualReset(false);
+                wrapper = withSignal(fetch, signal);
+            });
+
+            it('delays fetch until signaled', (done) => {
+                wrapper({});
+                setTimeout(() => {
+                    expect(fetch.called).toBe(false);
+                    signal.set();
+                    setTimeout(() => {
+                        expect(fetch.called).toBe(true);
+                        done();
+                    });
+                });
+            });
+
+            it('sets signal when fetch completes', async () => {
+                signal.set();
+                signal.set = spy();
+                await wrapper({});
+                expect(signal.set.called).toBe(true);
+            });
+
+            it('use case: authentication', (done) => {
+                wrapper({});
+                wrapper({});
+                wrapper({});
+                setTimeout(() => {
+                    expect(fetch.called).toBe(false);
+                    signal.set();
+                    setTimeout(() => {
+                        expect(fetch.called).toBe(true);
+                        expect(fetch.callCount).toBe(3);
+                        done();
+                    });
+                });
+            });
+
+            it('use case: sequencing', async () => {
+                signal = autoReset(true);
+                wrapper = withSignal(fetch, signal);
+                fetch.returns(new Promise(resolve => setTimeout(resolve, 10)));
+                await wrapper({});
+                await wrapper({});
+                await wrapper({});
+                expect(fetch.callCount).toBe(3);
+                expect(fetch.calls[1].callTime - fetch.calls[0].callTime > 5);
+                expect(fetch.calls[2].callTime - fetch.calls[1].callTime > 5);
             });
 
         });

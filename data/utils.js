@@ -947,3 +947,61 @@ export function withXSRF(fetch, options = {}) {
         return await fetch(clone);
     };
 }
+
+/**
+ * A {@link module:signals~ManualResetSignal ManualResetSignal}
+ * or {@link module:signals~AutoResetSignal AutoResetSignal}.
+ * @ignore
+ * @typedef {module:signals~ManualResetSignal|module:signals~AutoResetSignal} Signal
+ */
+
+/**
+ * Coordinates and synchronizes access to the data pipeline through
+ * the specified {@link module:signals~ManualResetSignal ManualResetSignal}
+ * or {@link module:signals~AutoResetSignal AutoResetSignal}.
+ *
+ * @function
+ * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Signal} signal The {@link module:signals~ManualResetSignal ManualResetSignal}
+ * or {@link module:signals~AutoResetSignal AutoResetSignal} to use to synchronize data calls.
+ * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @example
+ * // delay calls until the user is authenticated
+ *
+ * import { manualReset } from '@paychex/core/signals';
+ * import { withSignal } from '@paychex/core/data/utils';
+ *
+ * import fetch from 'path/to/datalayer';
+ *
+ * const authenticated = manualReset(false);
+ * export const pipeline = withSignal(fetch, authenticated);
+ *
+ * export function setAuthenticated() {
+ *   authenticated.set();
+ * }
+ * @example
+ * // prevent concurrent data calls from reaching the
+ * // server out of order by enforcing a sequence (i.e.
+ * // the first call must complete before a second call
+ * // is sent)
+ *
+ * import { autoReset } from '@paychex/core/signals';
+ * import { withSignal } from '@paychex/core/data/utils';
+ *
+ * import fetch from 'path/to/datalayer';
+ *
+ * // start the pipeline in a signaled state; each call will
+ * // automatically reset the signal, which will be set again
+ * // when the call completes, allowing the next call to proceed
+ * export const pipeline = withSignal(fetch, autoReset(true));
+ */
+export function withSignal(fetch, signal) {
+    return async function useSignal(request) {
+        await signal.ready();
+        try {
+            return await fetch(request);
+        } finally {
+            signal.set();
+        }
+    };
+}
