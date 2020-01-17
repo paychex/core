@@ -24,12 +24,12 @@ describe('data', () => {
             let proxy;
             beforeEach(() => proxy = createProxy());
 
-            it('returns default url if no rules set', async () => {
+            it('returns default url if no rules set', () => {
                 const url = proxy.url('base', 'path1', 'path2');
                 expect(url).toBe('//base/path1/path2');
             });
 
-            it('returns default url if no rules match', async () => {
+            it('returns default url if no rules match', () => {
                 proxy.use({
                     match: {
                         base: 'does-not-match'
@@ -39,12 +39,12 @@ describe('data', () => {
                 expect(url).toBe('//base/path1/path2');
             });
 
-            it('strips trailing slash if no paths provided', async () => {
+            it('strips trailing slash if no paths provided', () => {
                 const url = proxy.url('base');
                 expect(url).toBe('//base');
             });
 
-            it('returns modified url if one rule matches', async () => {
+            it('returns modified url if one rule matches', () => {
                 proxy.use({
                     protocol: 'ftp',
                     host: 'files.myserver.com',
@@ -56,7 +56,7 @@ describe('data', () => {
                 expect(proxy.url('test')).toBe('ftp://files.myserver.com:21');
             });
 
-            it('returns modified url if rule has no conditions', async () => {
+            it('returns modified url if rule has no conditions', () => {
                 proxy.use({
                     protocol: 'ftp',
                     host: 'files.myserver.com',
@@ -65,7 +65,7 @@ describe('data', () => {
                 expect(proxy.url('test')).toBe('ftp://files.myserver.com:21');
             });
 
-            it('adds 3rd slash for file protocol', async () => {
+            it('adds 3rd slash for file protocol', () => {
                 proxy.use({
                     protocol: 'file',
                     host: 'C:\\Users\\Documents'
@@ -73,40 +73,48 @@ describe('data', () => {
                 expect(proxy.url('test')).toBe('file:///C:\\Users\\Documents');
             });
 
-            it('returns correct url if multiple rules match', async () => {
-                proxy.use({
+            it('returns correct url if multiple rules match', () => {
+                const ftp = {
                     protocol: 'ftp',
                     host: 'files.myserver.com',
                     port: 21,
                     match: {
                         base: 'test'
                     }
-                }, {
-                        protocol: 'http',
-                        host: 'cache.myserver.com',
-                        match: {
-                            base: 'test'
-                        }
-                    });
+                };
+                const http = {
+                    protocol: 'http',
+                    host: 'cache.myserver.com',
+                    match: {
+                        base: 'test'
+                    }
+                };
+                proxy.use(ftp, http);
                 expect(proxy.url('test', 'file')).toBe('http://cache.myserver.com:21/file');
             });
 
-            it('ignores non-matching rules', async () => {
-                proxy.use({
+            it('ignores non-matching rules', () => {
+                const ftp = {
                     protocol: 'ftp',
                     host: 'files.myserver.com',
                     port: 21,
                     match: {
                         base: 'test'
                     }
-                }, {
-                        protocol: 'http',
-                        host: 'cache.myserver.com',
-                        match: {
-                            base: 'does-not-match'
-                        }
-                    });
+                };
+                const http = {
+                    protocol: 'http',
+                    host: 'cache.myserver.com',
+                    match: {
+                        base: 'does-not-match'
+                    }
+                };
+                proxy.use(ftp, http);
                 expect(proxy.url('test', 'file')).toBe('ftp://files.myserver.com:21/file');
+            });
+
+            it('returns relative url if no base or protocol', () => {
+                expect(proxy.url('', 'some/path')).toBe('/some/path');
             });
 
         });

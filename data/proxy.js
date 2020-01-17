@@ -139,7 +139,7 @@ export function createProxy() {
                 .filter(ruleMatches, { base, path })
                 .reduce(merge, {});
             return [
-                format.protocol(protocol),
+                host ? format.protocol(protocol) : '',
                 host,
                 format.port(port),
                 format.path(path)

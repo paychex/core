@@ -689,6 +689,10 @@ describe('data', () => {
                 expect(tokenize(tokens, params)).toBe('http://www.value1.com/value2');
             });
 
+            it('handles partial path tokens', () => {
+                expect(tokenize('/path/:token1-dir/:token2.ext', params)).toBe('/path/value1-dir/value2.ext');
+            });
+
             it('appends params to querystring when no tokens', () => {
                 expect(tokenize(none, params)).toBe('http://www.url.com?token1=value1&token2=value2');
             });
