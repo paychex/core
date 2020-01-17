@@ -261,8 +261,10 @@ function getErrorMessage(response) {
  *
  * @global
  * @typedef {object} DataDefinition
- * @property {string} base Used by the Proxy to determine a base path.
- * @property {string} path Combined with the base path to construct a full URL.
+ * @property {string} base Used in conjunction with {@link ProxyRule ProxyRules} to determine the
+ * domain name for the resulting {@link Request} URL. If an empty string is provided then a relative
+ * URL (one without a protocol or domain name) will be created using the existing domain name and protocol.
+ * @property {string} path Combined with the base path (if provided) to construct an absolute or relative URL.
  * @property {string} [adapter='xhr'] The adapter to use to complete the request.
  * @property {HeadersMap} [headers={accept: 'application/json, text/plain, *∕*'}] The HTTP headers to use on the request.
  * @property {object} [ignore={}] Can be used to skip certain behaviors. See documentation for details.
@@ -460,6 +462,8 @@ export function createDataLayer(proxy, adapters = new Map()) {
      * @returns {Request} A fully formed Request that can be passed to {@link DataLayer#fetch fetch}.
      * @throws A valid DataDefinition object must be passed to createRequest.
      * @example
+     * // save modified user data using a PATCH
+     *
      * import { createPatch } from 'some/json-patch/library';
      * import { rethrow, fatal } from '@paychex/core/errors';
      * import { createRequest, fetch } from '~/path/to/datalayer';
@@ -475,6 +479,26 @@ export function createDataLayer(proxy, adapters = new Map()) {
      *   const body = createPatch(original, modified);
      *   const request = createRequest(operation, params, body);
      *   const response = await fetch(request).catch(rethrow(fatal(params)));
+     *   return response.data;
+     * }
+     * @example
+     * // load data using the current domain and protocol
+     *
+     * import { rethrow } from '@paychex/core/errors';
+     * import { createRequest, fetch } from '~/path/to/datalayer';
+     *
+     * const operation = {
+     *   method: 'GET',
+     *   // by not specifying a `base` value the resulting
+     *   // URL will be relative to the current domain and
+     *   // protocol
+     *   path: '/users/:id'
+     * };
+     *
+     * export async function loadUserData(id) {
+     *   const params = { id };
+     *   const request = createRequest(operation, params);
+     *   const response = await fetch(request).catch(rethrow(params));
      *   return response.data;
      * }
      */
