@@ -170,7 +170,7 @@ const PROXY_SCHEMA = {
 };
 
 const DDO_SCHEMA = {
-    base: isNonEmptyString,
+    base: isString,
     path: isNonEmptyString,
 };
 
