@@ -123,15 +123,15 @@ export async function xhr(request) {
             resolve(Object.freeze(response));
         }
 
-        http.timeout = request.timeout;
-        http.withCredentials = request.withCredentials;
-
         http.addEventListener('load', success);
         http.addEventListener('abort', abort);
         http.addEventListener('error', failure);
         http.addEventListener('timeout', timeout);
 
         http.open(request.method, request.url);
+
+        http.timeout = request.timeout;
+        http.withCredentials = request.withCredentials;
 
         setResponseType(request, http);
 
