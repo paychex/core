@@ -159,6 +159,12 @@ describe('process', () => {
             expect(typeof start().then).toBe('function');
         });
 
+        it('stop after start does nothing', () => {
+            const start = factory();
+            const promise = start();
+            promise.stop();
+        });
+
         it('empty process immediately resolves', () => {
             return method()().then((results) =>
                 expect(results).toEqual({}));
@@ -333,7 +339,7 @@ describe('process', () => {
                     done();
                 }, 50);
             });
-            promise.cancel();
+            setTimeout(() => promise.cancel());
         });
 
     }

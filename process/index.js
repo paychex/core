@@ -56,6 +56,8 @@ import { rethrow, error } from '../errors';
 
 const abort = (err) => Promise.reject(err);
 const readonly = (get) => ({ get, enumerable: true });
+const resolved = Promise.resolve();
+const immediate = (fn) => resolved.then(fn);
 
 const DEFAULTS = {
     init: noop,
@@ -761,9 +763,10 @@ export function process(name, actions, logic) {
             if (isEmpty(threads))
                 return resolve(context.results);
 
-            const startActions = getInitialActions(threads, context);
-
-            return runActions(startActions, { context, runtimeInfo }).catch(reject);
+            return immediate(() => {
+                const startActions = getInitialActions(threads, context);
+                return runActions(startActions, { context, runtimeInfo }).catch(reject);
+            });
 
         })
             .catch(throwError)
@@ -983,7 +986,7 @@ export function transitions(criteria = []) {
  * @typedef {Promise} ExecutionPromise
  * @property {ExecutionUpdate} update Updates the set of conditions used within a running process.
  * @property {ExecutionCancel} cancel Cancels the running promise, rejecting the promise.
- * @property {ExecutionStop} update Stops the running promise, resolving the promise.
+ * @property {ExecutionStop} stop Stops the running promise, resolving the promise.
  * @example
  * import { start } from '../path/to/machine';
  * import { dispatch } from '../path/to/workflow';
