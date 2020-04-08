@@ -20,9 +20,9 @@ function safeParseJSON(response) {
 }
 
 function asHeaderMap(map, header) {
-    const parts = header.split(': ');
+    const parts = header.split(':');
     const key = String(parts.shift());
-    const value = String(parts.join(': '));
+    const value = String(parts.join(':'));
     map[key.trim().toLowerCase()] = value.trim();
     return map;
 }

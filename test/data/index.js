@@ -624,6 +624,22 @@ describe('data', () => {
                 http.addEventListener.calls[0].args[1](); // load
             });
 
+            it('handles safari headers', (done) => {
+                const data = { key: 'value' };
+                http.status = 200;
+                http.response = JSON.stringify(data);
+                // safari response headers don't have a space
+                // between the header name and the value
+                http.getAllResponseHeaders.returns('content-type:application/json');
+                adapter(request).then(response => {
+                    expect(response.status).toBe(200);
+                    expect(response.meta.headers['content-type']).toBe('application/json');
+                    expect(response.data).toMatchObject(data);
+                    done();
+                });
+                http.addEventListener.calls[0].args[1](); // load
+            });
+
             it('parses JSON string', (done) => {
                 const data = { key: 'value' };
                 http.status = 200;
