@@ -1,17 +1,17 @@
-import noop from 'lodash/noop';
-import find from 'lodash/find';
-import last from 'lodash/last';
-import omit from 'lodash/omit';
-import keys from 'lodash/keys';
-import uniqBy from 'lodash/uniqBy';
-import without from 'lodash/without';
-import iteratee from 'lodash/iteratee';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
-import isFunction from 'lodash/isFunction';
-import isPlainObject from 'lodash/isPlainObject';
+import noop from 'lodash/noop.js';
+import find from 'lodash/find.js';
+import last from 'lodash/last.js';
+import omit from 'lodash/omit.js';
+import keys from 'lodash/keys.js';
+import uniqBy from 'lodash/uniqBy.js';
+import without from 'lodash/without.js';
+import iteratee from 'lodash/iteratee.js';
+import isEmpty from 'lodash/isEmpty.js';
+import isString from 'lodash/isString.js';
+import isFunction from 'lodash/isFunction.js';
+import isPlainObject from 'lodash/isPlainObject.js';
 
-import { rethrow, error } from '../errors';
+import { rethrow, error } from '../errors/index.js';
 
 /**
  * Provides utilities for running complex, multi-step asynchronous processes.

@@ -1,6 +1,6 @@
-import isError from 'lodash/isError';
-import attempt from 'lodash/attempt';
-import defaults from 'lodash/defaults';
+import isError from 'lodash/isError.js';
+import attempt from 'lodash/attempt.js';
+import defaults from 'lodash/defaults.js';
 
 /**
  * Contains utilities that do not fall under any of the other module categories.

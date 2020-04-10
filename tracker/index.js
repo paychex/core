@@ -1,13 +1,13 @@
-import uuid from 'uuid/v4';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import noop from 'lodash/noop';
-import invoke from 'lodash/invoke';
-import isArray from 'lodash/isArray';
-import isError from 'lodash/isError';
-import mergeWith from 'lodash/mergeWith';
-import isFunction from 'lodash/isFunction';
-import defaultsDeep from 'lodash/defaultsDeep';
+import uuid from 'uuid/v4.js';
+import get from 'lodash/get.js';
+import set from 'lodash/set.js';
+import noop from 'lodash/noop.js';
+import invoke from 'lodash/invoke.js';
+import isArray from 'lodash/isArray.js';
+import isError from 'lodash/isError.js';
+import mergeWith from 'lodash/mergeWith.js';
+import isFunction from 'lodash/isFunction.js';
+import defaultsDeep from 'lodash/defaultsDeep.js';
 
 /**
  * Provides event, error, and performance logging for applications.
@@ -43,11 +43,11 @@ function customizer(lhs, rhs) {
 }
 
 function tryMark(label) {
-    invoke(window, 'performance.mark', label)
+    invoke(globalThis, 'performance.mark', label)
 }
 
 function tryMeasure(label, start) {
-    invoke(window, 'performance.measure', label, start);
+    invoke(globalThis, 'performance.measure', label, start);
 }
 
 /**

@@ -1,10 +1,10 @@
-import get from 'lodash/get';
-import set from 'lodash/set';
-import filter from 'lodash/filter';
-import flatten from 'lodash/flatten';
-import attempt from 'lodash/attempt';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
+import get from 'lodash/get.js';
+import set from 'lodash/set.js';
+import filter from 'lodash/filter.js';
+import flatten from 'lodash/flatten.js';
+import attempt from 'lodash/attempt.js';
+import isEmpty from 'lodash/isEmpty.js';
+import isString from 'lodash/isString.js';
 
 const splitter = /[\r\n]+/;
 const XSSI = /^\)]\}',?\n/;

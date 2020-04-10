@@ -1,4 +1,4 @@
-import isString from 'lodash/isString';
+import isString from 'lodash/isString.js';
 
 /**
  * Provides methods for storing information on the client's

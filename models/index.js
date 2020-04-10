@@ -1,17 +1,17 @@
-import head from 'lodash/head';
-import size from 'lodash/size';
-import orderBy from 'lodash/orderBy';
-import groupBy from 'lodash/groupBy';
-import filter from 'lodash/filter';
-import isEmpty from 'lodash/isEmpty';
-import isNumber from 'lodash/isNumber';
-import identity from 'lodash/identity';
-import uniqBy from 'lodash/uniqBy';
-import differenceBy from 'lodash/differenceBy';
-import intersectionBy from 'lodash/intersectionBy';
-import negate from 'lodash/negate';
+import head from 'lodash/head.js';
+import size from 'lodash/size.js';
+import orderBy from 'lodash/orderBy.js';
+import groupBy from 'lodash/groupBy.js';
+import filter from 'lodash/filter.js';
+import isEmpty from 'lodash/isEmpty.js';
+import isNumber from 'lodash/isNumber.js';
+import identity from 'lodash/identity.js';
+import uniqBy from 'lodash/uniqBy.js';
+import differenceBy from 'lodash/differenceBy.js';
+import intersectionBy from 'lodash/intersectionBy.js';
+import negate from 'lodash/negate.js';
 
-import { eventBus } from '../index';
+import { eventBus } from '../index.js';
 
 /**
  * Provides utilities for working with collections of structured data.

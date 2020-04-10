@@ -1,5 +1,5 @@
-import attempt from 'lodash/attempt';
-import isEmpty from 'lodash/isEmpty';
+import attempt from 'lodash/attempt.js';
+import isEmpty from 'lodash/isEmpty.js';
 
 const readonly = (get) => ({ get, enumerable: true });
 

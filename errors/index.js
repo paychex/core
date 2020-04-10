@@ -24,9 +24,9 @@
  * }
  */
 
-import curry from 'lodash/curry';
-import isError from 'lodash/isError';
-import isPlainObject from 'lodash/isPlainObject';
+import curry from 'lodash/curry.js';
+import isError from 'lodash/isError.js';
+import isPlainObject from 'lodash/isPlainObject.js';
 
 /**
  * Indicates an Error that cannot be recovered from.

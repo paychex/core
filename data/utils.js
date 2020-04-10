@@ -1,19 +1,19 @@
 import QS from 'query-string';
-import lte from 'lodash/lte';
-import has from 'lodash/has';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import noop from 'lodash/noop';
-import pick from 'lodash/pick';
-import invoke from 'lodash/invoke';
-import isEqual from 'lodash/isEqual';
-import memoize from 'lodash/memoize';
-import defaults from 'lodash/defaults';
-import cloneDeep from 'lodash/cloneDeep';
-import conformsTo from 'lodash/conformsTo';
-import isFunction from 'lodash/isFunction';
+import lte from 'lodash/lte.js';
+import has from 'lodash/has.js';
+import get from 'lodash/get.js';
+import set from 'lodash/set.js';
+import noop from 'lodash/noop.js';
+import pick from 'lodash/pick.js';
+import invoke from 'lodash/invoke.js';
+import isEqual from 'lodash/isEqual.js';
+import memoize from 'lodash/memoize.js';
+import defaults from 'lodash/defaults.js';
+import cloneDeep from 'lodash/cloneDeep.js';
+import conformsTo from 'lodash/conformsTo.js';
+import isFunction from 'lodash/isFunction.js';
 
-import { error } from '../errors';
+import { error } from '../errors/index.js';
 
 /**
  * Functionality used to customize a {@link DataLayer DataLayer} pipeline.

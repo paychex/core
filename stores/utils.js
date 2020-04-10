@@ -1,11 +1,11 @@
 import sjcl from 'sjcl';
-import memoize from 'lodash/memoize';
-import identity from 'lodash/identity';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import conforms from 'lodash/conforms';
-import stubTrue from 'lodash/stubTrue';
-import cond from 'lodash/cond';
+import memoize from 'lodash/memoize.js';
+import identity from 'lodash/identity.js';
+import isEmpty from 'lodash/isEmpty.js';
+import isFunction from 'lodash/isFunction.js';
+import conforms from 'lodash/conforms.js';
+import stubTrue from 'lodash/stubTrue.js';
+import cond from 'lodash/cond.js';
 
 /**
  * Contains utility methods for working with Stores.

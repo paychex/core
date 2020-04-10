@@ -1,15 +1,15 @@
-import get from 'lodash/get';
-import defaults from 'lodash/defaults';
-import conformsTo from 'lodash/conformsTo';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
-import isFunction from 'lodash/isFunction';
+import get from 'lodash/get.js';
+import defaults from 'lodash/defaults.js';
+import conformsTo from 'lodash/conformsTo.js';
+import isEmpty from 'lodash/isEmpty.js';
+import isString from 'lodash/isString.js';
+import isFunction from 'lodash/isFunction.js';
 
-import { xhr } from './xhr';
-import { tokenize } from './utils';
-import { error, fatal } from '../errors';
+import { xhr } from './xhr.js';
+import { tokenize } from './utils.js';
+import { error, fatal } from '../errors/index.js';
 
-export { createProxy } from './proxy';
+export { createProxy } from './proxy.js';
 
 /**
  * A Promise is an object representing the eventual completion or failure of an asynchronous operation.
