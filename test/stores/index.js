@@ -1,12 +1,12 @@
 import expect from 'expect';
-import { spy } from '../utils';
+import { spy } from '../utils.js';
 import {
     htmlStore,
     localStore,
     memoryStore,
     sessionStore,
     indexedDB,
-} from '../../stores';
+} from '../../stores/index.js';
 
 describe('stores', () => {
 

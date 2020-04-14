@@ -8,7 +8,7 @@ import {
     ERROR,
     FATAL,
     IGNORE
-} from '../errors';
+} from '../errors/index.js';
 
 describe('errors', () => {
 

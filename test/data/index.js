@@ -1,10 +1,10 @@
 import expect from 'expect';
-import set from 'lodash/set';
+import set from 'lodash/set.js';
 
-import { spy } from '../utils';
-import { FATAL } from '../../errors';
+import { spy } from '../utils.js';
+import { FATAL } from '../../errors/index.js';
 
-import { createProxy, createDataLayer } from '../../data';
+import { createProxy, createDataLayer } from '../../data/index.js';
 
 describe('data', () => {
 

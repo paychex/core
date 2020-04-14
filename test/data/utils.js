@@ -1,9 +1,9 @@
 import expect from 'expect';
-import set from 'lodash/set';
-import unset from 'lodash/unset';
+import set from 'lodash/set.js';
+import unset from 'lodash/unset.js';
 
-import { spy } from '../utils';
-import { manualReset, autoReset } from '../../signals';
+import { spy } from '../utils.js';
+import { manualReset, autoReset } from '../../signals/index.js';
 
 import {
     falloff,
@@ -17,7 +17,7 @@ import {
     withHeaders,
     withXSRF,
     withSignal,
-} from '../../data/utils';
+} from '../../data/utils.js';
 
 describe('data', () => {
 

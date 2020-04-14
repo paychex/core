@@ -1,5 +1,5 @@
 import expect from 'expect';
-import { spy } from './utils';
+import { spy } from './utils.js';
 import {
     modelList,
     withOrdering,
@@ -10,7 +10,7 @@ import {
     withActive,
     withUnique,
     withUpdating,
-} from '../models';
+} from '../models/index.js';
 
 describe('modelList', () => {
 

@@ -1,8 +1,8 @@
 import expect from 'expect';
-import set from 'lodash/set';
-import unset from 'lodash/unset';
-import { spy } from './utils';
-import createTracker, { withNesting } from '../tracker';
+import set from 'lodash/set.js';
+import unset from 'lodash/unset.js';
+import { spy } from './utils.js';
+import createTracker, { withNesting } from '../tracker/index.js';
 
 describe('tracker', () => {
 
@@ -11,10 +11,10 @@ describe('tracker', () => {
     beforeEach(() => {
         mark = spy();
         measure = spy();
-        set(global, 'window.performance', { mark, measure });
+        set(globalThis, 'performance', { mark, measure });
     });
 
-    afterEach(() => unset(global, 'window'));
+    afterEach(() => unset(globalThis, 'performance'));
 
     describe('createTracker', () => {
 

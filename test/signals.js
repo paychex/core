@@ -1,11 +1,11 @@
 import expect from 'expect';
-import { spy } from './utils';
+import { spy } from './utils.js';
 import {
     autoReset,
     manualReset,
     countdown,
     semaphore,
-} from '../signals';
+} from '../signals/index.js';
 
 describe('signals', () => {
 

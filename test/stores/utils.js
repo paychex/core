@@ -1,13 +1,13 @@
 import expect from 'expect';
-import { spy } from '../utils';
+import { randomBytes } from 'crypto';
+import { spy } from '../utils.js';
 import {
     withEncryption,
     withPrefix,
     withExpiration,
     asDataCache,
     weeks,
-} from '../../stores/utils'
-import { randomBytes } from 'crypto';
+} from '../../stores/utils.js';
 
 describe('stores', () => {
 

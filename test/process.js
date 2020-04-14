@@ -1,13 +1,13 @@
 import expect from 'expect';
-import { spy } from './utils';
-import { ERROR } from '../errors';
-import { modelList } from '../models';
+import { spy } from './utils.js';
+import { ERROR } from '../errors/index.js';
+import { modelList } from '../models/index.js';
 import {
     action,
     dependencies,
     transitions,
     process,
-} from '../process';
+} from '../process/index.js';
 
 describe('process', () => {
 

@@ -21,36 +21,19 @@
   },
   "homepage": "https://github.com/paychex/core",
   "devDependencies": {
-    "@babel/core": "^7.5.4",
-    "@babel/preset-env": "^7.5.4",
-    "@babel/register": "^7.5.5",
     "docdash": "^1.1.1",
     "expect": "^24.8.0",
     "jsdoc": "^3.6.2",
-    "mocha": "^6.1.4",
+    "mocha": "^7.1.1",
     "nyc": "^14.1.1"
   },
   "engines": {
-    "node": ">= 7.6.0"
+    "node": ">= 13.2.0"
   },
   "scripts": {
-    "test": "nyc mocha --require @babel/register --recursive",
-    "test:coverage": "nyc --reporter=lcov mocha --require @babel/register --recursive",
+    "test": "nyc mocha --recursive",
+    "test:coverage": "nyc --reporter=lcov mocha --recursive",
     "docs": "jsdoc -c jsdoc.json"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/env",
-        {
-          "targets": "node 7.6.0",
-          "modules": "commonjs"
-        }
-      ]
-    ],
-    "plugins": [
-      "@babel/plugin-transform-modules-commonjs"
-    ]
   },
   "dependencies": {
     "lodash": "^4.17.11",

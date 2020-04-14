@@ -1,6 +1,6 @@
 import expect from 'expect';
-import { spy } from './utils';
-import { eventBus } from '../index';
+import { spy } from './utils.js';
+import { eventBus } from '../index.js';
 
 describe('eventBus', () => {
 
