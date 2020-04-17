@@ -421,7 +421,7 @@ export function run(action, context, initialize = true) {
  * resolves. Return an empty array if the process should not do anything.
  *
  * @method ProcessLogic#getNextActions
- * @param {ModelList} actions The actions available for the process.
+ * @param {Array.<Action>} actions The actions available for the process.
  * @param {ProcessContext} context Information about the running process.
  * @returns {Action[]} An array of actions to run.
  * @example
@@ -438,7 +438,7 @@ export function run(action, context, initialize = true) {
  * is started. Return an empty array if the process should not do anything.
  *
  * @method ProcessLogic#getInitialActions
- * @param {ModelList} actions The actions available for the process.
+ * @param {Array.<Action>} actions The actions available for the process.
  * @param {ProcessContext} context Information about the running process.
  * @returns {Action[]} An array of actions to run.
  * @example

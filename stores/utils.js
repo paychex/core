@@ -209,7 +209,7 @@ export function withPrefix(store, prefix) {
  * export const store = withExpiration(localStore(), function sevenDays() {
  *   const now = Date.now();
  *   const days = 24 * 60 * 60 * 1000;
- *   return new Date(7 * days);
+ *   return new Date(now + 7 * days);
  * });
  */
 
