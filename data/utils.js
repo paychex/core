@@ -273,10 +273,10 @@ export function withRetry(fetch, retry, retries = new Map()) {
     if (!isFunction(retry))
         throw error('Argument `retry` must be a function.');
 
-    return async function useRetry(request) {
+    return async function useRetry(request, ...args) {
         const count = retries.get(request) || 0;
         try {
-            const response = await fetch(request);
+            const response = await fetch(request, ...args);
             set(response, 'meta.retryCount', count);
             retries.delete(request);
             return response;
@@ -284,7 +284,7 @@ export function withRetry(fetch, retry, retries = new Map()) {
             retries.set(request, count + 1);
             return await Promise.resolve()
                 .then(() => retry(request, e.response))
-                .then(() => useRetry(request))
+                .then(() => useRetry(request, ...args))
                 .catch(() => {
                     if (retries.has(request))
                         set(e, 'response.meta.retryCount', retries.get(request));
@@ -419,14 +419,14 @@ export function withCache(fetch, cache) {
     if (!conformsTo(cache, CACHE_SCHEMA))
         throw error('An invalid cache was provided to withCache.');
 
-    return async function useCache(request) {
+    return async function useCache(request, ...args) {
         let response = await Promise.resolve()
             .then(() => invoke(cache, 'get', request))
             .catch(noop);
         if (response) {
             set(response, 'meta.cached', true);
         } else {
-            response = await fetch(request);
+            response = await fetch(request, ...args);
             await Promise.resolve()
                 .then(() => invoke(cache, 'set', request, response))
                 .catch(noop);
@@ -575,12 +575,12 @@ export function withCache(fetch, cache) {
  * }
  */
 export function withTransform(fetch, transformer) {
-    return async function useTransform(request) {
+    return async function useTransform(request, ...args) {
         const clone = cloneDeep(request);
         if (has(transformer, 'request')) {
             clone.body = await invoke(transformer, 'request', clone.body, clone.headers);
         }
-        const response = await fetch(clone);
+        const response = await fetch(clone, ...args);
         const modified = cloneDeep(response);
         if (has(transformer, 'response')) {
             modified.data = await invoke(transformer, 'response', modified.data);
@@ -674,10 +674,10 @@ export function withConnectivity(fetch, reconnect) {
     if (!isFunction(reconnect))
         throw error('Argument `reconnect` must be a function.');
 
-    return async function useConnectivity(request) {
-        if (!window.navigator.onLine)
+    return async function useConnectivity(request, ...args) {
+        if (!get(globalThis, 'navigator.onLine', true))
             await reconnect(request);
-        return await fetch(request);
+        return await fetch(request, ...args);
     };
 
 }
@@ -726,9 +726,9 @@ export function withDiagnostics(fetch, diagnostics) {
     if (!isFunction(diagnostics))
         throw error('Argument `diagnostics` must be a function.');
 
-    return async function useDiagnostics(request) {
+    return async function useDiagnostics(request, ...args) {
         try {
-            return await fetch(request);
+            return await fetch(request, ...args);
         } catch (e) {
             const status = get(e, 'status', get(e, 'response.status', 0));
             if (lte(status, 0))
@@ -783,14 +783,14 @@ export function withAuthentication(fetch, reauthenticate) {
     if (!isFunction(reauthenticate))
         throw error('Argument `reauthenticate` must be a function.');
 
-    return async function useAuthentication(request) {
+    return async function useAuthentication(request, ...args) {
         try {
-            return await fetch(request);
+            return await fetch(request, ...args);
         } catch (e) {
             if (e.status === 401)
                 return await Promise.resolve()
                     .then(() => reauthenticate(request))
-                    .then(() => useAuthentication(request))
+                    .then(() => useAuthentication(request, ...args))
                     .catch(() => { throw e });
             throw e;
         }
@@ -829,10 +829,10 @@ export function withAuthentication(fetch, reauthenticate) {
  * }
  */
 export function withHeaders(fetch, headers = {}) {
-    return async function useHeaders(request) {
+    return async function useHeaders(request, ...args) {
         const clone = cloneDeep(request);
         defaults(clone.headers, headers);
-        return await fetch(clone);
+        return await fetch(clone, ...args);
     };
 }
 
@@ -936,11 +936,11 @@ export function withXSRF(fetch, options = {}) {
     const whitelist = hosts.map(asRegExp);
     const urlProps = memoize(getUrlProperties);
     const origin = urlProps(get(window, 'location.href'));
-    return async function useXSRF(request) {
+    return async function useXSRF(request, ...args) {
         const token = provider(cookie);
         const target = urlProps(request.url);
         if (!token || !isAllowed(target, origin, whitelist)) {
-            return await fetch(request);
+            return await fetch(request, ...args);
         }
         const clone = cloneDeep(request);
         set(clone, `headers.${header}`, token);
@@ -996,10 +996,10 @@ export function withXSRF(fetch, options = {}) {
  * export const pipeline = withSignal(fetch, autoReset(true));
  */
 export function withSignal(fetch, signal) {
-    return async function useSignal(request) {
+    return async function useSignal(request, ...args) {
         await signal.ready();
         try {
-            return await fetch(request);
+            return await fetch(request, ...args);
         } finally {
             signal.set();
         }

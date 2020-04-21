@@ -336,7 +336,7 @@ describe('data', () => {
 
             it('waits for reconnect if offline', () => {
                 const response = {};
-                set(global, 'window.navigator.onLine', false);
+                set(globalThis, 'navigator.onLine', false);
                 fetch.returns(response);
                 reconnect.returns(new Promise(resolve => setTimeout(resolve, 10)));
                 return wrapper({}).then(result => {
