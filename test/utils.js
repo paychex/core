@@ -311,7 +311,7 @@ export function spy() {
         onCall:     { value: onCall },
         callCount:  { get() { return calls.length; } },
         called:     { get() { return !!calls.length; } },
-        calls:      { get() { return Object.freeze(calls); } },
+        calls:      { get() { return calls; } },
         args:       { get() { return calls.mostRecent().args; } },
         context:    { get() { return calls.mostRecent().context; } },
         callTime:   { get() { return calls.mostRecent().callTime; } },
