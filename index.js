@@ -234,3 +234,190 @@ export function eventBus(context) {
     };
 
 }
+
+/**
+ * @global
+ * @callback ParallelFunction
+ * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
+ * @property {Function} remove Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
+ * @property {Function} insert Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original ParallelFunction for chaining.
+ * @property {Function} clone Creates a new copy of the ParallelFunction. Methods can be added or removed
+ * from this function without modifying the original. Returns the original ParallelFunction for chaining.
+ * @param {...any} args The arguments to pass to the original functions.
+ * @returns {Promise} A Promise resolved with the array of settled return
+ * values or else rejecting with the first rejection reason or thrown error.
+ * @example
+ * const isValidUserName = parallel(isNonEmpty, allCharactersValid);
+ *
+ * // add more functions to the collection:
+ * isValidUserName.add(isNotTaken, passesProfanityFilter);
+ *
+ * export async function validate(username) {
+ *   try {
+ *     const results = await isValidUserName(username);
+ *     return result.every(Boolean);
+ *   } catch (e) {
+ *     return false;
+ *   }
+ * }
+ */
+
+/**
+ * @global
+ * @callback SequentialFunction
+ * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
+ * @property {Function} remove Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
+ * @property {Function} insert Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original SequentialFunction for chaining.
+ * @property {Function} clone Creates a new copy of the SequentialFunction. Methods can be added or removed
+ * from this function without modifying the original. Returns the original SequentialFunction for chaining.
+ * @param {...any} args The arguments to pass to the original functions.
+ * @returns {Promise} A Promise resolved with the last function's settled
+ * return value, or rejected if any function rejects or throws an error.
+ * The functions will be passed the incoming arguments along with the value
+ * returned by the previous function.
+ * @example
+ * // as a standalone function
+ *
+ * const process = sequence();
+ *
+ * async function handler1(...args, lastHandlerResult) {
+ *   console.log(args, lastHandlerResult);
+ *   await someAsyncMethod(...args);
+ *   return 1;
+ * }
+ *
+ * function handler2(...args, lastHandlerResult) {
+ *   console.log(args, lastHandlerResult);
+ *   return 2;
+ * }
+ *
+ * process.add(handler1);
+ * process.add(handler2);
+ *
+ * await process('abc', 'def'); // 2
+ * // output from handler1: ['abc', 'def'], undefined
+ * // output from handler2: ['abc', 'def'], 1
+ * @example
+ * // as a combination event handler
+ *
+ * function handler1(...args) {
+ *   return 'some value';
+ * }
+ *
+ * function handler2(...args, previousValue) {
+ *   return previousValue === 'some value';
+ * }
+ *
+ * const bus = eventBus();
+ *
+ * bus.on('event', sequence(handler1, handler2));
+ * await bus.fire('event', 'arg1', 'arg2'); // [true]
+ */
+
+function getInvocationPattern(invoker) {
+    return function pattern(...functions) {
+        let set = new Set(functions);
+        function invoke(...args) {
+            const methods = Array.from(set);
+            return invoker.call(this, methods, args);
+        }
+        invoke.add = (...fns) => {
+            fns.forEach(set.add, set);
+            return invoke;
+        };
+        invoke.remove = (...fns) => {
+            fns.forEach(set.delete, set);
+            return invoke;
+        };
+        invoke.insert = (index, ...fns) => {
+            const methods = Array.from(set);
+            methods.splice(index, 0, ...fns);
+            set = new Set(methods);
+            return invoke;
+        };
+        invoke.clone = () => getInvocationPattern(invoker)(...set);
+        return invoke;
+    };
+}
+
+/**
+ * Invokes the specified functions in parallel, handling any
+ * returned Promises correctly.
+ *
+ * @function parallel
+ * @param {...Function} fns The functions to invoke in parallel.
+ * @returns {ParallelFunction} A function that will invoke the
+ * given functions in parallel, waiting for any returned Promises
+ * to settle, and either resolving with the array of settled return
+ * values or else rejecting with the first rejection reason or
+ * thrown error.
+ * @example
+ * const concurrent = parallel(fn1, fn2, fn3);
+ * const results = await concurrent('abc', 123);
+ * results.length; // 3
+ * @example
+ * // combining parallel() and sequence()
+ *
+ * const workflow = parallel(
+ *   step1,
+ *   sequence(step2a, step2b, step2c),
+ *   sequence(step3a, step3b),
+ *   step4,
+ * );
+ *
+ * workflow.add(sequence(step5a, step5b));
+ *
+ * await workflow('some args');
+ */
+export const parallel = getInvocationPattern(function invoker(methods, args) {
+    return Promise.all(methods.map(fn =>
+        new Promise(resolve =>
+            resolve(fn.apply(this, args)))));
+});
+
+/**
+ * Invokes the specified functions in sequence, handling any
+ * returned Promises correctly.
+ *
+ * @function sequence
+ * @param {...Function} fns The functions to invoke in sequence.
+ * @returns {SequentialFunction} A function that will invoke the
+ * given functions in sequence, waiting for any returned Promises
+ * to settle, and either resolving with the last settled return
+ * value or else rejecting with the first rejection reason or thrown
+ * error.
+ * @example
+ * const bus = eventBus();
+ * const checkDirty = parallel();
+ *
+ * bus.on('navigate', sequence(checkDirty, loadNewRoute));
+ *
+ * export function addDirtyChecker(fn) {
+ *   checkDirty.add(fn);
+ *   return function remove() {
+ *     checkDirty.remove(fn);
+ *   };
+ * }
+ *
+ * export async function navigate(container, path) {
+ *   await bus.fire('navigate', container, path);
+ * }
+ * @example
+ * // combining parallel() and sequence()
+ *
+ * const workflow = parallel(
+ *   step1,
+ *   sequence(step2a, step2b, step2c),
+ *   sequence(step3a, step3b),
+ *   step4,
+ * );
+ *
+ * workflow.add(sequence(step5a, step5b));
+ *
+ * await workflow('some args');
+ */
+export const sequence = getInvocationPattern(function invoker(methods, args){
+    return methods.reduce((promise, fn) =>
+        promise.then((result) => fn.call(this, ...args, result)),
+            Promise.resolve());
+});
