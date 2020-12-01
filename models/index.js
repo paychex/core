@@ -1498,7 +1498,7 @@ export function withUpdating(list, selector = identity) {
         const toUpdate = intersectionBy(inner.items(), items, selector);
         inner.add(...toAdd);
         if (!isEmpty(toUpdate)) {
-            inner.pause();
+            inner.stop();
             const modified = intersectionBy(items, toUpdate, selector);
             inner.remove(...toUpdate);
             inner.add(...modified);

@@ -113,13 +113,17 @@ describe('eventBus', () => {
 
     describe('pause', () => {
 
+    describe('stop', () => {
+
         it('does not notify listeners', () => {
             const handler = spy();
             bus.on('event', handler);
-            bus.pause();
+            bus.stop();
             bus.fire('event');
             expect(handler.called).toBe(false);
         });
+
+    });
 
     });
 
@@ -128,7 +132,7 @@ describe('eventBus', () => {
         it('does not queue events', () => {
             const handler = spy();
             bus.on('event', handler);
-            bus.pause();
+            bus.stop();
             bus.fire('event');
             bus.resume();
             expect(handler.called).toBe(false);
@@ -137,7 +141,7 @@ describe('eventBus', () => {
         it('notifies listeners', () => {
             const handler = spy();
             bus.on('event', handler);
-            bus.pause();
+            bus.stop();
             bus.resume();
             bus.fire('event');
             expect(handler.called).toBe(true);

@@ -179,7 +179,7 @@ import defaults from 'lodash/defaults.js';
  */
 export function eventBus(context) {
 
-    let paused = false;
+    let stopped = false;
     const subscribers = new Map();
 
     function proxyErrors(handler) {
@@ -210,16 +210,16 @@ export function eventBus(context) {
         return off;
     }
 
-    function pause() {
-        paused = true;
+    function stop() {
+        stopped = true;
     }
 
     function resume() {
-        paused = false;
+        stopped = false;
     }
 
     function fire(event, ...args) {
-        if (paused) return;
+        if (stopped) return;
         const context = { event, args };
         const handlers = subscribers.get(event);
         handlers && handlers.forEach(proxyErrors, context);
@@ -229,7 +229,7 @@ export function eventBus(context) {
         on,
         one,
         fire,
-        pause,
+        stop,
         resume,
     };
 
