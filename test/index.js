@@ -102,24 +102,43 @@ describe('eventBus', () => {
             expect(calls).toEqual([1, 3, 2]);
         });
 
-        it('fires "error" on error', () => {
-            const error = spy();
-            const handler = spy();
-            bus.on('oops', () => { throw new Error('test') });
-            bus.on('oops', handler);
-            bus.on('error', error);
-            bus.fire('oops', 'a', 'b');
-            expect(handler.called).toBe(true);
-            expect(error.args[0]).toMatchObject({
-                event: 'oops',
-                message: 'test',
-                args: ['a', 'b']
-            });
+        it('returns Promise resolved with return values', async () => {
+            bus.on('test', delay(20, 1));
+            bus.on('test', () => Promise.resolve(3));
+            bus.on('test', () => 2);
+            const result = await bus.fire('test');
+            expect(result).toEqual([1, 3, 2]);
+        });
+
+        it('rejects if any subscriber rejects', async () => {
+            const err = new Error('rejected');
+            bus.on('test', () => 1);
+            bus.on('test', () => Promise.reject(err));
+            bus.on('test', () => 2);
+            try {
+                await bus.fire('test', 'a', 'b');
+                throw new Error('should not be reached');
+            } catch (e) {
+                expect(e).toBe(err);
+                expect(e).toMatchObject({
+                    event: 'test',
+                    args: ['a', 'b']
+                });
+            }
+        });
+
+        it('rejects if any subscriber throws', async () => {
+            const err = new Error();
+            bus.on('test', () => { throw err; });
+            try {
+                await bus.fire('test');
+                throw new Error('should not be reached');
+            } catch (e) {
+                expect(e).toBe(err);
+            }
         });
 
     });
-
-    describe('pause', () => {
 
     describe('stop', () => {
 
@@ -131,7 +150,10 @@ describe('eventBus', () => {
             expect(handler.called).toBe(false);
         });
 
-    });
+        it('returns false from fire()', () => {
+            bus.stop();
+            expect(bus.fire('event')).toBe(false);
+        });
 
     });
 

@@ -1,11 +1,55 @@
-import isError from 'lodash/isError.js';
-import attempt from 'lodash/attempt.js';
-import defaults from 'lodash/defaults.js';
+import { rethrow } from './errors/index.js';
+
+const stubPromise = () => Promise.resolve();
 
 /**
  * Contains utilities that do not fall under any of the other module categories.
  *
  * @module index
+ * @example
+ * // combining eventBus, sequence, and parallel
+ *
+ * import { eventBus, sequence, parallel } from '@paychex/core';
+ * import { localStore } from '@paychex/core/stores';
+ *
+ * // allow users to register concurrent event handlers;
+ * // if any of these handlers throw an exception, the
+ * // fired event will be rejected
+ * const interceptors = parallel();
+ * export function addInterceptor(fn) {
+ *   interceptors.add(fn);
+ *   return function remove() {
+ *     interceptors.remove(fn);
+ *   };
+ * }
+ *
+ * // our internal event handler will run after any
+ * // interceptors have run and be provided the results
+ * // returned by all the interceptors
+ * async function internalHandler(...args, lastResult) {
+ *   // lastResult is array of results from interceptors
+ * }
+ *
+ * // all interceptors will have access to our context
+ * // object (e.g. `this.store` inside the subscriber)
+ * const context = {
+ *   store: localStore(),
+ * };
+ *
+ * // execute handlers sequentially
+ * // instead of in parallel
+ * const bus = eventBus(context, sequence);
+ *
+ * bus.on('event', interceptors);    // run first
+ * bus.on('event', internalHandler); // run second
+ *
+ * // we could also have written:
+ * // const bus = eventBus(context);
+ * // bus.on('event', sequence(interceptors, internalHandler));
+ *
+ * export async function run(...args) {
+ *   return await bus.fire('event', ...args);
+ * }
  */
 
 /**
@@ -20,27 +64,34 @@ import defaults from 'lodash/defaults.js';
  *
  * const bus = eventBus();
  *
- * bus.on('error', tracker.error);
- *
- * bus.on('add', function handler(value1, value2) {
- *   console.log(value1 + value2); // 3
- *   throw new Error();
+ * bus.on('event', function handler(arg1, arg2) {
+ *   console.log(`received ${arg1} and ${arg2}`);
+ *   return arg1 + arg2;
  * });
  *
- * bus.on('add', function handler() {
- *   // even though the first handler threw
- *   // an exception, this handler will still
- *   // be called
- *   console.log([...arguments]); // [1, 2]
+ * // subscribers can be asynchronous
+ * bus.on('event', async function handler(arg1, arg2) {
+ *   const result = await someAsyncMethod(arg1);
+ *   await someOtherAsyncMethod(result, arg2);
+ *   return 'abc';
  * });
  *
- * bus.fire('add', 1, 2);
+ * // fire and forget
+ * bus.fire('event', 1, 2);
+ *
+ * // catch any rejected promises returned by
+ * // handlers (or errors thrown by handlers)
+ * await bus.fire('event', 1, 2).catch(tracker.error);
+ *
+ * // examine the return values of handlers
+ * const results = await bus.fire('event', 1, 2);
+ * console.log(results); // [3, 'abc']
  */
 
 /**
- * Stops notifying subscribers of fired events until {@link ResumeMethod resume} is called.
+ * Stops notifying subscribers of fired events until {@link EventBus#resume resume} is called.
  *
- * @method EventBus#pause
+ * @method EventBus#stop
  * @example
  * import { eventBus } from '@paychex/core';
  *
@@ -51,12 +102,13 @@ import defaults from 'lodash/defaults.js';
  * });
  *
  * bus.fire('add', 1, 2); // 3
- * bus.pause();
+ * bus.stop();
  * bus.fire('add', 1, 2); // does not invoke subscriber
  */
 
 /**
- * Resumes notifying subscribers after {@link PauseMethod pause} was called.
+ * Resumes notifying subscribers after {@link EventBus#stop stop} was called. Any
+ * events fired before resuming are dropped entirely.
  *
  * @method EventBus#resume
  * @example
@@ -69,49 +121,101 @@ import defaults from 'lodash/defaults.js';
  * });
  *
  * bus.fire('add', 1, 2); // 3
- * bus.pause();
+ * bus.stop();
  * bus.fire('add', 1, 2); // does not invoke subscriber
  * bus.resume();
  * bus.fire('add', 1, 2); // 3
  */
 
 /**
- * Notifies any subscribers registered through {@link SubscribeMethod on}
- * or {@link SubscribeMethod one} that the specified event has occurred. If
- * any subscribers throw an exception then an 'error' event will be fired on
- * the bus, but any other subscribers will continue to be notified of the
- * initial event.
+ * Notifies any subscribers registered through {@link EventBus#on on}
+ * or {@link EventBus#on one} that the specified event has occurred. If
+ * any subscribers throw an exception then the {@link EventBus#fire fire}
+ * promise will be rejected, but any other subscribers will continue to be
+ * notified of the initial event.
  *
  * @method EventBus#fire
  * @param {string} event The name of the event to fire.
  * @param {...any} [args] Optional arguments to pass to subscribers.
+ * @returns {boolean|Promise} Returns `false` if the bus is stopped. Otherwise,
+ * returns a Promise that will resolve with an array of values returned by
+ * event subscribers, or reject with the first Promise rejection or thrown error.
  * @example
  * import { eventBus } from '@paychex/core';
  * import { tracker } from '~/tracking';
  *
  * const bus = eventBus();
  *
- * bus.on('error', tracker.error);
- *
- * bus.on('add', function handler(value1, value2) {
- *   console.log(value1 + value2); // 3
- *   throw new Error();
+ * bus.on('event', async function handler(value1, value2) {
+ *   return await someAsyncMethod(value1, value2);
  * });
  *
- * bus.on('add', function handler() {
- *   // even though the first handler threw
- *   // an exception, this handler will still
- *   // be called
- *   console.log([...arguments]); // [1, 2]
- * });
+ * bus.fire('event', arg1, arg2);
+ * const results = await bus.fire('event', arg1, arg2);
+ * await bus.fire('event', arg1, arg2).catch(tracker.error);
+ * @example
+ * import { eventBus, sequence } from '@paychex/core';
+ * import { error } from '@paychex/core/errors';
  *
- * bus.fire('add', 1, 2);
+ * const bus = eventBus();
+ *
+ * async function dirtyCheck(container, path) {
+ *   if (container.dirty)
+ *     throw error('save your changes');
+ * }
+ *
+ * async function navigate(container, path) {
+ *   // load new route
+ * }
+ *
+ * bus.on('navigate', sequence(dirtyCheck, navigate));
+ *
+ * export async function navigate(container, path) {
+ *   await bus.fire('navigate', container, path);
+ * }
+ *
+ * // caller
+ * function linkHandler(e) {
+ *   e.preventDefault();
+ *   e.stopPropagation();
+ *   const route = e.target.getAttribute('route');
+ *   const container = e.target.getAttribute('container');
+ *   navigate(container, route).then(
+ *     () => console.info('navigation complete'),
+ *     (err) => console.log('navigation failed', err);
+ *   );
+ * }
+ * @example
+ * import { eventBus, sequence, parallel } from '@paychex/core';
+ *
+ * const bus1 = eventBus(null, sequence);
+ * const bus2 = eventBus(null, parallel); // the default behavior
+ *
+ * function handler1() {
+ *   return 1;
+ * }
+ *
+ * function handler2() {
+ *   return 2;
+ * }
+ *
+ * bus1.on('event', handler1);
+ * bus1.on('event', handler2);
+ *
+ * // sequence bus returns last subscriber's return value
+ * await bus1.fire('event'); // 2
+ *
+ * bus2.on('event', handler1);
+ * bus2.on('event', handler2);
+ *
+ * // parallel bus returns array
+ * await bus2.fire('event'); // [1, 2]
  */
 
 /**
  * Registers a subscriber for the given event. The subscriber will be invoked
  * in the context used to create the {@link EventBus} and passed any arguments
- * provided to the {@link FireMethod fire method}.
+ * provided to the {@link EventBus#fire fire method}.
  *
  * @method EventBus#on
  * @param {string} event The name of the event to listen for.
@@ -139,6 +243,9 @@ import defaults from 'lodash/defaults.js';
  *
  * @function eventBus
  * @param {*} [context=undefined] An optional `this` context to use when invoking subscribers.
+ * @param {function} [mode=parallel] Optional factory to create an execution processor. The
+ * default is {@link module:index~parallel parallel}, but you could also pass {@link module:index~sequence sequence}
+ * or your own factory method. See the examples.
  * @returns {EventBus} An EventBus that provides publish/subscribe functionality.
  * @example
  * import { eventBus } from '@paychex/core';
@@ -146,29 +253,38 @@ import defaults from 'lodash/defaults.js';
  *
  * const bus = eventBus();
  *
- * bus.on('error', tracker.error);
- *
- * bus.on('add', function handler(value1, value2) {
- *   console.log(value1 + value2); // 3
- *   throw new Error();
+ * bus.on('event', function handler(arg1, arg2) {
+ *   console.log(`received ${arg1} and ${arg2}`);
+ *   return arg1 + arg2;
  * });
  *
- * bus.on('add', function handler() {
- *   // even though the first handler threw
- *   // an exception, this handler will still
- *   // be called
- *   console.log([...arguments]); // [1, 2]
+ * // subscribers can be asynchronous
+ * bus.on('event', async function handler(arg1, arg2) {
+ *   const result = await someAsyncMethod(arg1);
+ *   await someOtherAsyncMethod(result, arg2);
+ *   return 'abc';
  * });
  *
- * bus.fire('add', 1, 2);
+ * // fire and forget
+ * bus.fire('event', 1, 2);
+ *
+ * // catch any rejected promises returned by
+ * // handlers (or errors thrown by handlers)
+ * await bus.fire('event', 1, 2).catch(tracker.error);
+ *
+ * // examine the return values of handlers
+ * const results = await bus.fire('event', 1, 2);
+ * console.log(results); // [3, 'abc']
  * @example
+ * // custom handler context
+ *
  * import { eventBus } from '@paychex/core';
  *
- * const object = {
+ * const context = {
  *   key: 'value'
  * };
  *
- * const bus = eventBus(object); // subscriber context
+ * const bus = eventBus(context); // subscriber context
  *
  * // NOTE: to access `this` in this handler
  * // we MUST use a real function and NOT the
@@ -176,28 +292,30 @@ import defaults from 'lodash/defaults.js';
  * bus.on('custom-event', function handler() {
  *   console.log(this.key); // 'value'
  * });
+ * @example
+ * // sequential mode
+ *
+ * const bus = eventBus(null, sequence);
+ *
+ * bus.on('event', handler1); // runs first
+ * bus.on('event', handler2); // runs after
+ *
+ * export async function trigger(...args) {
+ *   await bus.fire('event', ...args);
+ * }
  */
-export function eventBus(context) {
+export function eventBus(context, mode = parallel) {
 
     let stopped = false;
     const subscribers = new Map();
 
-    function proxyErrors(handler) {
-        const { args } = this;
-        const result = attempt(handler, ...args);
-        if (isError(result)) {
-            defaults(result, this);
-            fire('error', result);
-        }
-    }
-
     function on(event, subscriber) {
         const handler = subscriber.bind(context);
-        const handlers = subscribers.get(event) || new Set();
+        const handlers = subscribers.get(event) || mode();
         handlers.add(handler);
         subscribers.set(event, handlers);
         return function off() {
-            subscribers.get(event).delete(handler);
+            subscribers.get(event).remove(handler);
         };
     }
 
@@ -219,10 +337,8 @@ export function eventBus(context) {
     }
 
     function fire(event, ...args) {
-        if (stopped) return;
-        const context = { event, args };
-        const handlers = subscribers.get(event);
-        handlers && handlers.forEach(proxyErrors, context);
+        const handlers = subscribers.get(event) || stubPromise;
+        return !stopped && handlers(...args).catch(rethrow({ event, args }));
     }
 
     return {
