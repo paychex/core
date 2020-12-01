@@ -274,12 +274,12 @@ export function withRetry(fetch, retry, retries = new Map()) {
         throw error('Argument `retry` must be a function.');
 
     return async function useRetry(request, ...args) {
+        let response;
         const count = retries.get(request) || 0;
         try {
-            const response = await fetch(request, ...args);
+            response = await fetch(request, ...args);
             set(response, 'meta.retryCount', count);
             retries.delete(request);
-            return response;
         } catch (e) {
             retries.set(request, count + 1);
             return await Promise.resolve()
@@ -292,6 +292,7 @@ export function withRetry(fetch, retry, retries = new Map()) {
                     throw e;
                 });
         }
+        return response;
     };
 }
 
@@ -727,8 +728,9 @@ export function withDiagnostics(fetch, diagnostics) {
         throw error('Argument `diagnostics` must be a function.');
 
     return async function useDiagnostics(request, ...args) {
+        let response;
         try {
-            return await fetch(request, ...args);
+            response = await fetch(request, ...args);
         } catch (e) {
             const status = get(e, 'status', get(e, 'response.status', 0));
             if (lte(status, 0))
@@ -737,6 +739,7 @@ export function withDiagnostics(fetch, diagnostics) {
                     .catch(noop);
             throw e;
         }
+        return response;
     };
 
 }
@@ -784,8 +787,9 @@ export function withAuthentication(fetch, reauthenticate) {
         throw error('Argument `reauthenticate` must be a function.');
 
     return async function useAuthentication(request, ...args) {
+        let response;
         try {
-            return await fetch(request, ...args);
+            response = await fetch(request, ...args);
         } catch (e) {
             if (e.status === 401)
                 return await Promise.resolve()
@@ -794,6 +798,7 @@ export function withAuthentication(fetch, reauthenticate) {
                     .catch(() => { throw e });
             throw e;
         }
+        return response;
     };
 
 }
@@ -997,11 +1002,13 @@ export function withXSRF(fetch, options = {}) {
  */
 export function withSignal(fetch, signal) {
     return async function useSignal(request, ...args) {
+        let response;
         await signal.ready();
         try {
-            return await fetch(request, ...args);
+            response = await fetch(request, ...args);
         } finally {
             signal.set();
         }
+        return response;
     };
 }

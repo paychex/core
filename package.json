@@ -21,18 +21,18 @@
   },
   "homepage": "https://github.com/paychex/core",
   "devDependencies": {
+    "c8": "^7.3.5",
     "docdash": "^1.1.1",
     "expect": "^24.8.0",
     "jsdoc": "^3.6.2",
-    "mocha": "^7.1.1",
-    "nyc": "^14.1.1"
+    "mocha": "^7.1.1"
   },
   "engines": {
     "node": ">= 13.2.0"
   },
   "scripts": {
-    "test": "nyc mocha --recursive",
-    "test:coverage": "nyc --reporter=lcov mocha --recursive",
+    "test": "mocha --recursive",
+    "coverage": "c8 --reporter=lcov mocha --recursive",
     "docs": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
