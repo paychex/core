@@ -74,7 +74,7 @@ function setRequestHeader([name, value]) {
     this.setRequestHeader(name, value);
 }
 
-export async function xhr(request) {
+export function xhr(request) {
 
     return new Promise(function XHRPromise(resolve) {
 

@@ -1,6 +1,6 @@
 {
   "name": "@paychex/core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Provides framework-agnostic functionality for use in applications.",
   "main": "index.js",
   "license": "Apache-2.0",

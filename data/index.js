@@ -5,7 +5,9 @@ import isEmpty from 'lodash/isEmpty.js';
 import isString from 'lodash/isString.js';
 import isFunction from 'lodash/isFunction.js';
 
-import { xhr } from './xhr.js';
+import { xhr } from './adapters/xhr.js';
+import { node } from './adapters/node.js';
+
 import { tokenize } from './utils.js';
 import { error, fatal } from '../errors/index.js';
 
@@ -596,6 +598,7 @@ export function createDataLayer(proxy, adapters = new Map()) {
     }
 
     setAdapter('xhr', xhr);
+    setAdapter('node', node);
 
     return {
         fetch,
