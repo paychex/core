@@ -67,7 +67,15 @@ export { createProxy } from './proxy.js';
  *
  * An `adapter` converts a Request into a {@link external:Promise Promise} resolved with
  * a {@link Response}. It should never throw an Error; instead, if a failure occurs, it
- * should set the appropriate properties on the Response.
+ * should set the appropriate properties on the Response. The following adapters are included
+ * in `@paychex/core`:
+ *
+ * | adapter | description |
+ * | --- | --- |
+ * | `'xhr'` | Uses `XMLHttpRequest` to fulfill a data operation. Works in web browsers. |
+ * | `'node'` | Uses `https` to fulfill a data operation. Works in NodeJS. |
+ *
+ * **NOTE:** The default adapter for requests (if none is specified on a {@link DataDefinition DataDefinition object}) is `'xhr'`.
  *
  * A `data pipeline` is a sequence of steps whose job is to retrieve data. For that
  * reason, even the simplest data pipeline requires these 3 steps:

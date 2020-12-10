@@ -1,6 +1,9 @@
 import expect from 'expect';
 import { spy } from './utils.js';
+import { manualReset, autoReset } from '../signals/index.js';
+
 import {
+    buffer,
     eventBus,
     sequence,
     parallel,
@@ -9,6 +12,8 @@ import {
 const delay = (ms, value) =>
     () => new Promise(resolve =>
         setTimeout(resolve, ms, value));
+
+const tick = () => delay(0)();
 
 describe('eventBus', () => {
 
@@ -475,6 +480,98 @@ describe('sequence and parallel', () => {
         );
         expect(await seq()).toBe(1);
         expect(calls).toEqual([1, 2, 3, 4, 1]);
+    });
+
+});
+
+describe('buffer', () => {
+
+    let fn;
+    beforeEach(() => fn = spy());
+
+    it('works with async function', async () => {
+        const calls = [];
+        const signal = manualReset(true);
+        fn.invokes(() => new Promise((resolve) => setTimeout(resolve, 10, calls.push(calls.length))));
+        const buf = buffer(fn, [signal]);
+        await Promise.all([ buf(), buf() ]);
+        expect(fn.callCount).toBe(2);
+        expect(calls).toEqual([0, 1]);
+    });
+
+    it('works with no signals', async () => {
+        await buffer(fn, [])();
+        expect(fn.called).toBe(true);
+    });
+
+    it('uses mapped results', async () => {
+        const lastOnly = (arr) => arr.slice(-1);
+        const buf = buffer(fn, [], lastOnly);
+        await Promise.all([ buf(1), buf(2), buf(3) ]);
+        expect(fn.callCount).toBe(1);
+        expect(fn.args).toEqual([3]);
+    });
+
+    describe('queues until signaled', () => {
+
+        it('with autoReset', (done) => {
+            const signal = autoReset(false);
+            const buf = buffer(fn, [signal]);
+            expect(fn.called).toBe(false);
+            Promise.all([
+                buf(),
+                buf(),
+                buf(),
+            ]).then(() => {
+                expect(fn.callCount).toBe(3);
+                done();
+            });
+            signal.set();
+            signal.set();
+            signal.set();
+        });
+
+        it('with manualReset', async () => {
+            const signal = manualReset(false);
+            const ctx = Object.create(null);
+            const buf = buffer(fn, [signal]);
+            expect(fn.called).toBe(false);
+            buf.call(ctx, 123, 456);
+            await tick();
+            expect(fn.called).toBe(false);
+            signal.set();
+            await tick();
+            expect(fn.called).toBe(true);
+            expect(fn.context).toBe(ctx);
+            expect(fn.args).toEqual([123, 456]);
+        });
+
+    });
+
+    describe('handles concurrency', () => {
+
+        it('when invoked twice before signaled', (done) => {
+            const signal = manualReset(false);
+            const buf = buffer(fn, [signal]);
+            Promise.all([
+                buf(),
+                buf(),
+            ]).then(() => {
+                expect(fn.callCount).toBe(2);
+                done();
+            });
+            signal.set();
+        });
+
+        it('when signaled during invocation', async () => {
+            const signal = autoReset(true);
+            const buf = buffer(fn, [signal]);
+            fn.invokes(() => signal.set());
+            await Promise.all([buf(1), buf(2), buf(3)]);
+            expect(fn.callCount).toBe(3);
+            expect(fn.args).toEqual([3]);
+        });
+
     });
 
 });

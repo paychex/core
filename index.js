@@ -1,3 +1,4 @@
+import identity from 'lodash/identity.js';
 import { rethrow } from './errors/index.js';
 
 const stubPromise = () => Promise.resolve();
@@ -537,3 +538,105 @@ export const sequence = getInvocationPattern(function invoker(methods, args){
         promise.then((result) => fn.call(this, ...args, result)),
             Promise.resolve());
 });
+
+/**
+ * Function returned by {@link module:index~buffer buffer}.
+ *
+ * @global
+ * @callback BufferFunction
+ * @param {...any} args The arguments to pass to the wrapped function.
+ * @returns {Promise} A promise resolved when all the queued invocations
+ * are complete, or rejected if any queued invocation throws an error or
+ * returns a rejected Promise.
+ */
+
+/**
+ * @global
+ * @typedef {Array} InvocationData
+ * @property {any} 0 The invocation context.
+ * @property {any[]} 1 The arguments passed to this invocation.
+ */
+
+/**
+ * Filters the queued invocations when a {@link module:index~buffer buffer}'s
+ * signals are ready.
+ *
+ * @global
+ * @callback BufferFilter
+ * @param {InvocationData[]} invocations The queued invocations.
+ * @returns {InvocationData[]} A subset of queued invocations to invoke.
+ * Filters can modify the invocation contexts and arguments.
+ */
+
+/**
+ * Queues invocations of a function until the specified signals are ready.
+ * Optionally, allows filtering the queued invocations or modifying their
+ * arguments or `this` contexts.
+ *
+ * @function buffer
+ * @param {Function} fn The function whose invocations should be buffered.
+ * @param {Signal[]} signals The signals to wait on before ending buffering.
+ * @param {BufferFilter} [filter=identity] Provides optional manipulation of the
+ * buffered invocations. Passed an array of invocations and should return an
+ * array of invocations. See the example for details.
+ * @returns {BufferFunction} A function that will queue invocations while any of
+ * the given signals are in a blocked state.
+ * @example
+ * // pause or resume tracking without losing events
+ *
+ * const { parallel, buffer } = require('@paychex/core');
+ * const createTracker = require('@paychex/core/tracker');
+ * const { manualReset } = require('@paychex/core/signals');
+ *
+ * const ready = manualReset(false);
+ * const collectors = parallel();
+ * const buffered = buffer(collectors, [ready]);
+ *
+ * export const tracker = createTracker(buffered);
+ *
+ * export function add(collector) {
+ *   collectors.add(collector);
+ * };
+ *
+ * export function pause() {
+ *   ready.reset();
+ * }
+ *
+ * export function start() {
+ *   ready.set();
+ * }
+ * @example
+ * // only run most recent invocation of a function
+ * // if invoked multiple times while queued
+ *
+ * const ready = manualReset(false);
+ *
+ * function onlyMostRecent(invocations) {
+ *   return invocations.slice(-1);
+ * }
+ *
+ * async function loadData(arg) {
+ *   console.log('call', arg);
+ * }
+ *
+ * export const proceed = () => ready.set();
+ * export const load = buffer(loadData, [ready], onlyMostRecent);
+ *
+ * // consumer:
+ * load(1);
+ * load(2);
+ * load(3);
+ * proceed(); // "call 3"
+ */
+export function buffer(fn, signals, filter = identity) {
+    const queue = [];
+    const ready = (signal) => signal.ready();
+    const invoke = ([ctx, args]) =>
+        new Promise((resolve) =>
+            resolve(fn.apply(ctx, args)));
+    return async function buffered(...args) {
+        queue.push([this, args]);
+        await Promise.all(signals.map(ready));
+        await Promise.all(filter(queue.splice(0)).map(invoke));
+    };
+}
