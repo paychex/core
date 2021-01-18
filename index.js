@@ -610,24 +610,27 @@ export const sequence = getInvocationPattern(function invoker(methods, args){
  * // only run most recent invocation of a function
  * // if invoked multiple times while queued
  *
- * const ready = manualReset(false);
+ * const signal = manualReset(true);
  *
  * function onlyMostRecent(invocations) {
  *   return invocations.slice(-1);
  * }
  *
  * async function loadData(arg) {
- *   console.log('call', arg);
+ *   try {
+ *     await signal.ready();
+ *     // make data call here
+ *   } finally {
+ *     signal.set();
+ *   }
  * }
  *
- * export const proceed = () => ready.set();
- * export const load = buffer(loadData, [ready], onlyMostRecent);
+ * export const load = buffer(loadData, [signal], onlyMostRecent);
  *
  * // consumer:
- * load(1);
- * load(2);
- * load(3);
- * proceed(); // "call 3"
+ * load(...); // runs, queues future calls until finished
+ * load(...); // will be queued, then dropped in favor of most recent call
+ * load(...); // will be queued, then run after first load completes
  */
 export function buffer(fn, signals, filter = identity) {
     const queue = [];
