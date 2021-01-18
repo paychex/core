@@ -1,3 +1,4 @@
+import iteratee from 'lodash/iteratee.js';
 import identity from 'lodash/identity.js';
 import { rethrow } from './errors/index.js';
 
@@ -358,8 +359,8 @@ export function eventBus(context, mode = parallel) {
  * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
  * @property {Function} remove Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
  * @property {Function} insert Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original ParallelFunction for chaining.
- * @property {Function} clone Creates a new copy of the ParallelFunction. Methods can be added or removed
- * from this function without modifying the original. Returns the original ParallelFunction for chaining.
+ * @property {Function} clone Creates and returns a new copy of the ParallelFunction. Methods can be added or removed
+ * from this function without modifying the original.
  * @param {...any} args The arguments to pass to the original functions.
  * @returns {Promise} A Promise resolved with the array of settled return
  * values or else rejecting with the first rejection reason or thrown error.
@@ -385,8 +386,8 @@ export function eventBus(context, mode = parallel) {
  * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
  * @property {Function} remove Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
  * @property {Function} insert Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original SequentialFunction for chaining.
- * @property {Function} clone Creates a new copy of the SequentialFunction. Methods can be added or removed
- * from this function without modifying the original. Returns the original SequentialFunction for chaining.
+ * @property {Function} clone Creates and returns a new copy of the SequentialFunction. Methods can be added or removed
+ * from this function without modifying the original.
  * @param {...any} args The arguments to pass to the original functions.
  * @returns {Promise} A Promise resolved with the last function's settled
  * return value, or rejected if any function rejects or throws an error.
@@ -638,5 +639,39 @@ export function buffer(fn, signals, filter = identity) {
         queue.push([this, args]);
         await Promise.all(signals.map(ready));
         await Promise.all(filter(queue.splice(0)).map(invoke));
+    };
+}
+
+/**
+ * Conditionally invokes the supplied function if the given predicate returns `true`.
+ *
+ * @function invokeIf
+ * @param {Function} fn The function to invoke conditionally.
+ * @param {Function} predicate A predicate function that returns `true` or `false`
+ * depending on whether the passed function should be invoked. Will be called with
+ * the original set of arguments and context.
+ * @returns {Function} A function that will invoke `fn` only if `predicate` returns `true`.
+ * @example
+ * const collectors = parallel();
+ *
+ * collectors.add(console.log);
+ * collectors.add(gaCollector(window.ga));
+ *
+ * function isEvent(item) {
+ *   return item.type === 'event';
+ * }
+ *
+ * const tracker = createTracker(invokeIf(collectors, isEvent));
+ *
+ * // we could also use lodash iteratee syntax:
+ * const tracker = createTracker(invokeIf(collectors, { type: 'event' }));
+ * const tracker = createTracker(invokeIf(collectors, ['type', 'event']));
+ */
+export function invokeIf(fn, predicate) {
+    const pred = iteratee(predicate);
+    return function conditional(...args) {
+        if (pred.apply(this, args)) {
+            return fn.apply(this, args);
+        }
     };
 }

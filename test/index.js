@@ -7,6 +7,7 @@ import {
     eventBus,
     sequence,
     parallel,
+    invokeIf,
 } from '../index.js';
 
 const delay = (ms, value) =>
@@ -572,6 +573,44 @@ describe('buffer', () => {
             expect(fn.args).toEqual([3]);
         });
 
+    });
+
+});
+
+describe('invokeIf', () => {
+
+    let fn;
+    beforeEach(() => fn = spy());
+
+    it('invokes predicate with args and context', () => {
+        const pred = spy().returns(true);
+        const wrap = invokeIf(fn, pred);
+        const context = Object.create(null);
+        const args = ['abc', 123];
+        wrap.apply(context, args);
+        expect(pred.called).toBe(true);
+        expect(pred.context).toBe(context);
+        expect(pred.args).toEqual(args);
+    });
+
+    it('accepts function predicate', () => {
+        invokeIf(fn, () => true)();
+        expect(fn.called).toBe(true);
+    });
+
+    it('accepts key-value predicate', () => {
+        invokeIf(fn, {key: 'value'})({a: true, key: 'value'});
+        expect(fn.called).toBe(true);
+    });
+
+    it('accepts array predicate', () => {
+        invokeIf(fn, ['key', 'value'])({a: true, key: 'value'});
+        expect(fn.called).toBe(true);
+    });
+
+    it('does not invoke function if predicate is false', () => {
+        invokeIf(fn, () => false)();
+        expect(fn.called).toBe(false);
     });
 
 });
