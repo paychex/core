@@ -5,9 +5,6 @@ import isEmpty from 'lodash/isEmpty.js';
 import isString from 'lodash/isString.js';
 import isFunction from 'lodash/isFunction.js';
 
-import { xhr } from './adapters/xhr.js';
-import { node } from './adapters/node.js';
-
 import { tokenize } from './utils.js';
 import { error, fatal } from '../errors/index.js';
 
@@ -67,15 +64,13 @@ export { createProxy } from './proxy.js';
  *
  * An `adapter` converts a Request into a {@link external:Promise Promise} resolved with
  * a {@link Response}. It should never throw an Error; instead, if a failure occurs, it
- * should set the appropriate properties on the Response. The following adapters are included
- * in `@paychex/core`:
+ * should set the appropriate properties on the Response. The following adapter repositories
+ * can be used:
  *
  * | adapter | description |
  * | --- | --- |
- * | `'xhr'` | Uses `XMLHttpRequest` to fulfill a data operation. Works in web browsers. |
- * | `'node'` | Uses `https` to fulfill a data operation. Works in NodeJS. |
- *
- * **NOTE:** The default adapter for requests (if none is specified on a {@link DataDefinition DataDefinition object}) is `'xhr'`.
+ * | @paychex/adapter-xhr | Uses `XMLHttpRequest` to fulfill a data operation. Works in web browsers. |
+ * | @paychex/adapter-node | Uses `https` to fulfill a data operation. Works in NodeJS. |
  *
  * A `data pipeline` is a sequence of steps whose job is to retrieve data. For that
  * reason, even the simplest data pipeline requires these 3 steps:
@@ -275,7 +270,7 @@ function getErrorMessage(response) {
  * domain name for the resulting {@link Request} URL. If an empty string is provided then a relative
  * URL (one without a protocol or domain name) will be created using the existing domain name and protocol.
  * @property {string} path Combined with the base path (if provided) to construct an absolute or relative URL.
- * @property {string} [adapter='xhr'] The adapter to use to complete the request.
+ * @property {string} [adapter='default'] The adapter to use to complete the request.
  * @property {HeadersMap} [headers={accept: 'application/json, text/plain, *∕*'}] The HTTP headers to use on the request.
  * @property {object} [ignore={}] Can be used to skip certain behaviors. See documentation for details.
  * @property {string} [method='GET'] The HTTP verb to use.
@@ -372,6 +367,7 @@ function getErrorMessage(response) {
  *
  * @function
  * @param {Proxy} proxy The Proxy to use to construct requests.
+ * @param {Adapter} adapter The default adapter to use for requests.
  * @returns {DataLayer} A DataLayer that can be used to retrieve
  * data asynchronously.
  * @throws A proxy must be passed to createDataLayer.
@@ -380,9 +376,10 @@ function getErrorMessage(response) {
  *
  * import { createDataLayer } from '@paychex/core/data';
  * import { withHeaders } from '@paychex/core/data/utils';
+ * import xhr from '@paychex/adapter-xhr';
  * import proxy from '~/path/to/my/proxy';
  *
- * const { fetch, createRequest } = createDataLayer(proxy);
+ * const { fetch, createRequest } = createDataLayer(proxy, xhr);
  *
  * // we can extend the base functionality of fetch before
  * // returning it to consumers:
@@ -397,7 +394,7 @@ function getErrorMessage(response) {
  *   fetch: pipeline
  * }
  */
-export function createDataLayer(proxy, adapters = new Map()) {
+export function createDataLayer(proxy, defaultAdapter, adapters = new Map()) {
 
     if (!conformsTo(proxy, PROXY_SCHEMA))
         throw error('A proxy must be passed to createDataLayer.', fatal());
@@ -416,12 +413,13 @@ export function createDataLayer(proxy, adapters = new Map()) {
      * @throws (if the Response.status is not 2xx)
      * @example
      * import { createDataLayer } from '@paychex/core/data';
+     * import xhr from '@paychex/adapter-xhr';
      * import tracker from '~/path/to/tracker';
      * import proxy from '~/path/to/proxy';
      *
      * // NOTE: you will probably already have access to
      * // a datalayer and not need to create one yourself
-     * const { fetch, createRequest } = createDataLayer(proxy);
+     * const { fetch, createRequest } = createDataLayer(proxy, xhr);
      *
      * const request = createRequest({
      *   base: 'my-app',
@@ -522,7 +520,7 @@ export function createDataLayer(proxy, adapters = new Map()) {
             ignore: {},
             timeout: 0,
             method: 'GET',
-            adapter: 'xhr',
+            adapter: 'default',
             responseType: '',
             withCredentials: false,
             headers: { accept: 'application/json, text/plain, */*' },
@@ -541,12 +539,8 @@ export function createDataLayer(proxy, adapters = new Map()) {
      * method will match the `'adapter'` value on the {@link Request} it is given with
      * any Adapters registered here.
      *
-     * **NOTE:** The default adapter for a Request is `'xhr'`. If you do not specify
-     * your own adapter on the {@link DataDefinition} object used to create a Request then
-     * `'xhr'` will be used. A built-in XHR adapter is registered automatically with each new
-     * DataLayer instance. You only need to register your own Adapter if you want to use
-     * a mechanism other than an XMLHttpRequest to make network calls (e.g. the Fetch API
-     * or a 3rd-party library like Axios).
+     * **NOTE:** The default adapter for a Request is the adapter used to construct the
+     * data layer, which is always registered as `'default'`.
      *
      * @function DataLayer#setAdapter
      * @param {string} name The name of the Adapter to register.
@@ -605,8 +599,7 @@ export function createDataLayer(proxy, adapters = new Map()) {
         adapters.set(name, adapter);
     }
 
-    setAdapter('xhr', xhr);
-    setAdapter('node', node);
+    setAdapter('default', defaultAdapter);
 
     return {
         fetch,

@@ -8,6 +8,8 @@ import isString from 'lodash/isString.js';
 import merge from 'lodash/merge.js';
 import attempt from 'lodash/attempt.js';
 
+import { error, fatal } from '../../errors/index.js';
+
 const XSSI = /^\)]\}',?\n/;
 const SUCCESS = /^2\d\d$/;
 
@@ -57,6 +59,28 @@ function transformHeaders(headers) {
         .reduce(setHeaderValue, Object.create(null));
 }
 
+async function parseData(type, response) {
+    switch (String(type).toLowerCase()) {
+        case '':
+        case 'json':
+            attempt(safeParseJSON, response);
+            break;
+        case 'arraybuffer':
+            response.data = new Uint8Array(response.data.split(' '));
+            break;
+        case 'blob':
+            response.data = null;
+            response.meta.error = true;
+            response.statusText = 'Type `Blob` does not exist in NodeJS.';
+            break;
+        case 'document':
+            const parser = new DOMParser();
+            const responseType = get(response, 'meta.headers.content-type', 'text/html');
+            response.data = parser.parseFromString(response.data, responseType);
+            break;
+    }
+}
+
 export function node(request) {
 
     const response = {
@@ -90,10 +114,9 @@ export function node(request) {
             res.on('data', (chunk) => {
                 data += chunk;
             });
-            res.on('end', () => {
+            res.on('end', async () => {
                 response.data = data;
-                if (get(response, 'meta.headers.content-type', '').includes('json'))
-                    attempt(safeParseJSON, response);
+                await parseData(request.responseType, response);
                 setErrorFromStatus(response);
                 resolve(response);
             });
