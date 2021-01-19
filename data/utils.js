@@ -842,11 +842,11 @@ export function withHeaders(fetch, headers = {}) {
 }
 
 function cookieProvider(name) {
-    return get(window, ['document', 'cookie', name]);
+    return get(globalThis, ['document', 'cookie', name]);
 }
 
 function getUrlProperties(url) {
-    const a = invoke(window, 'document.createElement', 'a');
+    const a = invoke(globalThis, 'document.createElement', 'a');
     invoke(a, 'setAttribute', 'href', url);
     invoke(a, 'setAttribute', 'href', get(a, 'href')); // set twice to force parsing
     return pick(a, ['port', 'hostname', 'protocol']);
@@ -940,7 +940,7 @@ export function withXSRF(fetch, options = {}) {
     } = options;
     const whitelist = hosts.map(asRegExp);
     const urlProps = memoize(getUrlProperties);
-    const origin = urlProps(get(window, 'location.href'));
+    const origin = urlProps(get(globalThis, 'location.href'));
     return async function useXSRF(request, ...args) {
         const token = provider(cookie);
         const target = urlProps(request.url);

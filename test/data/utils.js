@@ -66,13 +66,13 @@ describe('data', () => {
 
             it('uses default arguments when necessary', async () => {
                 const original = setTimeout;
-                const timeout = global.setTimeout = spy();
+                const timeout = globalThis.setTimeout = spy();
                 const retry = falloff();
                 retry({});
                 expect(timeout.called).toBe(true);
                 expect(timeout.args).toEqual([expect.any(Function), 200]);
                 timeout.args[0]();
-                global.setTimeout = original.bind(global);
+                globalThis.setTimeout = original.bind(global);
             });
 
         });
@@ -314,10 +314,10 @@ describe('data', () => {
                 fetch = spy();
                 reconnect = spy();
                 wrapper = withConnectivity(fetch, reconnect);
-                set(global, 'window.navigator.onLine', true);
+                set(globalThis, 'navigator.onLine', true);
             });
 
-            afterEach(() => unset(global, 'window'));
+            afterEach(() => unset(globalThis, 'navigator'));
 
             it('throws if reconnect not provided', () => {
                 expect(() => withConnectivity(fetch))
@@ -527,8 +527,8 @@ describe('data', () => {
                     createElement: spy().returns(a1)
                 };
                 document.createElement.onCall(1).returns(a2);
-                set(global, 'window.location.href', '');
-                set(global, 'window.document', document);
+                set(globalThis, 'location.href', '');
+                set(globalThis, 'document', document);
             });
 
             beforeEach(() => {
@@ -536,7 +536,8 @@ describe('data', () => {
             });
 
             afterEach(() => {
-                unset(global, 'window');
+                unset(globalThis, 'location');
+                unset(globalThis, 'document');
             });
 
             it('does nothing if cookie not set', async () => {
