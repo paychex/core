@@ -36,4 +36,4 @@ name | description
 
 ## Contributing
 
-Before creating a new feature for the `@paychex/core` library, please read [CONTRIBUTING.md](CONTRIBUTING.md).
+Before creating a new feature for the `@paychex/core` library, please read [CONTRIBUTING.md](https://github.com/paychex/core/blob/master/CONTRIBUTING.md).
