@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>data/proxy.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/paychex/core" target="_blank" class="menu-item" id="repository" >Source Code</a></h2><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.createDataLayer">createDataLayer</a></li><li data-type='method'><a href="module-data.html#.createProxy">createProxy</a></li></ul></li><li><a href="module-data_utils.html">data/utils</a><ul class='methods'><li data-type='method'><a href="module-data_utils.html#.falloff">falloff</a></li><li data-type='method'><a href="module-data_utils.html#.tokenize">tokenize</a></li><li data-type='method'><a href="module-data_utils.html#.withAuthentication">withAuthentication</a></li><li data-type='method'><a href="module-data_utils.html#.withCache">withCache</a></li><li data-type='method'><a href="module-data_utils.html#.withConnectivity">withConnectivity</a></li><li data-type='method'><a href="module-data_utils.html#.withDiagnostics">withDiagnostics</a></li><li data-type='method'><a href="module-data_utils.html#.withHeaders">withHeaders</a></li><li data-type='method'><a href="module-data_utils.html#.withRetry">withRetry</a></li><li data-type='method'><a href="module-data_utils.html#.withSignal">withSignal</a></li><li data-type='method'><a href="module-data_utils.html#.withTransform">withTransform</a></li><li data-type='method'><a href="module-data_utils.html#.withXSRF">withXSRF</a></li></ul></li><li><a href="module-errors.html">errors</a><ul class='methods'><li data-type='method'><a href="module-errors.html#.error">error</a></li><li data-type='method'><a href="module-errors.html#.fatal">fatal</a></li><li data-type='method'><a href="module-errors.html#.ignore">ignore</a></li><li data-type='method'><a href="module-errors.html#.rethrow">rethrow</a></li></ul></li><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method'><a href="module-index.html#~buffer">buffer</a></li><li data-type='method'><a href="module-index.html#~eventBus">eventBus</a></li><li data-type='method'><a href="module-index.html#~invokeIf">invokeIf</a></li><li data-type='method'><a href="module-index.html#~parallel">parallel</a></li><li data-type='method'><a href="module-index.html#~sequence">sequence</a></li></ul></li><li><a href="module-models.html">models</a><ul class='methods'><li data-type='method'><a href="module-models.html#.modelList">modelList</a></li><li data-type='method'><a href="module-models.html#.withActive">withActive</a></li><li data-type='method'><a href="module-models.html#.withFiltering">withFiltering</a></li><li data-type='method'><a href="module-models.html#.withGrouping">withGrouping</a></li><li data-type='method'><a href="module-models.html#.withOrdering">withOrdering</a></li><li data-type='method'><a href="module-models.html#.withPaging">withPaging</a></li><li data-type='method'><a href="module-models.html#.withSelection">withSelection</a></li><li data-type='method'><a href="module-models.html#.withUnique">withUnique</a></li><li data-type='method'><a href="module-models.html#.withUpdating">withUpdating</a></li></ul></li><li><a href="module-process.html">process</a><ul class='methods'><li data-type='method'><a href="module-process.html#.action">action</a></li><li data-type='method'><a href="module-process.html#.dependencies">dependencies</a></li><li data-type='method'><a href="module-process.html#.process">process</a></li><li data-type='method'><a href="module-process.html#.run">run</a></li><li data-type='method'><a href="module-process.html#.transitions">transitions</a></li></ul></li><li><a href="module-signals.html">signals</a><ul class='methods'><li data-type='method'><a href="module-signals.html#.autoReset">autoReset</a></li><li data-type='method'><a href="module-signals.html#.countdown">countdown</a></li><li data-type='method'><a href="module-signals.html#.manualReset">manualReset</a></li><li data-type='method'><a href="module-signals.html#.semaphore">semaphore</a></li></ul></li><li><a href="module-stores.html">stores</a><ul class='methods'><li data-type='method'><a href="module-stores.html#.memoryStore">memoryStore</a></li></ul></li><li><a href="module-stores_utils.html">stores/utils</a><ul class='methods'><li data-type='method'><a href="module-stores_utils.html#.asDataCache">asDataCache</a></li><li data-type='method'><a href="module-stores_utils.html#.days">days</a></li><li data-type='method'><a href="module-stores_utils.html#.hours">hours</a></li><li data-type='method'><a href="module-stores_utils.html#.minutes">minutes</a></li><li data-type='method'><a href="module-stores_utils.html#.weeks">weeks</a></li><li data-type='method'><a href="module-stores_utils.html#.withEncryption">withEncryption</a></li><li data-type='method'><a href="module-stores_utils.html#.withExpiration">withExpiration</a></li><li data-type='method'><a href="module-stores_utils.html#.withPrefix">withPrefix</a></li></ul></li><li><a href="module-test.html">test</a><ul class='methods'><li data-type='method'><a href="module-test.html#.spy">spy</a></li></ul></li><li><a href="module-tracker.html">tracker</a><ul class='methods'><li data-type='method'><a href="module-tracker.html#.createTracker">createTracker</a></li><li data-type='method'><a href="module-tracker.html#.withNesting">withNesting</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Promise.html">Promise</a></li></ul><h3>Events</h3><ul><li><a href="ModelList-ActiveModelList.html#~event:active-change">active-change</a></li><li><a href="ModelList.html#~event:items-add">items-add</a></li><li><a href="ModelList.html#~event:items-remove">items-remove</a></li><li><a href="ModelList-FilteredModelList.html#~event:filter-change">filter-change</a></li><li><a href="ModelList-GroupedModelList.html#~event:group-change">group-change</a></li><li><a href="ModelList-OrderedModelList.html#~event:order-change">order-change</a></li><li><a href="ModelList-PagedModelList.html#~event:page-change">page-change</a></li><li><a href="ModelList-SelectionModelList.html#~event:selection-change">selection-change</a></li><li><a href="ModelList-UniqueModelList.html#~event:unique-change">unique-change</a></li><li><a href="ModelList-UpdatingModelList.html#~event:items-update">items-update</a></li></ul><h3>Interfaces</h3><ul><li><a href="Action.html">Action</a><ul class='methods'><li data-type='method'><a href="Action.html#execute">execute</a></li><li data-type='method'><a href="Action.html#failure">failure</a></li><li data-type='method'><a href="Action.html#init">init</a></li><li data-type='method'><a href="Action.html#retry">retry</a></li><li data-type='method'><a href="Action.html#rollback">rollback</a></li><li data-type='method'><a href="Action.html#success">success</a></li></ul></li><li><a href="Cache.html">Cache</a><ul class='methods'><li data-type='method'><a href="Cache.html#get">get</a></li><li data-type='method'><a href="Cache.html#set">set</a></li></ul></li><li><a href="DataLayer.html">DataLayer</a><ul class='methods'><li data-type='method'><a href="DataLayer.html#createRequest">createRequest</a></li><li data-type='method'><a href="DataLayer.html#fetch">fetch</a></li><li data-type='method'><a href="DataLayer.html#setAdapter">setAdapter</a></li></ul></li><li><a href="EventBus.html">EventBus</a><ul class='methods'><li data-type='method'><a href="EventBus.html#fire">fire</a></li><li data-type='method'><a href="EventBus.html#on">on</a></li><li data-type='method'><a href="EventBus.html#one">one</a></li><li data-type='method'><a href="EventBus.html#resume">resume</a></li><li data-type='method'><a href="EventBus.html#stop">stop</a></li></ul></li><li><a href="ModelList.html">ModelList</a><ul class='methods'><li data-type='method'><a href="ModelList.html#add">add</a></li><li data-type='method'><a href="ModelList.html#clear">clear</a></li><li data-type='method'><a href="ModelList.html#items">items</a></li><li data-type='method'><a href="ModelList.html#remove">remove</a></li></ul></li><li><a href="ModelList-ActiveModelList.html">ActiveModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-ActiveModelList.html#active">active</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#next">next</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#prev">prev</a></li></ul></li><li><a href="ModelList-FilteredModelList.html">FilteredModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-FilteredModelList.html#filterBy">filterBy</a></li></ul></li><li><a href="ModelList-GroupedModelList.html">GroupedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-GroupedModelList.html#groupBy">groupBy</a></li><li data-type='method'><a href="ModelList-GroupedModelList.html#groups">groups</a></li></ul></li><li><a href="ModelList-OrderedModelList.html">OrderedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-OrderedModelList.html#orderBy">orderBy</a></li></ul></li><li><a href="ModelList-PagedModelList.html">PagedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-PagedModelList.html#nextPage">nextPage</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageIndex">pageIndex</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageSize">pageSize</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#prevPage">prevPage</a></li></ul></li><li><a href="ModelList-SelectionModelList.html">SelectionModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-SelectionModelList.html#selected">selected</a></li><li data-type='method'><a href="ModelList-SelectionModelList.html#toggle">toggle</a></li></ul></li><li><a href="ModelList-UniqueModelList.html">UniqueModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UniqueModelList.html#uniqueBy">uniqueBy</a></li></ul></li><li><a href="ModelList-UpdatingModelList.html">UpdatingModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UpdatingModelList.html#merge">merge</a></li><li data-type='method'><a href="ModelList-UpdatingModelList.html#upsert">upsert</a></li></ul></li><li><a href="module-signals-AutoResetSignal.html">AutoResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-AutoResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-CountdownSignal.html">CountdownSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-CountdownSignal.html#decrement">decrement</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#increment">increment</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#ready">ready</a></li></ul></li><li><a href="module-signals-ManualResetSignal.html">ManualResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-ManualResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-Semaphore.html">Semaphore</a><ul class='methods'><li data-type='method'><a href="module-signals-Semaphore.html#ready">ready</a></li><li data-type='method'><a href="module-signals-Semaphore.html#release">release</a></li></ul></li><li><a href="NestedTimingTracker.html">NestedTimingTracker</a><ul class='methods'><li data-type='method'><a href="NestedTimingTracker.html#child">child</a></li><li data-type='method'><a href="NestedTimingTracker.html#context">context</a></li><li data-type='method'><a href="NestedTimingTracker.html#error">error</a></li><li data-type='method'><a href="NestedTimingTracker.html#event">event</a></li><li data-type='method'><a href="NestedTimingTracker.html#start">start</a></li><li data-type='method'><a href="NestedTimingTracker.html#uuid">uuid</a></li></ul></li><li><a href="ProcessLogic.html">ProcessLogic</a><ul class='methods'><li data-type='method'><a href="ProcessLogic.html#contextFromArgs">contextFromArgs</a></li><li data-type='method'><a href="ProcessLogic.html#getInitialActions">getInitialActions</a></li><li data-type='method'><a href="ProcessLogic.html#getNextActions">getNextActions</a></li></ul></li><li><a href="Proxy.html">Proxy</a><ul class='methods'><li data-type='method'><a href="Proxy.html#apply">apply</a></li><li data-type='method'><a href="Proxy.html#url">url</a></li><li data-type='method'><a href="Proxy.html#use">use</a></li></ul></li><li><a href="Spy.html">Spy</a><ul class='methods'><li data-type='method'><a href="Spy.html#invokes">invokes</a></li><li data-type='method'><a href="Spy.html#onCall">onCall</a></li><li data-type='method'><a href="Spy.html#returns">returns</a></li><li data-type='method'><a href="Spy.html#throws">throws</a></li></ul></li><li><a href="SpyBehaviors.html">SpyBehaviors</a><ul class='methods'><li data-type='method'><a href="SpyBehaviors.html#invokes">invokes</a></li><li data-type='method'><a href="SpyBehaviors.html#returns">returns</a></li><li data-type='method'><a href="SpyBehaviors.html#throws">throws</a></li></ul></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#delete">delete</a></li><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#set">set</a></li></ul></li><li><a href="Tracker.html">Tracker</a><ul class='methods'><li data-type='method'><a href="Tracker.html#child">child</a></li><li data-type='method'><a href="Tracker.html#context">context</a></li><li data-type='method'><a href="Tracker.html#error">error</a></li><li data-type='method'><a href="Tracker.html#event">event</a></li><li data-type='method'><a href="Tracker.html#start">start</a></li><li data-type='method'><a href="Tracker.html#uuid">uuid</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">data/proxy.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import cond from 'lodash/cond.js';
+import omit from 'lodash/omit.js';
+import isEmpty from 'lodash/isEmpty.js';
+import isArray from 'lodash/isArray.js';
+import isNumber from 'lodash/isNumber.js';
+import matches from 'lodash/matches.js';
+import constant from 'lodash/constant.js';
+import stubTrue from 'lodash/stubTrue.js';
+import mergeWith from 'lodash/mergeWith.js';
+
+const DOUBLE_SLASH = /\/\//g;
+const LEADING_SLASHES = /^\/+/;
+
+const merge = (lhs, rhs) => mergeWith(lhs, rhs, arrayConcat);
+
+function arrayConcat(lhs, rhs) {
+    if (isArray(lhs)) {
+        return lhs.concat(rhs);
+    }
+}
+
+/**
+ * @ignore
+ * @this {ProxyRule}
+ */
+function patternMatches([key, pattern]) {
+    return new RegExp(pattern, 'i').test(this[key]);
+}
+
+/**
+ * @ignore
+ * @this {ProxyRule}
+ */
+function ruleMatches(rule) {
+    const { match = {} } = rule;
+    return Object.entries(match).every(patternMatches, this);
+}
+
+function withoutMatchObject(rule) {
+    return omit(rule, 'match');
+}
+
+const equals = rhs => lhs => lhs === rhs;
+const suffix = after => value => `${value}${after}`;
+const prefix = before => value => `${before}${value}`;
+
+const format = {
+    protocol: cond([
+        [matches('file'), constant('file:///')],
+        [isEmpty, constant('//')],
+        [stubTrue, suffix('://')]
+    ]),
+    port: cond([
+        [equals(80), constant('')],
+        [isNumber, prefix(':')],
+        [stubTrue, constant('')]
+    ]),
+    path: cond([
+        [isEmpty, constant('')],
+        [stubTrue, prefix('/')]
+    ])
+};
+
+/**
+ * Represents a single rule in a proxy instance. A Proxy rule looks like a normal Request
+ * object with an additional property `match` that specifies the property values on a Request
+ * instance that must match in order for the rule to be applied.
+ *
+ * @global
+ * @typedef {{}} ProxyRule
+ * @alias ProxyRule
+ * @mixes Request
+ * @property {string} [protocol] 'http', 'https', 'file', etc.
+ * @property {string} [host] 'myapps.myserver.com', 'localhost', etc.
+ * @property {number} [port] 80, 8080, etc.
+ * @property {Object.&lt;string, string>} match One or more keys in a request object whose values must match
+ * the given regular expression patterns. E.g.: `{base: 'cdn'}` or `{base: 'myapp', path: 'load.+'}`
+ */
+
+/**
+ * The Proxy provides an intercept layer based on build- and run-time configurations to enable
+ * easier local development, impersonation, dynamic endpoints, static data redirects, and user-
+ * and environment-specific versioning.
+ *
+ * @interface Proxy
+ */
+
+/**
+* Creates a new proxy instance.
+*
+* @function module:data.createProxy
+* @returns {Proxy} A Proxy instance.
+* @example
+* import {createProxy} from '@paychex/data'
+* import rules from '~/config/proxy'
+* export const proxy = createProxy();
+* proxy.use(rules);
+*/
+export function createProxy() {
+
+    const config = [];
+
+    return /** @lends Proxy.prototype */ {
+
+        /**
+         * Uses the current proxy rules to construct a URL based on the given arguments.
+         *
+         * @param {string} base A base value, e.g. 'cdn' or 'myapp'.
+         * @param {...string} paths One or more URL paths to combine into the final URL.
+         * @returns {string} A URL with the appropriate protocol, host, port, and paths
+         * given the currently configured proxy rules.
+         * @example
+         * import { proxy } from '~/path/to/data';
+         * import { tokenize } from '@paychex/core/data';
+         *
+         * proxy.use({
+         *   port: 8118,
+         *   protocol: 'https',
+         *   host: 'images.myserver.com',
+         *   match: {
+         *     base: 'images'
+         *   }
+         * });
+         *
+         * ```html
+         *   &lt;img src="{{ getImageURL('avatars', 'e13d429a') }}" alt="" />
+         *   &lt;!-- https://images.myserver.com:8118/avatars/e13d429a -->
+         * ```
+         * export function getImageURL(bucket, id) {
+         *   return proxy.url('images', bucket, id);
+         * }
+         */
+        url(base, ...paths) {
+            const path = Array.prototype.concat.apply([], paths)
+                .join('/')
+                .replace(DOUBLE_SLASH, '/')
+                .replace(LEADING_SLASHES, '');
+            const { protocol = '', host = base, port = 80 } = config
+                .filter(ruleMatches, { base, path })
+                .reduce(merge, {});
+            return [
+                host ? format.protocol(protocol) : '',
+                host,
+                format.port(port),
+                format.path(path)
+            ].join('');
+        },
+
+        /**
+         * Modifies the input Request object according to any matching Proxy rules.
+         * Rules are applied in the order they were added to the Proxy, so later rules will
+         * always override earlier rules.
+         *
+         * **NOTE:** You will not typically call this method directly. Instead, the
+         * DataLayer.createRequest method will invoke this function on your behalf. See
+         * that method for details.
+         *
+         * @param {Request} request The request object whose key/value pairs will be used
+         * to determine which proxy rules should be used to determine the version.
+         * @returns {Request} The input Request object, with properties modified according
+         * to the matching Proxy rules.
+         * @see {@link DataLayer#createRequest createRequest} &amp;mdash; invokes the apply
+         * method for you
+         * @example
+         * import { rethrow, fatal } from '@paychex/core/errors';
+         * import { proxy, createRequest, fetch } from '~/path/to/data';
+         * import switches from '../config/features.json';
+         *
+         * if (switches.useV2endpoint) {
+         *   // switch from Remote to REST endpoint
+         *   proxy.use({
+         *     path: '/v2/endpoint',
+         *     match: {
+         *       base: 'my-project',
+         *       path: '/endpoint',
+         *     }
+         *   });
+         * }
+         *
+         * export async function getEndpointData() {
+         *   // createRequest modifies the Request
+         *   // object generated by the DDO using
+         *   // Proxy rules, including the one above
+         *   const request = createRequest({
+         *     base: 'my-project',
+         *     path: '/endpoint',
+         *   });
+         *   const response = await fetch(request)
+         *     .catch(rethrow(fatal()));
+         *   return response.data;
+         * }
+         */
+        apply(request) {
+            return config
+                .filter(ruleMatches, request)
+                .map(withoutMatchObject)
+                .reduce(merge, request);
+        },
+
+        /**
+         * Add rules to the proxy instance. The order rules are added determines
+         * the order they are applied.
+         * @param {...ProxyRule} rules The rules to use to configure this proxy instance.
+         * @example
+         * import { proxy } from '~/path/to/data';
+         *
+         * // any {@link Request Requests} with base == 'files'
+         * // will be routed to https://files.myserver.com:8118
+         * proxy.use({
+         *   port: 8118,
+         *   protocol: 'https',
+         *   host: 'files.myserver.com',
+         *   match: {
+         *     base: 'files'
+         *   }
+         * });
+         */
+        use(...rules) {
+            config.push(...Array.prototype.concat.apply([], rules));
+        },
+
+    };
+
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>

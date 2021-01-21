@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>EventBus - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/paychex/core" target="_blank" class="menu-item" id="repository" >Source Code</a></h2><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.createDataLayer">createDataLayer</a></li><li data-type='method'><a href="module-data.html#.createProxy">createProxy</a></li></ul></li><li><a href="module-data_utils.html">data/utils</a><ul class='methods'><li data-type='method'><a href="module-data_utils.html#.falloff">falloff</a></li><li data-type='method'><a href="module-data_utils.html#.tokenize">tokenize</a></li><li data-type='method'><a href="module-data_utils.html#.withAuthentication">withAuthentication</a></li><li data-type='method'><a href="module-data_utils.html#.withCache">withCache</a></li><li data-type='method'><a href="module-data_utils.html#.withConnectivity">withConnectivity</a></li><li data-type='method'><a href="module-data_utils.html#.withDiagnostics">withDiagnostics</a></li><li data-type='method'><a href="module-data_utils.html#.withHeaders">withHeaders</a></li><li data-type='method'><a href="module-data_utils.html#.withRetry">withRetry</a></li><li data-type='method'><a href="module-data_utils.html#.withSignal">withSignal</a></li><li data-type='method'><a href="module-data_utils.html#.withTransform">withTransform</a></li><li data-type='method'><a href="module-data_utils.html#.withXSRF">withXSRF</a></li></ul></li><li><a href="module-errors.html">errors</a><ul class='methods'><li data-type='method'><a href="module-errors.html#.error">error</a></li><li data-type='method'><a href="module-errors.html#.fatal">fatal</a></li><li data-type='method'><a href="module-errors.html#.ignore">ignore</a></li><li data-type='method'><a href="module-errors.html#.rethrow">rethrow</a></li></ul></li><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method'><a href="module-index.html#~buffer">buffer</a></li><li data-type='method'><a href="module-index.html#~eventBus">eventBus</a></li><li data-type='method'><a href="module-index.html#~invokeIf">invokeIf</a></li><li data-type='method'><a href="module-index.html#~parallel">parallel</a></li><li data-type='method'><a href="module-index.html#~sequence">sequence</a></li></ul></li><li><a href="module-models.html">models</a><ul class='methods'><li data-type='method'><a href="module-models.html#.modelList">modelList</a></li><li data-type='method'><a href="module-models.html#.withActive">withActive</a></li><li data-type='method'><a href="module-models.html#.withFiltering">withFiltering</a></li><li data-type='method'><a href="module-models.html#.withGrouping">withGrouping</a></li><li data-type='method'><a href="module-models.html#.withOrdering">withOrdering</a></li><li data-type='method'><a href="module-models.html#.withPaging">withPaging</a></li><li data-type='method'><a href="module-models.html#.withSelection">withSelection</a></li><li data-type='method'><a href="module-models.html#.withUnique">withUnique</a></li><li data-type='method'><a href="module-models.html#.withUpdating">withUpdating</a></li></ul></li><li><a href="module-process.html">process</a><ul class='methods'><li data-type='method'><a href="module-process.html#.action">action</a></li><li data-type='method'><a href="module-process.html#.dependencies">dependencies</a></li><li data-type='method'><a href="module-process.html#.process">process</a></li><li data-type='method'><a href="module-process.html#.run">run</a></li><li data-type='method'><a href="module-process.html#.transitions">transitions</a></li></ul></li><li><a href="module-signals.html">signals</a><ul class='methods'><li data-type='method'><a href="module-signals.html#.autoReset">autoReset</a></li><li data-type='method'><a href="module-signals.html#.countdown">countdown</a></li><li data-type='method'><a href="module-signals.html#.manualReset">manualReset</a></li><li data-type='method'><a href="module-signals.html#.semaphore">semaphore</a></li></ul></li><li><a href="module-stores.html">stores</a><ul class='methods'><li data-type='method'><a href="module-stores.html#.memoryStore">memoryStore</a></li></ul></li><li><a href="module-stores_utils.html">stores/utils</a><ul class='methods'><li data-type='method'><a href="module-stores_utils.html#.asDataCache">asDataCache</a></li><li data-type='method'><a href="module-stores_utils.html#.days">days</a></li><li data-type='method'><a href="module-stores_utils.html#.hours">hours</a></li><li data-type='method'><a href="module-stores_utils.html#.minutes">minutes</a></li><li data-type='method'><a href="module-stores_utils.html#.weeks">weeks</a></li><li data-type='method'><a href="module-stores_utils.html#.withEncryption">withEncryption</a></li><li data-type='method'><a href="module-stores_utils.html#.withExpiration">withExpiration</a></li><li data-type='method'><a href="module-stores_utils.html#.withPrefix">withPrefix</a></li></ul></li><li><a href="module-test.html">test</a><ul class='methods'><li data-type='method'><a href="module-test.html#.spy">spy</a></li></ul></li><li><a href="module-tracker.html">tracker</a><ul class='methods'><li data-type='method'><a href="module-tracker.html#.createTracker">createTracker</a></li><li data-type='method'><a href="module-tracker.html#.withNesting">withNesting</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Promise.html">Promise</a></li></ul><h3>Events</h3><ul><li><a href="ModelList-ActiveModelList.html#~event:active-change">active-change</a></li><li><a href="ModelList.html#~event:items-add">items-add</a></li><li><a href="ModelList.html#~event:items-remove">items-remove</a></li><li><a href="ModelList-FilteredModelList.html#~event:filter-change">filter-change</a></li><li><a href="ModelList-GroupedModelList.html#~event:group-change">group-change</a></li><li><a href="ModelList-OrderedModelList.html#~event:order-change">order-change</a></li><li><a href="ModelList-PagedModelList.html#~event:page-change">page-change</a></li><li><a href="ModelList-SelectionModelList.html#~event:selection-change">selection-change</a></li><li><a href="ModelList-UniqueModelList.html#~event:unique-change">unique-change</a></li><li><a href="ModelList-UpdatingModelList.html#~event:items-update">items-update</a></li></ul><h3>Interfaces</h3><ul><li><a href="Action.html">Action</a><ul class='methods'><li data-type='method'><a href="Action.html#execute">execute</a></li><li data-type='method'><a href="Action.html#failure">failure</a></li><li data-type='method'><a href="Action.html#init">init</a></li><li data-type='method'><a href="Action.html#retry">retry</a></li><li data-type='method'><a href="Action.html#rollback">rollback</a></li><li data-type='method'><a href="Action.html#success">success</a></li></ul></li><li><a href="Cache.html">Cache</a><ul class='methods'><li data-type='method'><a href="Cache.html#get">get</a></li><li data-type='method'><a href="Cache.html#set">set</a></li></ul></li><li><a href="DataLayer.html">DataLayer</a><ul class='methods'><li data-type='method'><a href="DataLayer.html#createRequest">createRequest</a></li><li data-type='method'><a href="DataLayer.html#fetch">fetch</a></li><li data-type='method'><a href="DataLayer.html#setAdapter">setAdapter</a></li></ul></li><li><a href="EventBus.html">EventBus</a><ul class='methods'><li data-type='method'><a href="EventBus.html#fire">fire</a></li><li data-type='method'><a href="EventBus.html#on">on</a></li><li data-type='method'><a href="EventBus.html#one">one</a></li><li data-type='method'><a href="EventBus.html#resume">resume</a></li><li data-type='method'><a href="EventBus.html#stop">stop</a></li></ul></li><li><a href="ModelList.html">ModelList</a><ul class='methods'><li data-type='method'><a href="ModelList.html#add">add</a></li><li data-type='method'><a href="ModelList.html#clear">clear</a></li><li data-type='method'><a href="ModelList.html#items">items</a></li><li data-type='method'><a href="ModelList.html#remove">remove</a></li></ul></li><li><a href="ModelList-ActiveModelList.html">ActiveModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-ActiveModelList.html#active">active</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#next">next</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#prev">prev</a></li></ul></li><li><a href="ModelList-FilteredModelList.html">FilteredModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-FilteredModelList.html#filterBy">filterBy</a></li></ul></li><li><a href="ModelList-GroupedModelList.html">GroupedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-GroupedModelList.html#groupBy">groupBy</a></li><li data-type='method'><a href="ModelList-GroupedModelList.html#groups">groups</a></li></ul></li><li><a href="ModelList-OrderedModelList.html">OrderedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-OrderedModelList.html#orderBy">orderBy</a></li></ul></li><li><a href="ModelList-PagedModelList.html">PagedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-PagedModelList.html#nextPage">nextPage</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageIndex">pageIndex</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageSize">pageSize</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#prevPage">prevPage</a></li></ul></li><li><a href="ModelList-SelectionModelList.html">SelectionModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-SelectionModelList.html#selected">selected</a></li><li data-type='method'><a href="ModelList-SelectionModelList.html#toggle">toggle</a></li></ul></li><li><a href="ModelList-UniqueModelList.html">UniqueModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UniqueModelList.html#uniqueBy">uniqueBy</a></li></ul></li><li><a href="ModelList-UpdatingModelList.html">UpdatingModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UpdatingModelList.html#merge">merge</a></li><li data-type='method'><a href="ModelList-UpdatingModelList.html#upsert">upsert</a></li></ul></li><li><a href="module-signals-AutoResetSignal.html">AutoResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-AutoResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-CountdownSignal.html">CountdownSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-CountdownSignal.html#decrement">decrement</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#increment">increment</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#ready">ready</a></li></ul></li><li><a href="module-signals-ManualResetSignal.html">ManualResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-ManualResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-Semaphore.html">Semaphore</a><ul class='methods'><li data-type='method'><a href="module-signals-Semaphore.html#ready">ready</a></li><li data-type='method'><a href="module-signals-Semaphore.html#release">release</a></li></ul></li><li><a href="NestedTimingTracker.html">NestedTimingTracker</a><ul class='methods'><li data-type='method'><a href="NestedTimingTracker.html#child">child</a></li><li data-type='method'><a href="NestedTimingTracker.html#context">context</a></li><li data-type='method'><a href="NestedTimingTracker.html#error">error</a></li><li data-type='method'><a href="NestedTimingTracker.html#event">event</a></li><li data-type='method'><a href="NestedTimingTracker.html#start">start</a></li><li data-type='method'><a href="NestedTimingTracker.html#uuid">uuid</a></li></ul></li><li><a href="ProcessLogic.html">ProcessLogic</a><ul class='methods'><li data-type='method'><a href="ProcessLogic.html#contextFromArgs">contextFromArgs</a></li><li data-type='method'><a href="ProcessLogic.html#getInitialActions">getInitialActions</a></li><li data-type='method'><a href="ProcessLogic.html#getNextActions">getNextActions</a></li></ul></li><li><a href="Proxy.html">Proxy</a><ul class='methods'><li data-type='method'><a href="Proxy.html#apply">apply</a></li><li data-type='method'><a href="Proxy.html#url">url</a></li><li data-type='method'><a href="Proxy.html#use">use</a></li></ul></li><li><a href="Spy.html">Spy</a><ul class='methods'><li data-type='method'><a href="Spy.html#invokes">invokes</a></li><li data-type='method'><a href="Spy.html#onCall">onCall</a></li><li data-type='method'><a href="Spy.html#returns">returns</a></li><li data-type='method'><a href="Spy.html#throws">throws</a></li></ul></li><li><a href="SpyBehaviors.html">SpyBehaviors</a><ul class='methods'><li data-type='method'><a href="SpyBehaviors.html#invokes">invokes</a></li><li data-type='method'><a href="SpyBehaviors.html#returns">returns</a></li><li data-type='method'><a href="SpyBehaviors.html#throws">throws</a></li></ul></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#delete">delete</a></li><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#set">set</a></li></ul></li><li><a href="Tracker.html">Tracker</a><ul class='methods'><li data-type='method'><a href="Tracker.html#child">child</a></li><li data-type='method'><a href="Tracker.html#context">context</a></li><li data-type='method'><a href="Tracker.html#error">error</a></li><li data-type='method'><a href="Tracker.html#event">event</a></li><li data-type='method'><a href="Tracker.html#start">start</a></li><li data-type='method'><a href="Tracker.html#uuid">uuid</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">EventBus</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        EventBus
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line57">line 57</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Provides publish/subscribe functionality.</p></div>
+            
+
+            
+                <h3>Example</h3>
+                
+    <pre class="prettyprint"><code>import { eventBus } from '@paychex/core';import { tracker } from '~/tracking';const bus = eventBus();bus.on('event', function handler(arg1, arg2) {  console.log(`received ${arg1} and ${arg2}`);  return arg1 + arg2;});// subscribers can be asynchronousbus.on('event', async function handler(arg1, arg2) {  const result = await someAsyncMethod(arg1);  await someOtherAsyncMethod(result, arg2);  return 'abc';});// fire and forgetbus.fire('event', 1, 2);// catch any rejected promises returned by// handlers (or errors thrown by handlers)await bus.fire('event', 1, 2).catch(tracker.error);// examine the return values of handlersconst results = await bus.fire('event', 1, 2);console.log(results); // [3, 'abc']</code></pre>
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="fire"><span class="type-signature"></span>fire<span class="signature">(event, &hellip;args<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {boolean|Promise}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line132">line 132</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Notifies any subscribers registered through <a href="EventBus.html#on">on</a>
+or <a href="EventBus.html#on">one</a> that the specified event has occurred. If
+any subscribers throw an exception then the <a href="EventBus.html#fire">fire</a>
+promise will be rejected, but any other subscribers will continue to be
+notified of the initial event.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>import { eventBus } from '@paychex/core';import { tracker } from '~/tracking';const bus = eventBus();bus.on('event', async function handler(value1, value2) {  return await someAsyncMethod(value1, value2);});bus.fire('event', arg1, arg2);const results = await bus.fire('event', arg1, arg2);await bus.fire('event', arg1, arg2).catch(tracker.error);</code></pre>
+
+    <pre class="prettyprint"><code>import { eventBus, sequence } from '@paychex/core';import { error } from '@paychex/core/errors';const bus = eventBus();async function dirtyCheck(container, path) {  if (container.dirty)    throw error('save your changes');}async function navigate(container, path) {  // load new route}bus.on('navigate', sequence(dirtyCheck, navigate));export async function navigate(container, path) {  await bus.fire('navigate', container, path);}// callerfunction linkHandler(e) {  e.preventDefault();  e.stopPropagation();  const route = e.target.getAttribute('route');  const container = e.target.getAttribute('container');  navigate(container, route).then(    () => console.info('navigation complete'),    (err) => console.log('navigation failed', err);  );}</code></pre>
+
+    <pre class="prettyprint"><code>import { eventBus, sequence, parallel } from '@paychex/core';const bus1 = eventBus(null, sequence);const bus2 = eventBus(null, parallel); // the default behaviorfunction handler1() {  return 1;}function handler2() {  return 2;}bus1.on('event', handler1);bus1.on('event', handler2);// sequence bus returns last subscriber's return valueawait bus1.fire('event'); // 2bus2.on('event', handler1);bus2.on('event', handler2);// parallel bus returns arrayawait bus2.fire('event'); // [1, 2]</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The name of the event to fire.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional arguments to pass to subscribers.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Returns <code>false</code> if the bus is stopped. Otherwise,
+returns a Promise that will resolve with an array of values returned by
+event subscribers, or reject with the first Promise rejection or thrown error.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+|
+
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="on"><span class="type-signature"></span>on<span class="signature">(event, subscriber)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line217">line 217</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Registers a subscriber for the given event. The subscriber will be invoked
+in the context used to create the <a href="EventBus.html">EventBus</a> and passed any arguments
+provided to the <a href="EventBus.html#fire">fire method</a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { eventBus } from '@paychex/core';import { createSomething } from '../someFactory';const obj = createSomething();const bus = eventBus(obj); // subscriber contextbus.one('initialize', function init() {  // this only runs the first time  // the 'initialize' event is fired;});export const off = bus.on('some-event', function handler(arg) {  console.log(this === obj); // true});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the event to listen for.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>subscriber</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The subscriber to invoke when the event is fired.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Method to invoke to remove the subscriber.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="one"><span class="type-signature"></span>one<span class="signature">(event, subscriber)</span><span class="type-signature"> &rarr; {function}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line217">line 217</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Registers a subscriber for the given event. The subscriber will be invoked
+in the context used to create the <a href="EventBus.html">EventBus</a> and passed any arguments
+provided to the <a href="EventBus.html#fire">fire method</a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { eventBus } from '@paychex/core';import { createSomething } from '../someFactory';const obj = createSomething();const bus = eventBus(obj); // subscriber contextbus.one('initialize', function init() {  // this only runs the first time  // the 'initialize' event is fired;});export const off = bus.on('some-event', function handler(arg) {  console.log(this === obj); // true});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the event to listen for.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>subscriber</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The subscriber to invoke when the event is fired.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Method to invoke to remove the subscriber.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">function</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="resume"><span class="type-signature"></span>resume<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line111">line 111</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Resumes notifying subscribers after <a href="EventBus.html#stop">stop</a> was called. Any
+events fired before resuming are dropped entirely.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { eventBus } from '@paychex/core';const bus = eventBus();bus.on('add', function handler(value1, value2) {  console.log(value1 + value2);});bus.fire('add', 1, 2); // 3bus.stop();bus.fire('add', 1, 2); // does not invoke subscriberbus.resume();bus.fire('add', 1, 2); // 3</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="stop"><span class="type-signature"></span>stop<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line93">line 93</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Stops notifying subscribers of fired events until <a href="EventBus.html#resume">resume</a> is called.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { eventBus } from '@paychex/core';const bus = eventBus();bus.on('add', function handler(value1, value2) {  console.log(value1 + value2);});bus.fire('add', 1, 2); // 3bus.stop();bus.fire('add', 1, 2); // does not invoke subscriber</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>

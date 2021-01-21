@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>test/utils.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/paychex/core" target="_blank" class="menu-item" id="repository" >Source Code</a></h2><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.createDataLayer">createDataLayer</a></li><li data-type='method'><a href="module-data.html#.createProxy">createProxy</a></li></ul></li><li><a href="module-data_utils.html">data/utils</a><ul class='methods'><li data-type='method'><a href="module-data_utils.html#.falloff">falloff</a></li><li data-type='method'><a href="module-data_utils.html#.tokenize">tokenize</a></li><li data-type='method'><a href="module-data_utils.html#.withAuthentication">withAuthentication</a></li><li data-type='method'><a href="module-data_utils.html#.withCache">withCache</a></li><li data-type='method'><a href="module-data_utils.html#.withConnectivity">withConnectivity</a></li><li data-type='method'><a href="module-data_utils.html#.withDiagnostics">withDiagnostics</a></li><li data-type='method'><a href="module-data_utils.html#.withHeaders">withHeaders</a></li><li data-type='method'><a href="module-data_utils.html#.withRetry">withRetry</a></li><li data-type='method'><a href="module-data_utils.html#.withSignal">withSignal</a></li><li data-type='method'><a href="module-data_utils.html#.withTransform">withTransform</a></li><li data-type='method'><a href="module-data_utils.html#.withXSRF">withXSRF</a></li></ul></li><li><a href="module-errors.html">errors</a><ul class='methods'><li data-type='method'><a href="module-errors.html#.error">error</a></li><li data-type='method'><a href="module-errors.html#.fatal">fatal</a></li><li data-type='method'><a href="module-errors.html#.ignore">ignore</a></li><li data-type='method'><a href="module-errors.html#.rethrow">rethrow</a></li></ul></li><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method'><a href="module-index.html#~buffer">buffer</a></li><li data-type='method'><a href="module-index.html#~eventBus">eventBus</a></li><li data-type='method'><a href="module-index.html#~invokeIf">invokeIf</a></li><li data-type='method'><a href="module-index.html#~parallel">parallel</a></li><li data-type='method'><a href="module-index.html#~sequence">sequence</a></li></ul></li><li><a href="module-models.html">models</a><ul class='methods'><li data-type='method'><a href="module-models.html#.modelList">modelList</a></li><li data-type='method'><a href="module-models.html#.withActive">withActive</a></li><li data-type='method'><a href="module-models.html#.withFiltering">withFiltering</a></li><li data-type='method'><a href="module-models.html#.withGrouping">withGrouping</a></li><li data-type='method'><a href="module-models.html#.withOrdering">withOrdering</a></li><li data-type='method'><a href="module-models.html#.withPaging">withPaging</a></li><li data-type='method'><a href="module-models.html#.withSelection">withSelection</a></li><li data-type='method'><a href="module-models.html#.withUnique">withUnique</a></li><li data-type='method'><a href="module-models.html#.withUpdating">withUpdating</a></li></ul></li><li><a href="module-process.html">process</a><ul class='methods'><li data-type='method'><a href="module-process.html#.action">action</a></li><li data-type='method'><a href="module-process.html#.dependencies">dependencies</a></li><li data-type='method'><a href="module-process.html#.process">process</a></li><li data-type='method'><a href="module-process.html#.run">run</a></li><li data-type='method'><a href="module-process.html#.transitions">transitions</a></li></ul></li><li><a href="module-signals.html">signals</a><ul class='methods'><li data-type='method'><a href="module-signals.html#.autoReset">autoReset</a></li><li data-type='method'><a href="module-signals.html#.countdown">countdown</a></li><li data-type='method'><a href="module-signals.html#.manualReset">manualReset</a></li><li data-type='method'><a href="module-signals.html#.semaphore">semaphore</a></li></ul></li><li><a href="module-stores.html">stores</a><ul class='methods'><li data-type='method'><a href="module-stores.html#.memoryStore">memoryStore</a></li></ul></li><li><a href="module-stores_utils.html">stores/utils</a><ul class='methods'><li data-type='method'><a href="module-stores_utils.html#.asDataCache">asDataCache</a></li><li data-type='method'><a href="module-stores_utils.html#.days">days</a></li><li data-type='method'><a href="module-stores_utils.html#.hours">hours</a></li><li data-type='method'><a href="module-stores_utils.html#.minutes">minutes</a></li><li data-type='method'><a href="module-stores_utils.html#.weeks">weeks</a></li><li data-type='method'><a href="module-stores_utils.html#.withEncryption">withEncryption</a></li><li data-type='method'><a href="module-stores_utils.html#.withExpiration">withExpiration</a></li><li data-type='method'><a href="module-stores_utils.html#.withPrefix">withPrefix</a></li></ul></li><li><a href="module-test.html">test</a><ul class='methods'><li data-type='method'><a href="module-test.html#.spy">spy</a></li></ul></li><li><a href="module-tracker.html">tracker</a><ul class='methods'><li data-type='method'><a href="module-tracker.html#.createTracker">createTracker</a></li><li data-type='method'><a href="module-tracker.html#.withNesting">withNesting</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Promise.html">Promise</a></li></ul><h3>Events</h3><ul><li><a href="ModelList-ActiveModelList.html#~event:active-change">active-change</a></li><li><a href="ModelList.html#~event:items-add">items-add</a></li><li><a href="ModelList.html#~event:items-remove">items-remove</a></li><li><a href="ModelList-FilteredModelList.html#~event:filter-change">filter-change</a></li><li><a href="ModelList-GroupedModelList.html#~event:group-change">group-change</a></li><li><a href="ModelList-OrderedModelList.html#~event:order-change">order-change</a></li><li><a href="ModelList-PagedModelList.html#~event:page-change">page-change</a></li><li><a href="ModelList-SelectionModelList.html#~event:selection-change">selection-change</a></li><li><a href="ModelList-UniqueModelList.html#~event:unique-change">unique-change</a></li><li><a href="ModelList-UpdatingModelList.html#~event:items-update">items-update</a></li></ul><h3>Interfaces</h3><ul><li><a href="Action.html">Action</a><ul class='methods'><li data-type='method'><a href="Action.html#execute">execute</a></li><li data-type='method'><a href="Action.html#failure">failure</a></li><li data-type='method'><a href="Action.html#init">init</a></li><li data-type='method'><a href="Action.html#retry">retry</a></li><li data-type='method'><a href="Action.html#rollback">rollback</a></li><li data-type='method'><a href="Action.html#success">success</a></li></ul></li><li><a href="Cache.html">Cache</a><ul class='methods'><li data-type='method'><a href="Cache.html#get">get</a></li><li data-type='method'><a href="Cache.html#set">set</a></li></ul></li><li><a href="DataLayer.html">DataLayer</a><ul class='methods'><li data-type='method'><a href="DataLayer.html#createRequest">createRequest</a></li><li data-type='method'><a href="DataLayer.html#fetch">fetch</a></li><li data-type='method'><a href="DataLayer.html#setAdapter">setAdapter</a></li></ul></li><li><a href="EventBus.html">EventBus</a><ul class='methods'><li data-type='method'><a href="EventBus.html#fire">fire</a></li><li data-type='method'><a href="EventBus.html#on">on</a></li><li data-type='method'><a href="EventBus.html#one">one</a></li><li data-type='method'><a href="EventBus.html#resume">resume</a></li><li data-type='method'><a href="EventBus.html#stop">stop</a></li></ul></li><li><a href="ModelList.html">ModelList</a><ul class='methods'><li data-type='method'><a href="ModelList.html#add">add</a></li><li data-type='method'><a href="ModelList.html#clear">clear</a></li><li data-type='method'><a href="ModelList.html#items">items</a></li><li data-type='method'><a href="ModelList.html#remove">remove</a></li></ul></li><li><a href="ModelList-ActiveModelList.html">ActiveModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-ActiveModelList.html#active">active</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#next">next</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#prev">prev</a></li></ul></li><li><a href="ModelList-FilteredModelList.html">FilteredModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-FilteredModelList.html#filterBy">filterBy</a></li></ul></li><li><a href="ModelList-GroupedModelList.html">GroupedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-GroupedModelList.html#groupBy">groupBy</a></li><li data-type='method'><a href="ModelList-GroupedModelList.html#groups">groups</a></li></ul></li><li><a href="ModelList-OrderedModelList.html">OrderedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-OrderedModelList.html#orderBy">orderBy</a></li></ul></li><li><a href="ModelList-PagedModelList.html">PagedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-PagedModelList.html#nextPage">nextPage</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageIndex">pageIndex</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageSize">pageSize</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#prevPage">prevPage</a></li></ul></li><li><a href="ModelList-SelectionModelList.html">SelectionModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-SelectionModelList.html#selected">selected</a></li><li data-type='method'><a href="ModelList-SelectionModelList.html#toggle">toggle</a></li></ul></li><li><a href="ModelList-UniqueModelList.html">UniqueModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UniqueModelList.html#uniqueBy">uniqueBy</a></li></ul></li><li><a href="ModelList-UpdatingModelList.html">UpdatingModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UpdatingModelList.html#merge">merge</a></li><li data-type='method'><a href="ModelList-UpdatingModelList.html#upsert">upsert</a></li></ul></li><li><a href="module-signals-AutoResetSignal.html">AutoResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-AutoResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-CountdownSignal.html">CountdownSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-CountdownSignal.html#decrement">decrement</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#increment">increment</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#ready">ready</a></li></ul></li><li><a href="module-signals-ManualResetSignal.html">ManualResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-ManualResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-Semaphore.html">Semaphore</a><ul class='methods'><li data-type='method'><a href="module-signals-Semaphore.html#ready">ready</a></li><li data-type='method'><a href="module-signals-Semaphore.html#release">release</a></li></ul></li><li><a href="NestedTimingTracker.html">NestedTimingTracker</a><ul class='methods'><li data-type='method'><a href="NestedTimingTracker.html#child">child</a></li><li data-type='method'><a href="NestedTimingTracker.html#context">context</a></li><li data-type='method'><a href="NestedTimingTracker.html#error">error</a></li><li data-type='method'><a href="NestedTimingTracker.html#event">event</a></li><li data-type='method'><a href="NestedTimingTracker.html#start">start</a></li><li data-type='method'><a href="NestedTimingTracker.html#uuid">uuid</a></li></ul></li><li><a href="ProcessLogic.html">ProcessLogic</a><ul class='methods'><li data-type='method'><a href="ProcessLogic.html#contextFromArgs">contextFromArgs</a></li><li data-type='method'><a href="ProcessLogic.html#getInitialActions">getInitialActions</a></li><li data-type='method'><a href="ProcessLogic.html#getNextActions">getNextActions</a></li></ul></li><li><a href="Proxy.html">Proxy</a><ul class='methods'><li data-type='method'><a href="Proxy.html#apply">apply</a></li><li data-type='method'><a href="Proxy.html#url">url</a></li><li data-type='method'><a href="Proxy.html#use">use</a></li></ul></li><li><a href="Spy.html">Spy</a><ul class='methods'><li data-type='method'><a href="Spy.html#invokes">invokes</a></li><li data-type='method'><a href="Spy.html#onCall">onCall</a></li><li data-type='method'><a href="Spy.html#returns">returns</a></li><li data-type='method'><a href="Spy.html#throws">throws</a></li></ul></li><li><a href="SpyBehaviors.html">SpyBehaviors</a><ul class='methods'><li data-type='method'><a href="SpyBehaviors.html#invokes">invokes</a></li><li data-type='method'><a href="SpyBehaviors.html#returns">returns</a></li><li data-type='method'><a href="SpyBehaviors.html#throws">throws</a></li></ul></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#delete">delete</a></li><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#set">set</a></li></ul></li><li><a href="Tracker.html">Tracker</a><ul class='methods'><li data-type='method'><a href="Tracker.html#child">child</a></li><li data-type='method'><a href="Tracker.html#context">context</a></li><li data-type='method'><a href="Tracker.html#error">error</a></li><li data-type='method'><a href="Tracker.html#event">event</a></li><li data-type='method'><a href="Tracker.html#start">start</a></li><li data-type='method'><a href="Tracker.html#uuid">uuid</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">test/utils.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Provides functionality useful during unit testing.
+ *
+ * @module test
+ */
+
+/**
+ * Provides options for controlling how a {@link Spy} behaves when invoked.
+ *
+ * @global
+ * @interface SpyBehaviors
+ * @see {@link Spy}
+ */
+
+/**
+ * Throws the specified value when the {@link Spy} is invoked.
+ *
+ * @function SpyBehaviors#throws
+ * @returns {Spy|SpyBehaviors} The original context, for chaining.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy().throws(new Error());
+ *
+ * method.onCall(1).throws(new Error('2nd call'));
+ */
+
+/**
+ * Returns the specified value when the {@link Spy} is invoked.
+ *
+ * @function SpyBehaviors#returns
+ * @returns {Spy|SpyBehaviors} The original context, for chaining.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy().returns('abc');
+ *
+ * method.onCall(1).returns('def');
+ */
+
+/**
+ * Calls the specified method when the {@link Spy} is invoked.
+ *
+ * @function SpyBehaviors#invokes
+ * @returns {Spy|SpyBehaviors} The original context, for chaining.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy().invokes(function(...args) {
+ *   console.log('method called with', args);
+ * });
+ *
+ * method.onCall(1).invokes(function(...args) {
+ *   console.log('method called 2nd time', args);
+ * });
+ */
+
+/**
+ * Collection of {@link Spy~SpyCall information} about each invocation of the Spy.
+ *
+ * @typedef {Array.&lt;Spy~SpyCall>} Spy~SpyCalls
+ * @property {Function} mostRecent Retrieves the {@link Spy~SpyCall call information}
+ * for the most recent invocation of the Spy.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy();
+ *
+ * method('abc');
+ * method('def');
+ *
+ * method.calls[0].args; // ["abc"];
+ * method.calls[1].args; // ["def"];
+ *
+ * method('ghi');
+ * method.calls.mostRecent().args; // ["ghi"]
+ */
+
+/**
+ * @typedef {object} Spy~SpyCall
+ * @property {any[]} args The arguments passed to this invocation of the spy.
+ * @property {any} context The `this` context used for this invocation of the spy.
+ * @property {Date} callTime When the spy was invoked.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy();
+ *
+ * method('abc');
+ * method('def');
+ *
+ * method.args; // ["def"]
+ * method.calls[0].args; // ["abc"]
+ * method.calls[0].callTime; // Date
+ *
+ * method.call(window, "ghi");
+ * method.calls.mostRecent().context; // Window
+ */
+
+/**
+ * Changes the behaviors for a specific invocation of the Spy.
+ *
+ * @function Spy#onCall
+ * @param {number} index The index of the call whose behavior should be changed.
+ * @returns {SpyBehaviors} The possible behaviors to invoke for this call.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy().returns(123);
+ * method.onCall(2).returns(456);
+ * method.onCall(3).invokes(console.log);
+ * method.onCall(4).throws(new Error());
+ *
+ * method(); // 123
+ * method(); // 123
+ * method(); // 456
+ * method('hello'); // "hello"
+ * method(); // throws
+ */
+
+/**
+ * Used to provide custom behaviors at test time to control code flow and ensure
+ * code coverage. Can also be used to verify individual call data (args and context)
+ * as well as overall invocation counts.
+ *
+ * @global
+ * @interface Spy
+ * @extends SpyBehaviors
+ * @extends Spy~SpyCall
+ * @property {number} callCount The number of times the spy was invoked.
+ * @property {boolean} called `true` if the spy was invoked.
+ * @property {Spy~SpyCalls} calls Collection of data about each call.
+ * @example
+ * import { spy } from '@paychex/core/test/utils';
+ *
+ * const method = spy(); // create a new Spy instance
+ *
+ * method.returns(123); // default behavior
+ * method.onCall(1).throws(new Error()); // throw error on 2nd call
+ *
+ * method.called; // false
+ *
+ * method(); // 123
+ *
+ * method.called; // true
+ * method.callCount; // 1
+ *
+ * try {
+ *   method();
+ * } catch (e) {
+ *   // 2nd invocation throws error
+ * }
+ *
+ * method.call({}, 'abc');
+ * method.callCount; // 3
+ *
+ * method.calls(2).args; // ['abc']
+ * method.calls(2).context; // {}
+ * method.calls(2).callTime; // Date
+ *
+ * method('def');
+ * method.calls.mostRecent().args; // ['def']
+ *
+ * // invoke a different function when the
+ * // spy is called
+ * method.invokes(function(...args) {
+ *   console.log('proxy method called', args);
+ * });
+ *
+ * method('abc', 123); // "proxy method called ['abc', 123]"
+ *
+ * method.reset();
+ * method.called; // false
+ * method.callCount; // 0
+ *
+ * method(); // undefined
+ */
+
+function Behavior(calls, delegate) {
+    return function behavior(...args) {
+        const call = Object.freeze({
+            args,
+            context: this,
+            callTime: new Date()
+        });
+        calls.push(call);
+        calls.mostRecent = () => call;
+        return delegate.apply(this, args);
+    };
+}
+
+function ThrowsBehavior(err) {
+    return function throws() {
+        throw err;
+    };
+}
+
+function ReturnsBehavior(value) {
+    return function returns() {
+        return value;
+    };
+}
+
+function InvokesBehavior(fn) {
+    return function invokes() {
+        return fn.apply(this, arguments);
+    };
+}
+
+function defineBehaviors(context, behaviors, index, calls) {
+    return {
+        throws: {
+            value(err) {
+                behaviors[index] = Behavior(calls, ThrowsBehavior(err));
+                return context;
+            }
+        },
+        invokes: {
+            value(fn) {
+                behaviors[index] = Behavior(calls, InvokesBehavior(fn));
+                return context;
+            }
+        },
+        returns: {
+            value(value) {
+                behaviors[index] = Behavior(calls, ReturnsBehavior(value));
+                return context;
+            }
+        }
+    };
+}
+
+/**
+ * Creates a new Spy instance for unit tests. A Spy is a
+ * method that takes the place of an existing method and
+ * has additional properties that can be queried to verify
+ * that certain test conditions have been met.
+ *
+ * @function
+ * @returns {Spy} A new Spy instance for unit testing.
+ * @example
+ * import expect from 'expect';
+ * import { spy } from '@paychex/core/test/utils';
+ * import someFactoryMethod from '../path/to/test/file';
+ *
+ * describe('some factory method', () => {
+ *
+ *   let instance, dependency;
+ *
+ *   beforeEach(() => {
+ *     dependency = {
+ *       methodA: spy().returns('a'),
+ *       methodB: spy().returns('b')
+ *     };
+ *     instance = someFactoryMethod(dependency);
+ *   });
+ *
+ *   it('invokes dependency method a', () => {
+ *     instance.method();
+ *     expect(dependency.methodA.called).toBe(true);
+ *   });
+ *
+ *   it('handles error', async () => {
+ *     const handler = spy();
+ *     const err = new Error('test');
+ *     dependency.methodB.throws(err);
+ *     await instance.anotherMethod().catch(handler);
+ *     expect(handler.called).toBe(true);
+ *     expect(handler.args[0]).toBe(err);
+ *   });
+ *
+ *   it('retries on error', async () => {
+ *     dependency.methodA.onCall(0).throws(new Error());
+ *     dependency.methodA.onCall(1).returns(123);
+ *     const result = instance.method();
+ *     expect(dependency.methodA.callCount).toBe(2);
+ *     expect(result).toBe(123);
+ *   });
+ *
+ * });
+ */
+export function spy() {
+
+    const calls = [];
+    const behaviors = [];
+
+    function setDefaults() {
+        const empty = Object.freeze({
+            args: [],
+            context: undefined,
+            callTime: undefined,
+        });
+        calls.mostRecent = () => empty;
+        behaviors.default = Behavior(calls, ReturnsBehavior());
+    }
+
+    function onCall(index) {
+        const call = Object.create(null);
+        return Object.defineProperties(call, defineBehaviors(call, behaviors, index, calls));
+    }
+
+    function invoke(...args) {
+        const index = calls.length;
+        const behavior = behaviors[index] || behaviors.default;
+        return behavior.apply(this, args);
+    }
+
+    setDefaults();
+
+    return Object.defineProperties(invoke, {
+        onCall:     { value: onCall },
+        callCount:  { get() { return calls.length; } },
+        called:     { get() { return !!calls.length; } },
+        calls:      { get() { return calls; } },
+        args:       { get() { return calls.mostRecent().args; } },
+        context:    { get() { return calls.mostRecent().context; } },
+        callTime:   { get() { return calls.mostRecent().callTime; } },
+        reset:      { value() {
+            calls.length = 0;
+            behaviors.length = 0;
+            setDefaults();
+        } },
+        ...defineBehaviors(invoke, behaviors, 'default', calls)
+    });
+
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>

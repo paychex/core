@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Action - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/paychex/core" target="_blank" class="menu-item" id="repository" >Source Code</a></h2><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.createDataLayer">createDataLayer</a></li><li data-type='method'><a href="module-data.html#.createProxy">createProxy</a></li></ul></li><li><a href="module-data_utils.html">data/utils</a><ul class='methods'><li data-type='method'><a href="module-data_utils.html#.falloff">falloff</a></li><li data-type='method'><a href="module-data_utils.html#.tokenize">tokenize</a></li><li data-type='method'><a href="module-data_utils.html#.withAuthentication">withAuthentication</a></li><li data-type='method'><a href="module-data_utils.html#.withCache">withCache</a></li><li data-type='method'><a href="module-data_utils.html#.withConnectivity">withConnectivity</a></li><li data-type='method'><a href="module-data_utils.html#.withDiagnostics">withDiagnostics</a></li><li data-type='method'><a href="module-data_utils.html#.withHeaders">withHeaders</a></li><li data-type='method'><a href="module-data_utils.html#.withRetry">withRetry</a></li><li data-type='method'><a href="module-data_utils.html#.withSignal">withSignal</a></li><li data-type='method'><a href="module-data_utils.html#.withTransform">withTransform</a></li><li data-type='method'><a href="module-data_utils.html#.withXSRF">withXSRF</a></li></ul></li><li><a href="module-errors.html">errors</a><ul class='methods'><li data-type='method'><a href="module-errors.html#.error">error</a></li><li data-type='method'><a href="module-errors.html#.fatal">fatal</a></li><li data-type='method'><a href="module-errors.html#.ignore">ignore</a></li><li data-type='method'><a href="module-errors.html#.rethrow">rethrow</a></li></ul></li><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method'><a href="module-index.html#~buffer">buffer</a></li><li data-type='method'><a href="module-index.html#~eventBus">eventBus</a></li><li data-type='method'><a href="module-index.html#~invokeIf">invokeIf</a></li><li data-type='method'><a href="module-index.html#~parallel">parallel</a></li><li data-type='method'><a href="module-index.html#~sequence">sequence</a></li></ul></li><li><a href="module-models.html">models</a><ul class='methods'><li data-type='method'><a href="module-models.html#.modelList">modelList</a></li><li data-type='method'><a href="module-models.html#.withActive">withActive</a></li><li data-type='method'><a href="module-models.html#.withFiltering">withFiltering</a></li><li data-type='method'><a href="module-models.html#.withGrouping">withGrouping</a></li><li data-type='method'><a href="module-models.html#.withOrdering">withOrdering</a></li><li data-type='method'><a href="module-models.html#.withPaging">withPaging</a></li><li data-type='method'><a href="module-models.html#.withSelection">withSelection</a></li><li data-type='method'><a href="module-models.html#.withUnique">withUnique</a></li><li data-type='method'><a href="module-models.html#.withUpdating">withUpdating</a></li></ul></li><li><a href="module-process.html">process</a><ul class='methods'><li data-type='method'><a href="module-process.html#.action">action</a></li><li data-type='method'><a href="module-process.html#.dependencies">dependencies</a></li><li data-type='method'><a href="module-process.html#.process">process</a></li><li data-type='method'><a href="module-process.html#.run">run</a></li><li data-type='method'><a href="module-process.html#.transitions">transitions</a></li></ul></li><li><a href="module-signals.html">signals</a><ul class='methods'><li data-type='method'><a href="module-signals.html#.autoReset">autoReset</a></li><li data-type='method'><a href="module-signals.html#.countdown">countdown</a></li><li data-type='method'><a href="module-signals.html#.manualReset">manualReset</a></li><li data-type='method'><a href="module-signals.html#.semaphore">semaphore</a></li></ul></li><li><a href="module-stores.html">stores</a><ul class='methods'><li data-type='method'><a href="module-stores.html#.memoryStore">memoryStore</a></li></ul></li><li><a href="module-stores_utils.html">stores/utils</a><ul class='methods'><li data-type='method'><a href="module-stores_utils.html#.asDataCache">asDataCache</a></li><li data-type='method'><a href="module-stores_utils.html#.days">days</a></li><li data-type='method'><a href="module-stores_utils.html#.hours">hours</a></li><li data-type='method'><a href="module-stores_utils.html#.minutes">minutes</a></li><li data-type='method'><a href="module-stores_utils.html#.weeks">weeks</a></li><li data-type='method'><a href="module-stores_utils.html#.withEncryption">withEncryption</a></li><li data-type='method'><a href="module-stores_utils.html#.withExpiration">withExpiration</a></li><li data-type='method'><a href="module-stores_utils.html#.withPrefix">withPrefix</a></li></ul></li><li><a href="module-test.html">test</a><ul class='methods'><li data-type='method'><a href="module-test.html#.spy">spy</a></li></ul></li><li><a href="module-tracker.html">tracker</a><ul class='methods'><li data-type='method'><a href="module-tracker.html#.createTracker">createTracker</a></li><li data-type='method'><a href="module-tracker.html#.withNesting">withNesting</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Promise.html">Promise</a></li></ul><h3>Events</h3><ul><li><a href="ModelList-ActiveModelList.html#~event:active-change">active-change</a></li><li><a href="ModelList.html#~event:items-add">items-add</a></li><li><a href="ModelList.html#~event:items-remove">items-remove</a></li><li><a href="ModelList-FilteredModelList.html#~event:filter-change">filter-change</a></li><li><a href="ModelList-GroupedModelList.html#~event:group-change">group-change</a></li><li><a href="ModelList-OrderedModelList.html#~event:order-change">order-change</a></li><li><a href="ModelList-PagedModelList.html#~event:page-change">page-change</a></li><li><a href="ModelList-SelectionModelList.html#~event:selection-change">selection-change</a></li><li><a href="ModelList-UniqueModelList.html#~event:unique-change">unique-change</a></li><li><a href="ModelList-UpdatingModelList.html#~event:items-update">items-update</a></li></ul><h3>Interfaces</h3><ul><li><a href="Action.html">Action</a><ul class='methods'><li data-type='method'><a href="Action.html#execute">execute</a></li><li data-type='method'><a href="Action.html#failure">failure</a></li><li data-type='method'><a href="Action.html#init">init</a></li><li data-type='method'><a href="Action.html#retry">retry</a></li><li data-type='method'><a href="Action.html#rollback">rollback</a></li><li data-type='method'><a href="Action.html#success">success</a></li></ul></li><li><a href="Cache.html">Cache</a><ul class='methods'><li data-type='method'><a href="Cache.html#get">get</a></li><li data-type='method'><a href="Cache.html#set">set</a></li></ul></li><li><a href="DataLayer.html">DataLayer</a><ul class='methods'><li data-type='method'><a href="DataLayer.html#createRequest">createRequest</a></li><li data-type='method'><a href="DataLayer.html#fetch">fetch</a></li><li data-type='method'><a href="DataLayer.html#setAdapter">setAdapter</a></li></ul></li><li><a href="EventBus.html">EventBus</a><ul class='methods'><li data-type='method'><a href="EventBus.html#fire">fire</a></li><li data-type='method'><a href="EventBus.html#on">on</a></li><li data-type='method'><a href="EventBus.html#one">one</a></li><li data-type='method'><a href="EventBus.html#resume">resume</a></li><li data-type='method'><a href="EventBus.html#stop">stop</a></li></ul></li><li><a href="ModelList.html">ModelList</a><ul class='methods'><li data-type='method'><a href="ModelList.html#add">add</a></li><li data-type='method'><a href="ModelList.html#clear">clear</a></li><li data-type='method'><a href="ModelList.html#items">items</a></li><li data-type='method'><a href="ModelList.html#remove">remove</a></li></ul></li><li><a href="ModelList-ActiveModelList.html">ActiveModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-ActiveModelList.html#active">active</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#next">next</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#prev">prev</a></li></ul></li><li><a href="ModelList-FilteredModelList.html">FilteredModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-FilteredModelList.html#filterBy">filterBy</a></li></ul></li><li><a href="ModelList-GroupedModelList.html">GroupedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-GroupedModelList.html#groupBy">groupBy</a></li><li data-type='method'><a href="ModelList-GroupedModelList.html#groups">groups</a></li></ul></li><li><a href="ModelList-OrderedModelList.html">OrderedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-OrderedModelList.html#orderBy">orderBy</a></li></ul></li><li><a href="ModelList-PagedModelList.html">PagedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-PagedModelList.html#nextPage">nextPage</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageIndex">pageIndex</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageSize">pageSize</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#prevPage">prevPage</a></li></ul></li><li><a href="ModelList-SelectionModelList.html">SelectionModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-SelectionModelList.html#selected">selected</a></li><li data-type='method'><a href="ModelList-SelectionModelList.html#toggle">toggle</a></li></ul></li><li><a href="ModelList-UniqueModelList.html">UniqueModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UniqueModelList.html#uniqueBy">uniqueBy</a></li></ul></li><li><a href="ModelList-UpdatingModelList.html">UpdatingModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UpdatingModelList.html#merge">merge</a></li><li data-type='method'><a href="ModelList-UpdatingModelList.html#upsert">upsert</a></li></ul></li><li><a href="module-signals-AutoResetSignal.html">AutoResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-AutoResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-CountdownSignal.html">CountdownSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-CountdownSignal.html#decrement">decrement</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#increment">increment</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#ready">ready</a></li></ul></li><li><a href="module-signals-ManualResetSignal.html">ManualResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-ManualResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-Semaphore.html">Semaphore</a><ul class='methods'><li data-type='method'><a href="module-signals-Semaphore.html#ready">ready</a></li><li data-type='method'><a href="module-signals-Semaphore.html#release">release</a></li></ul></li><li><a href="NestedTimingTracker.html">NestedTimingTracker</a><ul class='methods'><li data-type='method'><a href="NestedTimingTracker.html#child">child</a></li><li data-type='method'><a href="NestedTimingTracker.html#context">context</a></li><li data-type='method'><a href="NestedTimingTracker.html#error">error</a></li><li data-type='method'><a href="NestedTimingTracker.html#event">event</a></li><li data-type='method'><a href="NestedTimingTracker.html#start">start</a></li><li data-type='method'><a href="NestedTimingTracker.html#uuid">uuid</a></li></ul></li><li><a href="ProcessLogic.html">ProcessLogic</a><ul class='methods'><li data-type='method'><a href="ProcessLogic.html#contextFromArgs">contextFromArgs</a></li><li data-type='method'><a href="ProcessLogic.html#getInitialActions">getInitialActions</a></li><li data-type='method'><a href="ProcessLogic.html#getNextActions">getNextActions</a></li></ul></li><li><a href="Proxy.html">Proxy</a><ul class='methods'><li data-type='method'><a href="Proxy.html#apply">apply</a></li><li data-type='method'><a href="Proxy.html#url">url</a></li><li data-type='method'><a href="Proxy.html#use">use</a></li></ul></li><li><a href="Spy.html">Spy</a><ul class='methods'><li data-type='method'><a href="Spy.html#invokes">invokes</a></li><li data-type='method'><a href="Spy.html#onCall">onCall</a></li><li data-type='method'><a href="Spy.html#returns">returns</a></li><li data-type='method'><a href="Spy.html#throws">throws</a></li></ul></li><li><a href="SpyBehaviors.html">SpyBehaviors</a><ul class='methods'><li data-type='method'><a href="SpyBehaviors.html#invokes">invokes</a></li><li data-type='method'><a href="SpyBehaviors.html#returns">returns</a></li><li data-type='method'><a href="SpyBehaviors.html#throws">throws</a></li></ul></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#delete">delete</a></li><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#set">set</a></li></ul></li><li><a href="Tracker.html">Tracker</a><ul class='methods'><li data-type='method'><a href="Tracker.html#child">child</a></li><li data-type='method'><a href="Tracker.html#context">context</a></li><li data-type='method'><a href="Tracker.html#error">error</a></li><li data-type='method'><a href="Tracker.html#event">event</a></li><li data-type='method'><a href="Tracker.html#start">start</a></li><li data-type='method'><a href="Tracker.html#uuid">uuid</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Action</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        Action
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line73">line 73</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-process.html#.action">action</a> factory method</li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Encapsulates the business logic for a single action within a multi-step asynchronous process.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line81">line 81</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>The name of the process action. Should be unique within a given process instance.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="execute"><span class="type-signature">(async) </span>execute<span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line113">line 113</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Performs the bulk of the action's business logic. The value returned from
+this method (or the resolved value of the Promise returned by this method)
+will be assigned to the <code>results</code> map automatically.</p>
+<p>If you return a Promise, dependent actions will not be run until the Promise
+has resolved. If the Promise rejects or if the execute method throws an
+Error, the action's <a href="Action.html#retry">retry</a> method will be run. If
+that method throws or rejects, the entire process will be aborted.</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="global.html#ProcessContext">ProcessContext</a></li></ul>
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { action } from '@paychex/core/process';import { someAsyncOperation } from '../data';const loadData = action('load', {  async execute() {    return await someAsyncOperation(...this.args);  }});</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="failure"><span class="type-signature">(async) </span>failure<span class="signature">(error)</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line197">line 197</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>This method runs if <em>any</em> action of the process fails (even if this
+action was not previous executed). It provides a cross-cutting way
+to respond to errors caused by other actions.</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="global.html#ProcessContext">ProcessContext</a></li></ul>
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { tracker } from '~/tracking';import { action } from '@paychex/core/process';const logger = action('log process failure', {  failure(err) {    tracker.error(err);  }});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Error that failed the process.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="init"><span class="type-signature">(async) </span>init<span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line88">line 88</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Runs once per process invocation. Can be used to initialize local variables or set up starting conditions.</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="global.html#ProcessContext">ProcessContext</a></li></ul>
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { action } from '@paychex/core/process';const multiply = action('multiply', {  factor: 2,  init() {    // NOTE: args are passed to the    // process' start function    const [factor, _] = this.args;    this.factor = factor || 2;  },  execute() {    const [_, operand] = this.args;    return operand * this.factor;  }});</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="retry"><span class="type-signature">(async) </span>retry<span class="signature">(error)</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line138">line 138</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>This method is invoked if the <a href="Action.html#execute">execute</a> method throws
+or returns a rejected Promise. If this method also throws or rejects (which is
+the default behavior) then the entire process will be aborted.</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="global.html#ProcessContext">ProcessContext</a></li></ul>
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { action } from '@paychex/core/process';import { someAsyncOperation } from '../data';const loadData = action('load', {  errorCount: 0,  init() {    this.errorCount = 0;  },  async execute() {    return await someAsyncOperation(...this.args);  },  retry(err) {    err.errorCount = ++this.errorCount;    if (this.errorCount &lt; 3)      return Promise.resolve(); // try again    return Promise.reject(); // do not retry  }});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Error raised by the <a href="Action.html#execute">execute</a> method
+or returned as the rejection reason of that method's Promise.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="rollback"><span class="type-signature">(async) </span>rollback<span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line170">line 170</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>This method is invoked if the action ran but the process was aborted.
+You can use this opportunity to undo any behaviors performed in the
+<a href="Action.html#execute">execute</a> method.</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="global.html#ProcessContext">ProcessContext</a></li></ul>
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { action } from '@paychex/core/process';import { localStore } from '@paychex/core/stores';import { someAsyncOperation } from '../data';const loadData = action('load', {  store: localStore(),  async execute() {    const result = await someAsyncOperation(...this.args);    this.store.set('my data cache', result);    return result;  },  async rollback() {    return this.store.delete('my data cache');  }});</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="success"><span class="type-signature">(async) </span>success<span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_index.js.html">process/index.js</a>, <a href="process_index.js.html#line218">line 218</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>This method runs if and when the entire process resolves. It provides a
+cross-cutting way to respond to the overall success of a complex process.</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="global.html#ProcessContext">ProcessContext</a></li></ul>
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { tracker } from '~/tracking';import { action } from '@paychex/core/process';const logger = action('log process sucess', {  success() {    tracker.event(`${this.process} successful`, this.results);  }});</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>

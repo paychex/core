@@ -1,0 +1,2569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>data/utils - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/paychex/core" target="_blank" class="menu-item" id="repository" >Source Code</a></h2><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.createDataLayer">createDataLayer</a></li><li data-type='method'><a href="module-data.html#.createProxy">createProxy</a></li></ul></li><li><a href="module-data_utils.html">data/utils</a><ul class='methods'><li data-type='method'><a href="module-data_utils.html#.falloff">falloff</a></li><li data-type='method'><a href="module-data_utils.html#.tokenize">tokenize</a></li><li data-type='method'><a href="module-data_utils.html#.withAuthentication">withAuthentication</a></li><li data-type='method'><a href="module-data_utils.html#.withCache">withCache</a></li><li data-type='method'><a href="module-data_utils.html#.withConnectivity">withConnectivity</a></li><li data-type='method'><a href="module-data_utils.html#.withDiagnostics">withDiagnostics</a></li><li data-type='method'><a href="module-data_utils.html#.withHeaders">withHeaders</a></li><li data-type='method'><a href="module-data_utils.html#.withRetry">withRetry</a></li><li data-type='method'><a href="module-data_utils.html#.withSignal">withSignal</a></li><li data-type='method'><a href="module-data_utils.html#.withTransform">withTransform</a></li><li data-type='method'><a href="module-data_utils.html#.withXSRF">withXSRF</a></li></ul></li><li><a href="module-errors.html">errors</a><ul class='methods'><li data-type='method'><a href="module-errors.html#.error">error</a></li><li data-type='method'><a href="module-errors.html#.fatal">fatal</a></li><li data-type='method'><a href="module-errors.html#.ignore">ignore</a></li><li data-type='method'><a href="module-errors.html#.rethrow">rethrow</a></li></ul></li><li><a href="module-index.html">index</a><ul class='methods'><li data-type='method'><a href="module-index.html#~buffer">buffer</a></li><li data-type='method'><a href="module-index.html#~eventBus">eventBus</a></li><li data-type='method'><a href="module-index.html#~invokeIf">invokeIf</a></li><li data-type='method'><a href="module-index.html#~parallel">parallel</a></li><li data-type='method'><a href="module-index.html#~sequence">sequence</a></li></ul></li><li><a href="module-models.html">models</a><ul class='methods'><li data-type='method'><a href="module-models.html#.modelList">modelList</a></li><li data-type='method'><a href="module-models.html#.withActive">withActive</a></li><li data-type='method'><a href="module-models.html#.withFiltering">withFiltering</a></li><li data-type='method'><a href="module-models.html#.withGrouping">withGrouping</a></li><li data-type='method'><a href="module-models.html#.withOrdering">withOrdering</a></li><li data-type='method'><a href="module-models.html#.withPaging">withPaging</a></li><li data-type='method'><a href="module-models.html#.withSelection">withSelection</a></li><li data-type='method'><a href="module-models.html#.withUnique">withUnique</a></li><li data-type='method'><a href="module-models.html#.withUpdating">withUpdating</a></li></ul></li><li><a href="module-process.html">process</a><ul class='methods'><li data-type='method'><a href="module-process.html#.action">action</a></li><li data-type='method'><a href="module-process.html#.dependencies">dependencies</a></li><li data-type='method'><a href="module-process.html#.process">process</a></li><li data-type='method'><a href="module-process.html#.run">run</a></li><li data-type='method'><a href="module-process.html#.transitions">transitions</a></li></ul></li><li><a href="module-signals.html">signals</a><ul class='methods'><li data-type='method'><a href="module-signals.html#.autoReset">autoReset</a></li><li data-type='method'><a href="module-signals.html#.countdown">countdown</a></li><li data-type='method'><a href="module-signals.html#.manualReset">manualReset</a></li><li data-type='method'><a href="module-signals.html#.semaphore">semaphore</a></li></ul></li><li><a href="module-stores.html">stores</a><ul class='methods'><li data-type='method'><a href="module-stores.html#.memoryStore">memoryStore</a></li></ul></li><li><a href="module-stores_utils.html">stores/utils</a><ul class='methods'><li data-type='method'><a href="module-stores_utils.html#.asDataCache">asDataCache</a></li><li data-type='method'><a href="module-stores_utils.html#.days">days</a></li><li data-type='method'><a href="module-stores_utils.html#.hours">hours</a></li><li data-type='method'><a href="module-stores_utils.html#.minutes">minutes</a></li><li data-type='method'><a href="module-stores_utils.html#.weeks">weeks</a></li><li data-type='method'><a href="module-stores_utils.html#.withEncryption">withEncryption</a></li><li data-type='method'><a href="module-stores_utils.html#.withExpiration">withExpiration</a></li><li data-type='method'><a href="module-stores_utils.html#.withPrefix">withPrefix</a></li></ul></li><li><a href="module-test.html">test</a><ul class='methods'><li data-type='method'><a href="module-test.html#.spy">spy</a></li></ul></li><li><a href="module-tracker.html">tracker</a><ul class='methods'><li data-type='method'><a href="module-tracker.html#.createTracker">createTracker</a></li><li data-type='method'><a href="module-tracker.html#.withNesting">withNesting</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Promise.html">Promise</a></li></ul><h3>Events</h3><ul><li><a href="ModelList-ActiveModelList.html#~event:active-change">active-change</a></li><li><a href="ModelList.html#~event:items-add">items-add</a></li><li><a href="ModelList.html#~event:items-remove">items-remove</a></li><li><a href="ModelList-FilteredModelList.html#~event:filter-change">filter-change</a></li><li><a href="ModelList-GroupedModelList.html#~event:group-change">group-change</a></li><li><a href="ModelList-OrderedModelList.html#~event:order-change">order-change</a></li><li><a href="ModelList-PagedModelList.html#~event:page-change">page-change</a></li><li><a href="ModelList-SelectionModelList.html#~event:selection-change">selection-change</a></li><li><a href="ModelList-UniqueModelList.html#~event:unique-change">unique-change</a></li><li><a href="ModelList-UpdatingModelList.html#~event:items-update">items-update</a></li></ul><h3>Interfaces</h3><ul><li><a href="Action.html">Action</a><ul class='methods'><li data-type='method'><a href="Action.html#execute">execute</a></li><li data-type='method'><a href="Action.html#failure">failure</a></li><li data-type='method'><a href="Action.html#init">init</a></li><li data-type='method'><a href="Action.html#retry">retry</a></li><li data-type='method'><a href="Action.html#rollback">rollback</a></li><li data-type='method'><a href="Action.html#success">success</a></li></ul></li><li><a href="Cache.html">Cache</a><ul class='methods'><li data-type='method'><a href="Cache.html#get">get</a></li><li data-type='method'><a href="Cache.html#set">set</a></li></ul></li><li><a href="DataLayer.html">DataLayer</a><ul class='methods'><li data-type='method'><a href="DataLayer.html#createRequest">createRequest</a></li><li data-type='method'><a href="DataLayer.html#fetch">fetch</a></li><li data-type='method'><a href="DataLayer.html#setAdapter">setAdapter</a></li></ul></li><li><a href="EventBus.html">EventBus</a><ul class='methods'><li data-type='method'><a href="EventBus.html#fire">fire</a></li><li data-type='method'><a href="EventBus.html#on">on</a></li><li data-type='method'><a href="EventBus.html#one">one</a></li><li data-type='method'><a href="EventBus.html#resume">resume</a></li><li data-type='method'><a href="EventBus.html#stop">stop</a></li></ul></li><li><a href="ModelList.html">ModelList</a><ul class='methods'><li data-type='method'><a href="ModelList.html#add">add</a></li><li data-type='method'><a href="ModelList.html#clear">clear</a></li><li data-type='method'><a href="ModelList.html#items">items</a></li><li data-type='method'><a href="ModelList.html#remove">remove</a></li></ul></li><li><a href="ModelList-ActiveModelList.html">ActiveModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-ActiveModelList.html#active">active</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#next">next</a></li><li data-type='method'><a href="ModelList-ActiveModelList.html#prev">prev</a></li></ul></li><li><a href="ModelList-FilteredModelList.html">FilteredModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-FilteredModelList.html#filterBy">filterBy</a></li></ul></li><li><a href="ModelList-GroupedModelList.html">GroupedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-GroupedModelList.html#groupBy">groupBy</a></li><li data-type='method'><a href="ModelList-GroupedModelList.html#groups">groups</a></li></ul></li><li><a href="ModelList-OrderedModelList.html">OrderedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-OrderedModelList.html#orderBy">orderBy</a></li></ul></li><li><a href="ModelList-PagedModelList.html">PagedModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-PagedModelList.html#nextPage">nextPage</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageIndex">pageIndex</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#pageSize">pageSize</a></li><li data-type='method'><a href="ModelList-PagedModelList.html#prevPage">prevPage</a></li></ul></li><li><a href="ModelList-SelectionModelList.html">SelectionModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-SelectionModelList.html#selected">selected</a></li><li data-type='method'><a href="ModelList-SelectionModelList.html#toggle">toggle</a></li></ul></li><li><a href="ModelList-UniqueModelList.html">UniqueModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UniqueModelList.html#uniqueBy">uniqueBy</a></li></ul></li><li><a href="ModelList-UpdatingModelList.html">UpdatingModelList</a><ul class='methods'><li data-type='method'><a href="ModelList-UpdatingModelList.html#merge">merge</a></li><li data-type='method'><a href="ModelList-UpdatingModelList.html#upsert">upsert</a></li></ul></li><li><a href="module-signals-AutoResetSignal.html">AutoResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-AutoResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-AutoResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-CountdownSignal.html">CountdownSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-CountdownSignal.html#decrement">decrement</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#increment">increment</a></li><li data-type='method'><a href="module-signals-CountdownSignal.html#ready">ready</a></li></ul></li><li><a href="module-signals-ManualResetSignal.html">ManualResetSignal</a><ul class='methods'><li data-type='method'><a href="module-signals-ManualResetSignal.html#ready">ready</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#reset">reset</a></li><li data-type='method'><a href="module-signals-ManualResetSignal.html#set">set</a></li></ul></li><li><a href="module-signals-Semaphore.html">Semaphore</a><ul class='methods'><li data-type='method'><a href="module-signals-Semaphore.html#ready">ready</a></li><li data-type='method'><a href="module-signals-Semaphore.html#release">release</a></li></ul></li><li><a href="NestedTimingTracker.html">NestedTimingTracker</a><ul class='methods'><li data-type='method'><a href="NestedTimingTracker.html#child">child</a></li><li data-type='method'><a href="NestedTimingTracker.html#context">context</a></li><li data-type='method'><a href="NestedTimingTracker.html#error">error</a></li><li data-type='method'><a href="NestedTimingTracker.html#event">event</a></li><li data-type='method'><a href="NestedTimingTracker.html#start">start</a></li><li data-type='method'><a href="NestedTimingTracker.html#uuid">uuid</a></li></ul></li><li><a href="ProcessLogic.html">ProcessLogic</a><ul class='methods'><li data-type='method'><a href="ProcessLogic.html#contextFromArgs">contextFromArgs</a></li><li data-type='method'><a href="ProcessLogic.html#getInitialActions">getInitialActions</a></li><li data-type='method'><a href="ProcessLogic.html#getNextActions">getNextActions</a></li></ul></li><li><a href="Proxy.html">Proxy</a><ul class='methods'><li data-type='method'><a href="Proxy.html#apply">apply</a></li><li data-type='method'><a href="Proxy.html#url">url</a></li><li data-type='method'><a href="Proxy.html#use">use</a></li></ul></li><li><a href="Spy.html">Spy</a><ul class='methods'><li data-type='method'><a href="Spy.html#invokes">invokes</a></li><li data-type='method'><a href="Spy.html#onCall">onCall</a></li><li data-type='method'><a href="Spy.html#returns">returns</a></li><li data-type='method'><a href="Spy.html#throws">throws</a></li></ul></li><li><a href="SpyBehaviors.html">SpyBehaviors</a><ul class='methods'><li data-type='method'><a href="SpyBehaviors.html#invokes">invokes</a></li><li data-type='method'><a href="SpyBehaviors.html#returns">returns</a></li><li data-type='method'><a href="SpyBehaviors.html#throws">throws</a></li></ul></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#delete">delete</a></li><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#set">set</a></li></ul></li><li><a href="Tracker.html">Tracker</a><ul class='methods'><li data-type='method'><a href="Tracker.html#child">child</a></li><li data-type='method'><a href="Tracker.html#context">context</a></li><li data-type='method'><a href="Tracker.html#error">error</a></li><li data-type='method'><a href="Tracker.html#event">event</a></li><li data-type='method'><a href="Tracker.html#start">start</a></li><li data-type='method'><a href="Tracker.html#uuid">uuid</a></li></ul></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">data/utils</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description usertext"><p>Functionality used to customize a <a href="DataLayer.html">DataLayer</a> pipeline.</p>
+<p>A DataLayer provides only basic functionality for fetching data. These
+utility methods help you extend the data pipeline with powerful features.
+They work by wrapping the DataLayer's <a href="DataLayer.html#fetch">fetch()</a> method
+to process <a href="global.html#Request">Requests</a> and <a href="global.html#Response">Responses</a> based
+on various conditions you supply.</p>
+<p>You should use this same approach in your own applications to provide easy
+cross-cutting functionality for data operations.</p>
+<pre class="prettyprint source lang-javascript"><code>// datalayer.js
+
+import { rethrow } from '@paychex/core/errors';
+import { withHeaders } from '@paychex/core/data/utils';
+import { createProxy, createDataLayer } from '@paychex/core/data';
+
+import rules from '~/config/proxy';
+
+const proxy = createProxy();
+const { fetch, createRequest } = createDataLayer(proxy);
+
+proxy.use(...rules);
+
+// we extend the functionality of `fetch` by wrapping
+// it and returning a function with the same signature
+// that proxies to the real fetch while adding custom
+// error handling logic
+function withCustomErrors(fetch) {
+  return async function useCustomErrors(request) {
+    return await fetch(request)
+      .catch(rethrow({ app: 'my app' }));
+  };
+}
+
+let pipeline = fetch;
+// add custom error handling
+pipeline = withCustomErrors(pipeline);
+// add default request headers
+pipeline = withHeaders(pipeline, {
+  'x-app-name': 'my-app'
+});
+
+export {
+  proxy,
+  createRequest,
+  fetch: pipeline // return our extended pipeline
+}
+</code></pre>
+<pre class="prettyprint source lang-javascript"><code>// consumer.js
+
+import { rethrow, fatal } from '@paychex/core/errors';
+import { withRetry, falloff } from '@paychex/core/data/utils';
+import { fetch, createRequest } from './datalayer.js';
+
+const datacall = {
+  base: 'endpoint',
+  path: '/:id/info'
+};
+
+// automatically retry failed requests using
+// an exponential falloff between attempts;
+// the version of fetch we bring in has already
+// been wrapped to add custom error data and
+// request headers; this shows how we can combine
+// cross-cutting logic with custom one-off logic
+const load = withRetry(fetch, falloff());
+
+export async function loadData(id) {
+  const params = { id };
+  const request = createRequest(datacall, params);
+  const response = await load(request)
+    .catch(rethrow(fatal(params)));
+  return response.data;
+}
+</code></pre></div>
+            
+
+            
+                
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".falloff"><span class="type-signature">(static) </span>falloff<span class="signature">(times<span class="signature-attributes">opt</span>, base<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#RetryFunction">RetryFunction</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line216">line 216</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-data_utils.html#.withRetry">withRetry()</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Creates a <a href="global.html#RetryFunction">RetryFunction</a> that will retry a failed
+request the specified number of times, using the given
+exponential base as a falloff interval.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { rethrow } from '@paychex/core/errors'import { falloff, withRetry } from '@paychex/core/data/utils'import { fetch, createRequest } from '~/path/to/datalayer';const getUser = {  base: 'users',  method: 'GET',  path: '/users/:id',};const attempt = withRetry(fetch, falloff(5, 100));export async function loadUserData(id) {  const params = { id };  const request = createRequest(getUser, params);  const response = await attempt(request).catch(rethrow(params));  return response.data;}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>times</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>3</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>The number of times to retry the
+failed data operation before giving up.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>base</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>200</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>The base number of milliseconds
+to use as the exponential falloff period. On each invocation
+of the retry function, the falloff period will be increased
+by a power of 2 and multiplied by this base. For example:</p>
+<ul>
+<li>retry #1: 200ms</li>
+<li>retry #2: 400ms</li>
+<li>retry #3: 800ms</li>
+</ul></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Invoked to determine
+whether the data operation should be retried.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#RetryFunction">RetryFunction</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".tokenize"><span class="type-signature">(static) </span>tokenize<span class="signature">(url<span class="signature-attributes">opt</span>, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line154">line 154</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Replaces tokens in a string with values from the provided lookup,
+and then appends any unmatched key-value pairs in the lookup as
+a querystring.</p>
+<p><strong>NOTE:</strong> Nested objects will not be serialized; if you need to
+pass complex objects to your endpoint, you should be doing it
+through the request body; alternatively, use JSON.stringify on
+the object yourself before passing it to serialize.</p>
+<p><strong>NOTE:</strong> different falsy values are treated differently when
+appending to the querystring:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">input params</th>
+<th style="text-align:left">result string</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>{ key: false }</code></td>
+<td style="text-align:left"><code>key=false</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>{ key: null }</code></td>
+<td style="text-align:left"><code>key</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>{ key: undefined }</code></td>
+<td style="text-align:left">(no output)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>const url = tokenize('/clients/:id/apps', {id: '0012391'});assert.equals(url, '/clients/0012391/apps');</code></pre>
+
+    <pre class="prettyprint"><code>const url = tokenize('/my/endpoint', {offset: 1, pagesize: 20});assert.equals(url, '/my/endpoint?offset=1&amp;pagesize=20');</code></pre>
+
+    <pre class="prettyprint"><code>const url = tokenize('/users/:guid/clients', {  guid: '00123456789123456789',  order: ['displayName', 'branch']});assert.equals(url, '/users/00123456789123456789/clients?order=displayName&amp;order=branch');</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>''</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>A URL that may contain tokens in the <code>:name</code> format. Any
+tokens found in this format will be replaced with corresponding named values in
+the <code>params</code> argument.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>{}</code>
+                
+                </td>
+            
+
+            <td class="description last"><p>Values to use to replace named tokens in the URL. Any
+unmatched values will be appended to the URL as a properly encoded querystring.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A tokenized string with additional URL-encoded values
+appened to the querystring.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">string</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withAuthentication"><span class="type-signature">(static) </span>withAuthentication<span class="signature">(fetch, reauthenticate)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line784">line 784</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Wraps a fetch method so a reauthentication method is invoked if
+a <a href="global.html#Response">Response</a> status 401 is returned. The reauthentication
+method is responsible for ensuring future requests are authenticated.</p>
+<p>One way to do this is by adding a <a href="global.html#ProxyRule">ProxyRule</a> to the <a href="Proxy.html">Proxy</a>
+that sets an Authorize header to an updated value on specific <a href="global.html#Request">Requests</a>.
+A simpler approach is to rely on a Set-Cookie response header to update the
+cookies sent with future requests (if <a href="global.html#DataDefinition">withCredentials</a>
+is true).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { withAuthentication } from '@paychex/core/data/utils';import { fetch, createRequest } from '~/path/to/datalayer';const getUserToken = {  base: 'auth',  path: '/refreshToken',  withCredentials: true,};// a 401 has occurred; get a new JWT token// for the current userasync function reauthenticate() {  // a Set-Cookie response header will update  // the JWT that we send on future requests,  // so we don't need to do anything else here  return await fetch(createRequest(getUserToken));}export const pipeline = withAuthentication(fetch, reauthenticate);</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>reauthenticate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Reauthenticate">Reauthenticate</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Method to invoke to reauthenticate the user.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc usertext">
+    
+        <p>Argument <code>reauthenticate</code> must be a function.</p>
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withCache"><span class="type-signature">(static) </span>withCache<span class="signature">(fetch, cache)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line418">line 418</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-stores_utils.html#.asDataCache">asDataCache()</a> in @paychex/core/stores</li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Wraps the fetch method to cache successful Responses within a data pipeline.</p>
+<p><strong>NOTE:</strong> You can easily create <a href="Store.html">Store</a>-backed data caches for this method
+using <a href="module-stores_utils.html#.asDataCache">asDataCache()</a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { rethrow } from '@paychex/core/errors';import { withCache } from '@paychex/core/data/utils';import { indexedDB } from '@paychex/core/stores';import { asDataCache } from '@paychex/core/stores/utils';import { createRequest, fetch } from '~/path/to/datalayer';const getReportHistory = {  method: 'GET',  base: 'reports',  path: '/history/:id'};// NOTE: use withEncryption(store, options) if the response// might contain personal or sensitive information that you// wish to keep secretconst store = indexedDB({ store: 'reports' });const attempt = withCache(fetch, asDataCache(store));export async function loadReportHistory(id) {  const params = { id };  const request = createRequest(getReportHistory, params);  const response = await attempt(request).catch(rethrow(params));  return response.data;}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cache</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Cache.html">Cache</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The cache used to store <a href="global.html#Response">Responses</a>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc usertext">
+    
+        <p>An invalid cache was provided to withCache.</p>
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withConnectivity"><span class="type-signature">(static) </span>withConnectivity<span class="signature">(fetch, reconnect)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line673">line 673</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Wraps the fetch operation to wait for a network connection prior to
+attempting the data operation.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { withConnectivity } from '@paychex/core/data/utils';import { showDialog, connectToNetwork } from '~/path/to/dialogs';import { fetch, createRequest } from '~/path/to/datalayer';const operation = {  base: 'my-app',  path: '/path/to/data'};async function waitForConnect() {  return await showDialog(connectToNetwork, { modal: true });}const attempt = withConnectivity(fetch, waitForConnect);export async function loadData() {  const request = createRequest(operation);  const response = await attempt(request);  return response.data;}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>reconnect</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Reconnect">Reconnect</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Returns a Promise that resolves
+when the user's network connection has been re-established.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc usertext">
+    
+        <p>Argument <code>reconnect</code> must be a function.</p>
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withDiagnostics"><span class="type-signature">(static) </span>withDiagnostics<span class="signature">(fetch, diagnostics)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line725">line 725</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Invokes the specified method when a call is aborted (<a href="global.html#Response">Response</a>
+status = 0).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import noop from 'lodash/noop';import { withDiagnostics } from '@paychex/core/data/utils';import { fetch, createRequest } from '~/path/to/datalayer';import { tracker } from '~/path/to/tracker';import operations from '~/config/diagnostics.json';function trackResults(results) {  tracker.event('diagnostics run', { results });}function asResultPromise(request) {  const fromResponse = (response) =>    `${request.url}: ${response.status} (${response.statusText})`;  const fromError = (error) => fromResponse(error.response);  return fetch(request).then(fromResponse, fromError).catch(noop);}function performNetworkTests(request) {  // only perform diagnostics for calls that  // were aborted between the user and our servers  if (!request.url.includes('mydomain.com')) return;  const requests = operations.map(createRequest);  const responses = requests.map(asResultPromise);  Promise.all(responses).then(trackResults);}export const fetchWithDiagnostics =  withDiagnostics(fetch, performNetworkTests);</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>diagnostics</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Diagnostics">Diagnostics</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Invoked when a data call is aborted.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc usertext">
+    
+        <p>Argument <code>diagnostics</code> must be a function.</p>
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withHeaders"><span class="type-signature">(static) </span>withHeaders<span class="signature">(fetch, headers)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line836">line 836</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Applies default <a href="global.html#Request">Request</a> headers.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { withHeaders } from '@paychex/core/data/utils';import { fetch, createRequest } from '~/path/to/datalayer';const operation = {  base: 'my-app',  path: '/users/:id'};const attempt = withHeaders(fetch, {  'x-app-name': 'my-app',  'x-platform': 'android',});export function getUser(id) {  const params = { id };  const request = createRequest(operation, params);  const response = await attempt(request);  return response.data;}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>headers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#HeadersMap">HeadersMap</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The headers to apply to the <a href="global.html#Request">Request</a> headers
+collection. Request headers with will override any default headers with the same
+names specified here.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withRetry"><span class="type-signature">(static) </span>withRetry<span class="signature">(fetch, retry)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line271">line 271</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="module-data_utils.html#.falloff">falloff()</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Wraps <a href="DataLayer.html#fetch">fetch</a> to provide automatic
+retry functionality when the operation fails. You can provide
+pre-defined retry logic using <a href="module-data_utils.html#.falloff">existing</a>
+<a href="global.html#RetryFunction">RetryFunction</a> factories or by passing your own custom
+RetryFunction to this method.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import { rethrow } from '@paychex/core/errors'import { withRetry } from '@paychex/core/data/utils'import { fetch, createRequest } from '~/path/to/datalayer';const getUser = {  base: 'users',  method: 'GET',  path: '/users/:id',};function retryOnAbort(request, response) {  // aborted and timed-out calls  // should return status 0  if (response.status === 0)    return Promise.resolve(); // retry  return Promise.reject(); // don't retry}const attempt = withRetry(fetch, retryOnAbort);export async function loadUserData(id) {  const params = { id };  const request = createRequest(getUser, params);  const response = await attempt(request).catch(rethrow(params));  return response.data;}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The operation to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>retry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#RetryFunction">RetryFunction</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Invoked to determine
+whether the data operation should be retried.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withSignal"><span class="type-signature">(static) </span>withSignal<span class="signature">(fetch, signal)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line1003">line 1003</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Coordinates and synchronizes access to the data pipeline through
+the specified <a href="module-signals-ManualResetSignal.html">ManualResetSignal</a>
+or <a href="module-signals-AutoResetSignal.html">AutoResetSignal</a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>// delay calls until the user is authenticatedimport { manualReset } from '@paychex/core/signals';import { withSignal } from '@paychex/core/data/utils';import fetch from 'path/to/datalayer';const authenticated = manualReset(false);export const pipeline = withSignal(fetch, authenticated);export function setAuthenticated() {  authenticated.set();}</code></pre>
+
+    <pre class="prettyprint"><code>// prevent concurrent data calls from reaching the// server out of order by enforcing a sequence (i.e.// the first call must complete before a second call// is sent)import { autoReset } from '@paychex/core/signals';import { withSignal } from '@paychex/core/data/utils';import fetch from 'path/to/datalayer';// start the pipeline in a signaled state; each call will// automatically reset the signal, which will be set again// when the call completes, allowing the next call to proceedexport const pipeline = withSignal(fetch, autoReset(true));</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>signal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Signal</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The <a href="module-signals-ManualResetSignal.html">ManualResetSignal</a>
+or <a href="module-signals-AutoResetSignal.html">AutoResetSignal</a> to use to synchronize data calls.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withTransform"><span class="type-signature">(static) </span>withTransform<span class="signature">(fetch, transformer)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line578">line 578</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Wraps the given fetch method to add optional request and response
+transformations to the data pipeline.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import pako from 'pako'; // compressionimport { withTransform } from '@paychex/core/data/utils';import { fetch, createRequest } from '~/path/to/datalayer';const saveUser = {  method: 'POST',  base: 'my-app',  path: '/users/:id',  headers: {    'content-encoding': 'deflate'  }};// NOTE: `request` and `response` are optional;// see the Transformer documentation for detailsconst compressor = {  request(body, headers) {    const json = JSON.stringify(body);    if (headers['content-encoding'] === 'deflate')      return pako.deflate(json);    return json;  }};const attempt = withTransform(fetch, compressor);export async function saveUserData(id, user) {  const params = { id };  const request = createRequest(saveUser, params, user);  const response = await attempt(request);  return response.meta.headers['e-tag'];}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>transformer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Transformer">Transformer</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Determines how the <a href="global.html#Request">Request</a>
+and <a href="global.html#Response">Response</a> should be transformed before being passed to
+the next stage in the data pipeline.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".withXSRF"><span class="type-signature">(static) </span>withXSRF<span class="signature">(fetch, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="DataLayer.html#fetch">DataLayer#fetch</a>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="data_utils.js.html">data/utils.js</a>, <a href="data_utils.js.html#line934">line 934</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md">OWASP XSRF Cheat Sheet</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Adds Cross-Site Request Forgery protection to <a href="global.html#Request">Requests</a> made
+to the same origin where the app is hosted. For this to work, the server and
+client agree on a unique token to identify the user and prevent cross-site
+requests from being sent without the user's knowledge.</p>
+<p>By default, this method reads the <code>XSRF-TOKEN</code> cookie value sent by the server
+and adds it as the <code>X-XSRF-TOKEN</code> request header on any requests sent to the
+same origin. You can configure the cookie and/or the header name by passing your
+own values in the <code>options</code> argument. You can also specify a whitelist of cross-origin
+hostnames the header should be sent to (e.g. to subdomains of the host domain).
+See <a href="global.html#XSRFOptions">XSRFOptions</a> for details.</p>
+<p>Read more about XSRF and implementation best practices <a href="https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md">here</a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>import { withXSRF } from '@paychex/core/data/utils';import { fetch } from '~/path/to/datalayer';export const safeFetch = withXSRF(fetch);</code></pre>
+
+    <pre class="prettyprint"><code>import { withXSRF } from '@paychex/core/data/utils';import { fetch } from '~/path/to/datalayer';export const safeFetch = withXSRF(fetch, {  cookie: 'XSRF-MY-APP',  header: 'X-XSRF-MY-APP',  hosts: ['*.my-app.com']});</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fetch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The fetch method to wrap.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#XSRFOptions">XSRFOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional overrides for cookie and header names.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>The wrapped fetch method.</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataLayer.html#fetch">DataLayer#fetch</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+</body>
+</html>
