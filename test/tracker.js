@@ -3,6 +3,7 @@ import set from 'lodash/set.js';
 import unset from 'lodash/unset.js';
 import { spy } from './utils.js';
 import createTracker, { withNesting } from '../tracker/index.js';
+import { replacer } from '../tracker/utils.js';
 
 describe('tracker', () => {
 
@@ -203,15 +204,15 @@ describe('tracker', () => {
 
         it('creates tree correctly', async () => {
 
-            async function loadSecurity(start, clientId) {
+            async function loadSecurity(start) {
                 const [stop] = start('load user roles');
-                await delay(5, clientId); // pretend data call
+                await delay(5); // pretend data call
                 stop({ role: 'admin' });
             }
 
             async function loadFeatures(start, product) {
                 const [stop] = start(`load ${product} features`);
-                await delay(5, product);
+                await delay(5);
                 stop({
                     features: [
                         `${product}-feat-a`,
@@ -220,9 +221,9 @@ describe('tracker', () => {
                 });
             }
 
-            async function loadProducts(start, clientId) {
+            async function loadProducts(start) {
                 const [stop, nest] = start('loading products');
-                await delay(5, clientId);
+                await delay(5);
                 await Promise.all([
                     loadFeatures(nest, 'prod-a'),
                     loadFeatures(nest, 'prod-b')
@@ -232,8 +233,8 @@ describe('tracker', () => {
 
             async function loadClientData(clientId) {
                 const [stop, nest] = tracker.start('load client data');
-                await loadProducts(nest, clientId);
-                await loadSecurity(nest, clientId);
+                await loadProducts(nest);
+                await loadSecurity(nest);
                 stop({ clientId });
             }
 
@@ -332,16 +333,16 @@ describe('tracker', () => {
         it('creates sibling for each stop', async () => {
 
             async function makeParallelCalls(start) {
-                const [stop] = start('parallel calls');
+                const [end] = start('parallel calls');
                 await Promise.all([
-                    delay(10).then(() => stop()),
-                    delay(15).then(() => stop()),
-                    delay(20).then(() => stop())
+                    delay(10).then(() => end()),
+                    delay(15).then(() => end()),
+                    delay(20).then(() => end())
                 ]);
             }
 
-            const [stop, start] = tracker.start('load data');
-            await makeParallelCalls(start);
+            const [stop, nest] = tracker.start('load data');
+            await makeParallelCalls(nest);
             stop();
 
             expect(subscriber.args[0]).toMatchObject({
@@ -399,6 +400,133 @@ describe('tracker', () => {
             expect(subscriber.callCount).toBe(2);
             expect(subscriber.calls[0].args[0].count).toBe(1);
             expect(subscriber.calls[1].args[0].count).toBe(2);
+        });
+
+    });
+
+    describe('utils', () => {
+
+        describe('replacer', () => {
+
+            let map,
+                collector,
+                replace;
+
+            beforeEach(() => {
+                map = {
+                    'en': 'English',
+                    'lang': 'Language',
+                };
+                collector = spy();
+                replace = replacer(collector, map);
+            });
+
+            it('returns function', () => {
+                expect(replace).toBeInstanceOf(Function);
+            });
+
+            it('delegates to wrapped function', () => {
+                replace({});
+                expect(collector.called).toBe(true);
+            });
+
+            it('clones original object', () => {
+                const object = { lang: 'en' };
+                replace(object);
+                expect(object.lang).toBe('en');
+            });
+
+            it('ignores top-level keys', () => {
+                replace({ lang: 'en' });
+                const info = collector.args[0];
+                expect('lang' in info).toBe(true);
+                expect(info.lang).toBe('English');
+            });
+
+            it('replaces top-level values', () => {
+                replace({ action: 'change lang' });
+                expect(collector.args[0].action).toBe('change Language');
+            });
+
+            it('replaces data keys', () => {
+                replace({ data: { lang: 'en' }});
+                const info = collector.args[0];
+                expect(info).toMatchObject({
+                    data: { Language: 'English' }
+                });
+            });
+
+            it('replaces data values', () => {
+                replace({ data: { lang: 'en' } });
+                const info = collector.args[0];
+                expect(info).toMatchObject({
+                    data: { Language: 'English' }
+                });
+            });
+
+            it('does not replace substrings', () => {
+                replace({
+                    lang: 'eng',
+                    data: { lang: 'len' }
+                });
+                const info = collector.args[0];
+                expect(info).toMatchObject({
+                    lang: 'eng',
+                    data: { Language: 'len' }
+                });
+            });
+
+            it('skips non-strings', () => {
+                replace({
+                    id: 123,
+                    data: { val: 123, lang: null }
+                });
+                const info = collector.args[0];
+                expect(info).toMatchObject({
+                    id: 123,
+                    data: { val: 123, Language: null }
+                });
+            });
+
+            it('skips keys missing from dictionary', () => {
+                const object = {
+                    id: 'abc',
+                    data: {
+                        key: 'value'
+                    }
+                };
+                replace(object);
+                expect(collector.args[0]).toMatchObject(object);
+            });
+
+            it('works with arrays', () => {
+                replace({ lang: ['es', 'en'] });
+                expect(collector.args[0]).toMatchObject({
+                    lang: ['es', 'English']
+                });
+            });
+
+            it('works with nested objects', () => {
+                replace({
+                    lang: ['es', 'en'],
+                    data: {
+                        lang: {
+                            avail: ['en', 'es'],
+                            selected: 'en',
+                        }
+                    }
+                });
+                expect(collector.args[0]).toMatchObject({
+                    lang: ['es', 'English'],
+                    data: {
+                        Language: {
+                            avail: ['English', 'es'],
+                            selected: 'English'
+                        }
+                    }
+                });
+            });
+
         });
 
     });

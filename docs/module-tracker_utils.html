@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>Tracker - Documentation</title>
+    <title>tracker/utils - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -34,7 +34,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Tracker</h1>
+    <h1 class="page-title">tracker/utils</h1>
     
 
     
@@ -46,9 +46,8 @@
 
 <header>
     
-        <h2>
-        Tracker
-        </h2>
+        
+            
         
     
 </header>
@@ -58,13 +57,21 @@
         <div class="container-overview">
         
             
+                <div class="description usertext"><p>Provides utility methods for working with Tracker instances or collectors.</p></div>
+            
+
+            
+                
+
+
+
 
 <dl class="details">
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line106">line 106</a>
+        <a href="tracker_utils.js.html">tracker/utils.js</a>, <a href="tracker_utils.js.html#line1">line 1</a>
     </li></ul></dd>
     
 
@@ -102,23 +109,33 @@
 
 
 
-            
-                <div class="description usertext"><p>Provides methods for logging events, errors, and performance.</p>
-<p><strong>Best Practices</strong></p>
-<ul>
-<li>Combine <a href="Tracker.html#child">tracker.child()</a> with <a href="Tracker.html#context">tracker.context()</a>
-to set cross-cutting information specific to your application and to each high-level business
-process or transaction you have to track. You can create any number of child trackers that
-inherit settings from their ancestors.</li>
-</ul></div>
-            
 
-            
-                <h3>Examples</h3>
-                
-    <pre class="prettyprint"><code>// app/index.jsimport createTracker from '@paychex/core/tracker';export const tracker = createTracker();tracker.context({  app: 'my-app'});</code></pre>
 
-    <pre class="prettyprint"><code>// app/components/search.js// import the root tracker with 'app' definedimport { tracker } from '../index';import { fetch, createRequest } from '../data';import { rethrow } from '@paychex/core/errors';import { withOrdering, modelList } from '@paychex/core/models';// create a child tracker for use// only within this fileconst fileTracker = tracker.child();// all calls to child tracker methods// will include this 'component', along// with 'app' set by the root trackerfileTracker.context({  component: 'my-app-search'});const operation = {  base: 'my-app',  path: '/search'};export async function getSearchResults(query) {  // create a child tracker for use only within  // the lifetime of this function (ensures each  // call to this function gets its own context)  const methodTracker = fileTracker.child();  // set data specific to this invocation  methodTracker.context({ query });  // the following event will include 'query'  // and 'component' from ancestor trackers  // as well as 'app' from the root tracker  methodTracker.event('search');  const params = { query };  const stop = methodTracker.start('perform search');  const request = createRequest(operation, params);  const response = await fetch(request).catch(rethrow(params));  const results = response.data;  // the following timer will include 'query',  // 'component', 'app', and -- only on this  // timer -- a 'status' value  stop({ status: results.length ? 'Found' : 'Not Found' });  return withOrdering(modelList(...results), ['priority'], ['desc']);}</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             
         
@@ -147,7 +164,7 @@ inherit settings from their ancestors.</li>
 
     
 
-    <h4 class="name" id="child"><span class="type-signature"></span>child<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Tracker.html">Tracker</a>}</span></h4>
+    <h4 class="name" id="~replacer"><span class="type-signature">(inner) </span>replacer<span class="signature">(collector, map)</span><span class="type-signature"></span></h4>
 
     
 
@@ -159,7 +176,7 @@ inherit settings from their ancestors.</li>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line250">line 250</a>
+        <a href="tracker_utils.js.html">tracker/utils.js</a>, <a href="tracker_utils.js.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -199,7 +216,10 @@ inherit settings from their ancestors.</li>
 
 
 <div class="description usertext">
-    <p>Creates a child Tracker instance.</p>
+    <p>Wraps a collector so the <a href="global.html#TrackingInfo">TrackingInfo</a> instance's key and value
+strings will be replaced according to the specified map. Used
+primarily to convert system codes into human-readable values
+before passing to a collector.</p>
 </div>
 
 
@@ -212,124 +232,7 @@ inherit settings from their ancestors.</li>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>import { tracker } from '~/tracking';// this tracker will inherit any context data// set in landing's tracker while also mixing// in any contextual data of its ownexport const myAppTracker = tracker.child();myAppTracker.context({ app: 'my-app' });myAppTracker.event('app tracker created');</code></pre>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A new Tracker instance that will notify the same
-root subscriber of <a href="global.html#TrackingInfo">TrackingInfo</a> entries, mixing in ancestor
-contextual data as needed.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Tracker.html">Tracker</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="context"><span class="type-signature"></span>context<span class="signature">(data)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line276">line 276</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Sets contextual data to be mixed into each TrackingInfo created
-by this Tracker or any child Trackers.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import get from 'lodash/get';import { store, tracker } from '~/tracking';store.subscribe(() => {  const state = store.getState();  const app = get(state, 'routes.stage');  const drawer = get(state, 'routes.drawer');  tracker.context({ app, drawer });});</code></pre>
+    <pre class="prettyprint"><code>const map = {  lang: 'language',  en: 'English',  es: 'Spanish',};const collector = replacer(console.log, map);export const tracker = createTracker(collector);tracker.event('set lang', { avail: ['es', 'en'], selected: 'en' });`{  id: '09850c98-8d0e-4520-a61c-9401c750dec6',  type: 'event',  label: 'set language',  start: 1611671260770,  stop: 1611671260770,  duration: 0,  count: 1,  data: {    avail: [ 'Spanish', 'English' ],    selected: 'English'  }}`</code></pre>
 
 
 
@@ -359,13 +262,13 @@ by this Tracker or any child Trackers.</p>
 
         <tr>
             
-                <td class="name"><code>data</code></td>
+                <td class="name"><code>collector</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object.&lt;string, any></span>
+<span class="param-type">function</span>
 
 
             
@@ -375,9 +278,39 @@ by this Tracker or any child Trackers.</p>
 
             
 
-            <td class="description last"><p>The data to merge into any
-<a href="global.html#TrackingInfo">TrackingInfo</a> instances created by this (or child) Tracker
-methods.</p></td>
+            <td class="description last"><p>The collector function to wrap. Will
+be invoked with a new TrackingInfo instance whose keys and values
+will be replaced according to the given map.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>map</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object.&lt;string, string></span>
+|
+
+<span class="param-type">Map.&lt;string, string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The
+mapping of values to replace. For example, <code>{ 'en': 'English' }</code>
+would change all instances of <code>'en'</code> to <code>'English'</code>. <strong>NOTE:</strong>
+Word boundaries and casing are respected, so <code>'en'</code> would <em>not</em>
+replace <code>'length'</code>, <code>'EN'</code>, or <code>'eng'</code>.</p></td>
         </tr>
 
     
@@ -399,610 +332,6 @@ methods.</p></td>
 
 
 
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="error"><span class="type-signature"></span>error<span class="signature">(err)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line335">line 335</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Logs an <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { tracker } from '~/tracking';import { rethrow } from '@paychex/core/errors';export function doSomething(param) {  somePromiseMethod()    .catch(rethrow({ param }))    .catch(tracker.error);}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>err</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Error</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The Error instance to log.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="event"><span class="type-signature"></span>event<span class="signature">(message, data<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line304">line 304</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Logs an event. Events usually represent important points in an application's
-lifecycle or user-initiated actions such as button clicks.</p>
-<p><strong>NOTE:</strong> This method also creates a <a href="https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMark">browser performance mark</a> with the given message name.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { tracker } from '~/tracking';window.addEventListener('click', (e) => {  if (e.target.matches('button, a')) {    // could grab additional contextual data    // by looking at ancestor elements' attributes    const type = e.target.tagName.toLowerCase();    tracker.event('click', {      tags: ['ui', type],      label: e.target.innerText    });  }});</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>message</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The name of the event to log.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object.&lt;string, any></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Optional information to associate with this <a href="global.html#TrackingInfo">TrackingInfo</a>.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="start"><span class="type-signature"></span>start<span class="signature">(label)</span><span class="type-signature"> &rarr; {<a href="global.html#TimerStopFunction">TimerStopFunction</a>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line375">line 375</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Starts a timer to measure performance.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { tracker } from '~/tracking';export async function doSomething(param) {  const stop = tracker.start('doSomething');  const results = await somePromiseMethod();  stop({ count: results.length, param });  return results;}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>label</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The name of the timer to create.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Method to invoke to stop and log the timer.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#TimerStopFunction">TimerStopFunction</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="uuid"><span class="type-signature"></span>uuid<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="tracker_index.js.html">tracker/index.js</a>, <a href="tracker_index.js.html#line230">line 230</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Generates a random RFC 4122 UUID guaranteed to be unique.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { tracker } from '~/tracking';import { proxy } from '~/path/to/data';proxy.use({  headers: {    'x-session-id': tracker.uuid()  },  match: {    base: '^my\-app' // can use regular expression syntax  }});</code></pre>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A <a href="https://tools.ietf.org/html/rfc4122#section-4.4">RFC 4122 v4 UUID</a></p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
