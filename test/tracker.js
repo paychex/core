@@ -3,7 +3,7 @@ import set from 'lodash/set.js';
 import unset from 'lodash/unset.js';
 import { spy } from './utils.js';
 import createTracker, { withNesting } from '../tracker/index.js';
-import { replacer } from '../tracker/utils.js';
+import { withReplacement } from '../tracker/utils.js';
 
 describe('tracker', () => {
 
@@ -406,19 +406,19 @@ describe('tracker', () => {
 
     describe('utils', () => {
 
-        describe('replacer', () => {
+        describe('withReplacement', () => {
 
             let map,
                 collector,
                 replace;
 
             beforeEach(() => {
-                map = {
-                    'en': 'English',
-                    'lang': 'Language',
-                };
+                map = new Map([
+                    [/\ben\b/, 'English'],
+                    [/^lang$/, 'Language'],
+                ]);
                 collector = spy();
-                replace = replacer(collector, map);
+                replace = withReplacement(collector, map);
             });
 
             it('returns function', () => {
@@ -444,8 +444,8 @@ describe('tracker', () => {
             });
 
             it('replaces top-level values', () => {
-                replace({ action: 'change lang' });
-                expect(collector.args[0].action).toBe('change Language');
+                replace({ label: 'lang' });
+                expect(collector.args[0].label).toBe('Language');
             });
 
             it('replaces data keys', () => {
@@ -524,6 +524,17 @@ describe('tracker', () => {
                             selected: 'English'
                         }
                     }
+                });
+            });
+
+            it('respects position tokens', () => {
+                replace({
+                    label: 'lang',
+                    action: 'change lang',
+                });
+                expect(collector.args[0]).toMatchObject({
+                    label: 'Language',
+                    action: 'change lang',
                 });
             });
 
