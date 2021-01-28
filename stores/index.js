@@ -1,4 +1,7 @@
 import isString from 'lodash/isString.js';
+import { Store } from '../types/stores.js';
+
+class Unused extends Store {}
 
 /**
  * Provides methods for storing information on the client's
@@ -6,89 +9,6 @@ import isString from 'lodash/isString.js';
  * storage type and configuration.
  *
  * @module stores
- */
-
-/**
- * Provides asynchronous storage on the client's machine.
- * Stores are created indirectly through methods such as
- * {@link module:stores.indexedDB} and {@link module:stores.sessionStore}.
- *
- * @global
- * @interface Store
- */
-
-/**
- * Retrieves data stored on the client's machine.
- *
- * @async
- * @function Store#get
- * @param {string} key The item to retrieve from storage.
- * @returns {Promise<*>} A promise that will be resolved
- * with the value of the item in storage (or undefined, if
- * the item does not exist), or rejected if an error occurs.
- * @example
- * import { rethrow } from '@paychex/core/errors';
- * import { localStore } from '@paychex/core/stores';
- * import { withPrefix } from '@paychex/core/stores/utils';
- * import { user } from '../data/user';
- *
- * const store = withPrefix(localStore(), user.guid);
- *
- * function defaultFalse(result) {
- *   return (result === undefined) ? false : result;
- * }
- *
- * export async function termsAccepted() {
- *   return await store.get('terms_accepted')
- *     .then(defaultFalse)
- *     .catch(rethrow({ tags: ['legal'] }));
- * }
- */
-
-/**
- * Stores data on the client's machine.
- *
- * @async
- * @function Store#set
- * @param {string} key The key that uniquely identifies the item to store.
- * @param {*} value The value to store under the associated key.
- * @returns {Promise} A Promise that will be resolved with the key when the
- * item is stored, or rejected if the storage operation fails.
- * @example
- * import { rethrow } from '@paychex/core/errors';
- * import { localStore } from '@paychex/core/stores';
- * import { withPrefix } from '@paychex/core/stores/utils';
- * import { user } from '../data/user';
- *
- * const store = withPrefix(localStore(), user.guid);
- *
- * export async function markTermsAndConditionsRead() {
- *   return await store.set('terms_accepted', true)
- *     .catch(rethrow({ tags: ['legal'] }));
- * }
- */
-
-/**
- * Removes an item from storage.
- *
- * @async
- * @function Store#delete
- * @param {string} key The item to remove.
- * @returns {Promise} A Promise that will be resolved when the item
- * is removed from storage successfully _or_ if the item is not found.
- * This promise should only be rejected if the delete operation fails.
- * @example
- * import { rethrow } from '@paychex/core/errors';
- * import { localStore } from '@paychex/core/stores';
- * import { withPrefix } from '@paychex/core/stores/utils';
- * import { user } from '../data/user';
- *
- * const store = withPrefix(localStore(), user.guid);
- *
- * export async function resetTermsAndConditions() {
- *   return await store.delete('terms_accepted')
- *     .catch(rethrow({ tags: ['legal'] }));
- * }
  */
 
 export function htmlStore(provider) {

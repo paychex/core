@@ -15,6 +15,23 @@ import isFunction from 'lodash/isFunction.js';
 
 import { error } from '../errors/index.js';
 
+import {
+    Fetch,
+    DataLayer,
+    Transformer,
+    XSRFOptions,
+} from '../types/data.js';
+
+import { AutoResetSignal, ManualResetSignal } from '../types/signals.js';
+
+Fetch();
+
+class UnusedDataLayer extends DataLayer {}
+class UnusedTransformer extends Transformer {}
+class UnusedXSRFOptions extends XSRFOptions {}
+class UnusedAutoResetSignal extends AutoResetSignal {}
+class UnusedManualResetSignal extends ManualResetSignal {}
+
 /**
  * Functionality used to customize a {@link DataLayer DataLayer} pipeline.
  *
@@ -235,10 +252,10 @@ export function falloff(times = 3, base = 200, options = {}) {
  * RetryFunction to this method.
  *
  * @function
- * @param {DataLayer#fetch} fetch The operation to wrap.
+ * @param {Fetch} fetch The operation to wrap.
  * @param {RetryFunction} retry Invoked to determine
  * whether the data operation should be retried.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @see {@link module:data/utils.falloff falloff()}
  * @example
  * import { rethrow } from '@paychex/core/errors'
@@ -297,96 +314,15 @@ export function withRetry(fetch, retry, retries = new Map()) {
 }
 
 /**
- * Stores and retrieves Response objects.
- *
- * @global
- * @interface Cache
- * @see {@link module:stores/utils.asDataCache asDataCache()} in @paychex/core/stores/utils
- * @see {@link module:data/utils.withCache withCache()} in @paychex/core/data/utils
- * @example
- * import { indexedDB } from '@paychex/core/stores'
- *
- * const store = indexedDB({store: 'my-objects'});
- * const ignore = () => {};
- *
- * export const cache = {
- *   async get(request) {
- *     return await store.get(request.url).catch(ignore);
- *   },
- *   async set(request, response) {
- *     return await store.set(request.url, response).catch(ignore);
- *   }
- * }
- */
-
-/**
- * Retrieves a Response object from the cache. You should resolve
- * with `undefined` if the cached value is not found, expired, or
- * invalid. Do NOT reject the returned Promise.
- *
- * @async
- * @method Cache#get
- * @param {Request} request Contains information you can use to create
- * a cache key. Typically, the `url` is unique enough to act as a key.
- * See the example code.
- * @returns {Promise<?Response>} Promise resolved with `undefined` if
- * the key could not be found in the cache or is invalid; otherwise,
- * resolved with the {@link Response} object passed to {@link Cache.set}.
- * @example
- * import { indexedDB } from '@paychex/core/stores'
- *
- * const store = indexedDB({store: 'my-objects'});
- * const ignore = () => {};
- *
- * export const cache = {
- *   async get(request) {
- *     return await store.get(request.url).catch(ignore);
- *   },
- *   async set(request, response) {
- *     return await store.set(request.url, response).catch(ignore);
- *   }
- * }
- */
-
-/**
- * Stores a Response object in the cache. Resolve the returned promise
- * when the object has been cached OR if the caching operation fails. Do
- * NOT reject the returned Promise.
- *
- * @async
- * @method Cache#set
- * @param {Request} request Contains information you can use to create
- * a cache key. Typically, the `url` is unique enough to act as a key.
- * See the example code.
- * @param {Response} response The Response to cache. This is the value
- * that should be returned from {@link Cache.get}.
- * @returns {Promise} A promise resolved when the value is cached.
- * @example
- * import { indexedDB } from '@paychex/core/stores'
- *
- * const store = indexedDB({store: 'my-objects'});
- * const ignore = () => {};
- *
- * export const cache = {
- *   async get(request) {
- *     return await store.get(request.url).catch(ignore);
- *   },
- *   async set(request, response) {
- *     return await store.set(request.url, response).catch(ignore);
- *   }
- * }
- */
-
-/**
  * Wraps the fetch method to cache successful Responses within a data pipeline.
  *
  * **NOTE:** You can easily create {@link Store}-backed data caches for this method
  * using {@link module:stores/utils.asDataCache asDataCache()}.
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {Cache} cache The cache used to store {@link Response Responses}.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @see {@link module:stores/utils.asDataCache asDataCache()} in @paychex/core/stores
  * @throws An invalid cache was provided to withCache.
  * @example
@@ -438,109 +374,15 @@ export function withCache(fetch, cache) {
 }
 
 /**
- * Map of strings representing either {@link Request} headers
- * or {@link Response} {@link MetaData meta} headers. The header name is the key
- * and the header data is the value. If you pass an array of strings as the value,
- * the strings will be combined and separated by commas.
- *
- * @global
- * @typedef {Object.<string, string|string[]>} HeadersMap
- * @example
- * import { fetch, createRequest } from '~/path/to/datalayer';
- *
- * async function loadData() {
- *   const request = createRequest({
- *     base: 'my-app',
- *     path: '/path/to/data',
- *     headers: {
- *       'content-type': 'application/json',
- *       'accept': [
- *         'application/json',
- *         'text/plain',
- *         '*∕*'
- *       ]
- *     }
- *   });
- *   const response = await fetch(request);
- *   console.log(response.meta.headers);
- *   return response.data;
- * }
- */
-
-/**
- * Enables developers to modify the data of a request prior to sending. The
- * current body data and headers map will be passed to this method, and the return
- * value will be used as the new request body data. You can also mutate the headers
- * map (e.g. by adding or deleting values) prior to the request being sent.
- *
- * @global
- * @async
- * @callback RequestTransform
- * @param {*} data The payload passed to {@link DataLayer#createRequest}. Whatever
- * you return from this function will be used as the new request payload.
- * @param {HeadersMap} headers A key-value collection of header names
- * to header values. You can modify this object directly (e.g. by adding or
- * deleting values) prior to the request being sent.
- * @returns {*|Promise} The new body to send with the request.
- */
-
-/**
- * Enables developers to modify the data of a response before it is returned
- * to callers.
- *
- * @global
- * @async
- * @callback ResponseTransform
- * @param {*} data The response payload returned from the server. Whatever value
- * you return from this function will replace {@link Response}.data.
- * @returns {*|Promise} The data to return to callers.
- */
-
-/**
- * @global
- * @typedef {object} Transformer
- * @property {RequestTransform} [request] Transforms the {@link Request} body and headers.
- * @property {ResponseTransform} [response] Transforms the {@link Response} data.
- * @example
- * import isString from 'lodash/isString';
- * import { withTransform } from '@paychex/core/data/utils';
- * import { fetch, createRequest } from '~/path/to/datalayer';
- *
- * const operation = {
- *   method: 'GET',
- *   base: 'my-app',
- *   path: '/some/data',
- * };
- *
- * const transformer = {
- *   response(data) {
- *     try {
- *       return JSON.parse(data);
- *     } catch (e) {
- *       return data;
- *     }
- *   }
- * };
- *
- * const attempt = withTransform(fetch, transformer);
- *
- * export async function getJSONData() {
- *   const request = createRequest(operation);
- *   const response = await attempt(request);
- *   return response.data;
- * }
- */
-
-/**
  * Wraps the given fetch method to add optional request and response
  * transformations to the data pipeline.
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {Transformer} transformer Determines how the {@link Request}
  * and {@link Response} should be transformed before being passed to
  * the next stage in the data pipeline.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @example
  * import pako from 'pako'; // compression
  * import { withTransform } from '@paychex/core/data/utils';
@@ -643,10 +485,10 @@ export function withTransform(fetch, transformer) {
  * attempting the data operation.
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {Reconnect} reconnect Returns a Promise that resolves
  * when the user's network connection has been re-established.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @throws Argument `reconnect` must be a function.
  * @example
  * import { withConnectivity } from '@paychex/core/data/utils';
@@ -688,9 +530,9 @@ export function withConnectivity(fetch, reconnect) {
  * status = 0).
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {Diagnostics} diagnostics Invoked when a data call is aborted.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @throws Argument `diagnostics` must be a function.
  * @example
  * import noop from 'lodash/noop';
@@ -756,9 +598,9 @@ export function withDiagnostics(fetch, diagnostics) {
  * is true).
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {Reauthenticate} reauthenticate Method to invoke to reauthenticate the user.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @throws Argument `reauthenticate` must be a function.
  * @example
  * import { withAuthentication } from '@paychex/core/data/utils';
@@ -807,11 +649,11 @@ export function withAuthentication(fetch, reauthenticate) {
  * Applies default {@link Request} headers.
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {HeadersMap} headers The headers to apply to the {@link Request} headers
  * collection. Request headers with will override any default headers with the same
  * names specified here.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @example
  * import { withHeaders } from '@paychex/core/data/utils';
  * import { fetch, createRequest } from '~/path/to/datalayer';
@@ -869,34 +711,6 @@ function isAllowed(target, origin, hosts) {
 }
 
 /**
- * Provides optional overrides for XSRF cookie and header names. Can be passed to
- * {@link module:data/utils.withXSRF withXSRF} when wrapping a fetch operation.
- *
- * @global
- * @typedef {object} XSRFOptions
- * @property {string} [cookie=XSRF-TOKEN] The name of the cookie sent by the server
- * that has the user's XSRF token value.
- * @property {string} [header=x-xsrf-token] The name of the request header to set.
- * The server should ensure this value matches the user's expected XSRF token.
- * @property {string[]} [hosts] A whitelist of patterns used to determine which host
- * names the XSRF token will be sent to even when making a cross-origin request. For
- * example, a site running on `www.server.com` would not normally include the XSRF
- * token header on any requests to the `api.server.com` subdomain since the hostnames
- * don't exactly match. However, if you added `api.server.com` or `*.server.com` to
- * the hosts array (and if the port and protocol both still matched the origin's port
- * and protocol), the header would be sent.
- * @example
- * import { withXSRF } from '@paychex/core/data/utils';
- * import { fetch } from '~/path/to/datalayer';
- *
- * export const safeFetch = withXSRF(fetch, {
- *   cookie: 'XSRF-MY-APP',
- *   header: 'X-XSRF-MY-APP',
- *   hosts: ['*.my-app.com']
- * });
- */
-
-/**
  * Adds Cross-Site Request Forgery protection to {@link Request Requests} made
  * to the same origin where the app is hosted. For this to work, the server and
  * client agree on a unique token to identify the user and prevent cross-site
@@ -912,9 +726,9 @@ function isAllowed(target, origin, hosts) {
  * Read more about XSRF and implementation best practices {@link https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md here}.
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
+ * @param {Fetch} fetch The fetch method to wrap.
  * @param {XSRFOptions} [options] Optional overrides for cookie and header names.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @see {@link https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md OWASP XSRF Cheat Sheet}
  * @example
  * import { withXSRF } from '@paychex/core/data/utils';
@@ -954,22 +768,15 @@ export function withXSRF(fetch, options = {}) {
 }
 
 /**
- * A {@link module:signals~ManualResetSignal ManualResetSignal}
- * or {@link module:signals~AutoResetSignal AutoResetSignal}.
- * @ignore
- * @typedef {module:signals~ManualResetSignal|module:signals~AutoResetSignal} Signal
- */
-
-/**
  * Coordinates and synchronizes access to the data pipeline through
  * the specified {@link module:signals~ManualResetSignal ManualResetSignal}
  * or {@link module:signals~AutoResetSignal AutoResetSignal}.
  *
  * @function
- * @param {DataLayer#fetch} fetch The fetch method to wrap.
- * @param {Signal} signal The {@link module:signals~ManualResetSignal ManualResetSignal}
+ * @param {Fetch} fetch The fetch method to wrap.
+ * @param {AutoResetSignal|ManualResetSignal} signal The {@link module:signals~ManualResetSignal ManualResetSignal}
  * or {@link module:signals~AutoResetSignal AutoResetSignal} to use to synchronize data calls.
- * @returns {DataLayer#fetch} The wrapped fetch method.
+ * @returns {Fetch} The wrapped fetch method.
  * @example
  * // delay calls until the user is authenticated
  *

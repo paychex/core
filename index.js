@@ -2,6 +2,25 @@ import iteratee from 'lodash/iteratee.js';
 import identity from 'lodash/identity.js';
 import { rethrow } from './errors/index.js';
 
+import {
+    EventBus,
+    InvocationData,
+} from './types/index.js';
+
+import {
+    Semaphore,
+    CountdownSignal,
+    AutoResetSignal,
+    ManualResetSignal,
+} from './types/signals.js';
+
+class UnusedEventBus extends EventBus {}
+class UnusedSemaphore extends Semaphore {}
+class UnusedCountdown extends CountdownSignal {}
+class UnusedAutoReset extends AutoResetSignal {}
+class UnusedManualReset extends ManualResetSignal {}
+class UnusedInvocationData extends InvocationData {}
+
 const stubPromise = () => Promise.resolve();
 
 /**
@@ -52,192 +71,6 @@ const stubPromise = () => Promise.resolve();
  * export async function run(...args) {
  *   return await bus.fire('event', ...args);
  * }
- */
-
-/**
- * Provides publish/subscribe functionality.
- *
- * @global
- * @interface EventBus
- * @borrows EventBus#on as EventBus#one
- * @example
- * import { eventBus } from '@paychex/core';
- * import { tracker } from '~/tracking';
- *
- * const bus = eventBus();
- *
- * bus.on('event', function handler(arg1, arg2) {
- *   console.log(`received ${arg1} and ${arg2}`);
- *   return arg1 + arg2;
- * });
- *
- * // subscribers can be asynchronous
- * bus.on('event', async function handler(arg1, arg2) {
- *   const result = await someAsyncMethod(arg1);
- *   await someOtherAsyncMethod(result, arg2);
- *   return 'abc';
- * });
- *
- * // fire and forget
- * bus.fire('event', 1, 2);
- *
- * // catch any rejected promises returned by
- * // handlers (or errors thrown by handlers)
- * await bus.fire('event', 1, 2).catch(tracker.error);
- *
- * // examine the return values of handlers
- * const results = await bus.fire('event', 1, 2);
- * console.log(results); // [3, 'abc']
- */
-
-/**
- * Stops notifying subscribers of fired events until {@link EventBus#resume resume} is called.
- *
- * @method EventBus#stop
- * @example
- * import { eventBus } from '@paychex/core';
- *
- * const bus = eventBus();
- *
- * bus.on('add', function handler(value1, value2) {
- *   console.log(value1 + value2);
- * });
- *
- * bus.fire('add', 1, 2); // 3
- * bus.stop();
- * bus.fire('add', 1, 2); // does not invoke subscriber
- */
-
-/**
- * Resumes notifying subscribers after {@link EventBus#stop stop} was called. Any
- * events fired before resuming are dropped entirely.
- *
- * @method EventBus#resume
- * @example
- * import { eventBus } from '@paychex/core';
- *
- * const bus = eventBus();
- *
- * bus.on('add', function handler(value1, value2) {
- *   console.log(value1 + value2);
- * });
- *
- * bus.fire('add', 1, 2); // 3
- * bus.stop();
- * bus.fire('add', 1, 2); // does not invoke subscriber
- * bus.resume();
- * bus.fire('add', 1, 2); // 3
- */
-
-/**
- * Notifies any subscribers registered through {@link EventBus#on on}
- * or {@link EventBus#on one} that the specified event has occurred. If
- * any subscribers throw an exception then the {@link EventBus#fire fire}
- * promise will be rejected, but any other subscribers will continue to be
- * notified of the initial event.
- *
- * @method EventBus#fire
- * @param {string} event The name of the event to fire.
- * @param {...any} [args] Optional arguments to pass to subscribers.
- * @returns {boolean|Promise} Returns `false` if the bus is stopped. Otherwise,
- * returns a Promise that will resolve with an array of values returned by
- * event subscribers, or reject with the first Promise rejection or thrown error.
- * @example
- * import { eventBus } from '@paychex/core';
- * import { tracker } from '~/tracking';
- *
- * const bus = eventBus();
- *
- * bus.on('event', async function handler(value1, value2) {
- *   return await someAsyncMethod(value1, value2);
- * });
- *
- * bus.fire('event', arg1, arg2);
- * const results = await bus.fire('event', arg1, arg2);
- * await bus.fire('event', arg1, arg2).catch(tracker.error);
- * @example
- * import { eventBus, sequence } from '@paychex/core';
- * import { error } from '@paychex/core/errors';
- *
- * const bus = eventBus();
- *
- * async function dirtyCheck(container, path) {
- *   if (container.dirty)
- *     throw error('save your changes');
- * }
- *
- * async function navigate(container, path) {
- *   // load new route
- * }
- *
- * bus.on('navigate', sequence(dirtyCheck, navigate));
- *
- * export async function navigate(container, path) {
- *   await bus.fire('navigate', container, path);
- * }
- *
- * // caller
- * function linkHandler(e) {
- *   e.preventDefault();
- *   e.stopPropagation();
- *   const route = e.target.getAttribute('route');
- *   const container = e.target.getAttribute('container');
- *   navigate(container, route).then(
- *     () => console.info('navigation complete'),
- *     (err) => console.log('navigation failed', err);
- *   );
- * }
- * @example
- * import { eventBus, sequence, parallel } from '@paychex/core';
- *
- * const bus1 = eventBus(null, sequence);
- * const bus2 = eventBus(null, parallel); // the default behavior
- *
- * function handler1() {
- *   return 1;
- * }
- *
- * function handler2() {
- *   return 2;
- * }
- *
- * bus1.on('event', handler1);
- * bus1.on('event', handler2);
- *
- * // sequence bus returns last subscriber's return value
- * await bus1.fire('event'); // 2
- *
- * bus2.on('event', handler1);
- * bus2.on('event', handler2);
- *
- * // parallel bus returns array
- * await bus2.fire('event'); // [1, 2]
- */
-
-/**
- * Registers a subscriber for the given event. The subscriber will be invoked
- * in the context used to create the {@link EventBus} and passed any arguments
- * provided to the {@link EventBus#fire fire method}.
- *
- * @method EventBus#on
- * @param {string} event The name of the event to listen for.
- * @param {Function} subscriber The subscriber to invoke when the event is fired.
- * @returns {Function} Method to invoke to remove the subscriber.
- * @example
- * import { eventBus } from '@paychex/core';
- * import { createSomething } from '../someFactory';
- *
- * const obj = createSomething();
- * const bus = eventBus(obj); // subscriber context
- *
- * bus.one('initialize', function init() {
- *   // this only runs the first time
- *   // the 'initialize' event is fired;
- * });
- *
- * export const off = bus.on('some-event', function handler(arg) {
- *   console.log(this === obj); // true
- * });
  */
 
 /**
@@ -354,6 +187,7 @@ export function eventBus(context, mode = parallel) {
 }
 
 /**
+ * @async
  * @global
  * @callback ParallelFunction
  * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
@@ -381,6 +215,7 @@ export function eventBus(context, mode = parallel) {
  */
 
 /**
+ * @async
  * @global
  * @callback SequentialFunction
  * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
@@ -462,6 +297,7 @@ function getInvocationPattern(invoker) {
  * Invokes the specified functions in parallel, handling any
  * returned Promises correctly.
  *
+ * @async
  * @function parallel
  * @param {...Function} fns The functions to invoke in parallel.
  * @returns {ParallelFunction} A function that will invoke the
@@ -497,6 +333,7 @@ export const parallel = getInvocationPattern(function invoker(methods, args) {
  * Invokes the specified functions in sequence, handling any
  * returned Promises correctly.
  *
+ * @async
  * @function sequence
  * @param {...Function} fns The functions to invoke in sequence.
  * @returns {SequentialFunction} A function that will invoke the
@@ -543,19 +380,13 @@ export const sequence = getInvocationPattern(function invoker(methods, args){
 /**
  * Function returned by {@link module:index~buffer buffer}.
  *
+ * @async
  * @global
  * @callback BufferFunction
  * @param {...any} args The arguments to pass to the wrapped function.
  * @returns {Promise} A promise resolved when all the queued invocations
  * are complete, or rejected if any queued invocation throws an error or
  * returns a rejected Promise.
- */
-
-/**
- * @global
- * @typedef {Array} InvocationData
- * @property {any} 0 The invocation context.
- * @property {any[]} 1 The arguments passed to this invocation.
  */
 
 /**
@@ -576,7 +407,7 @@ export const sequence = getInvocationPattern(function invoker(methods, args){
  *
  * @function buffer
  * @param {Function} fn The function whose invocations should be buffered.
- * @param {Signal[]} signals The signals to wait on before ending buffering.
+ * @param {Array.<AutoResetSignal|ManualResetSignal|CountdownSignal|Semaphore>} signals The signals to wait on before ending buffering.
  * @param {BufferFilter} [filter=identity] Provides optional manipulation of the
  * buffered invocations. Passed an array of invocations and should return an
  * array of invocations. See the example for details.

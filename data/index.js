@@ -8,7 +8,17 @@ import isFunction from 'lodash/isFunction.js';
 import { tokenize } from './utils.js';
 import { error, fatal } from '../errors/index.js';
 
+import {
+    Proxy,
+    Adapter,
+    DataLayer,
+} from '../types/data.js';
+
 export { createProxy } from './proxy.js';
+
+Adapter();
+class UnusedProxy extends Proxy {}
+class UnusedDataLayer extends DataLayer {}
 
 /**
  * A Promise is an object representing the eventual completion or failure of an asynchronous operation.
@@ -252,120 +262,9 @@ function getErrorMessage(response) {
 }
 
 /**
- * Contains the minimum functionality necessary to convert a
- * {@link DataDefinition} object into a {@link Request} and to
- * execute that Request against an {@link Adapter}, returning
- * a {@link Response} with the requested data.
- *
- * @global
- * @interface DataLayer
- */
-
-/**
- * Metadata used to construct a {@link Request} instance.
- *
- * @global
- * @typedef {object} DataDefinition
- * @property {string} base Used in conjunction with {@link ProxyRule ProxyRules} to determine the
- * domain name for the resulting {@link Request} URL. If an empty string is provided then a relative
- * URL (one without a protocol or domain name) will be created using the existing domain name and protocol.
- * @property {string} path Combined with the base path (if provided) to construct an absolute or relative URL.
- * @property {string} [adapter='default'] The adapter to use to complete the request.
- * @property {HeadersMap} [headers={accept: 'application/json, text/plain, *∕*'}] The HTTP headers to use on the request.
- * @property {object} [ignore={}] Can be used to skip certain behaviors. See documentation for details.
- * @property {string} [method='GET'] The HTTP verb to use.
- * @property {string} [responseType=''] The desired response type. Can be one of `''` (the default),
- * `'text'`, `'json'`, `'arraybuffer'`, `'blob'` or `'document'`. See {@link https://xhr.spec.whatwg.org/#response-body the XHR spec}
- * for more information. Setting this will change the {@link Response Response.data} type.
- * @property {number} [timeout=0] The number of milliseconds to wait before aborting the data call.
- * @property {boolean} [withCredentials=false] Whether to send Cookies with the request.
- */
-
-/**
- * Encapsulates the information used by {@link Adapter Adapters} to complete a data call.
- *
- * **WARNING:** Do not construct a Request object manually. Instead, pass a {@link DataDefinition}
- * object to {@link DataLayer#createRequest createRequest()} directly.
- *
- * **IMPORTANT:** The Request object is frozen. Any attempt to modify existing Request values
- * will result in an Error. If you need to modify a Request as part of a data pipeline, use
- * {@link https://lodash.com/docs/4.17.11#cloneDeep cloneDeep} (or similar) to make a copy of
- * the Request that can be safely modified.
- *
- * @global
- * @typedef {DataDefinition} Request
- * @property {string} url The URL to open, constructed using {@link Proxy#url Proxy.url()} and any
- * {@link ProxyRule ProxyRules} that match the given Request properties as well as any optional
- * parameters passed to {@link DataLayer#createRequest createRequest()}.
- * @property {*} body An optional payload to send to the URL, set when calling {@link DataLayer#createRequest createRequest()}.
- */
-
-/**
- * Contains information returned from endpoints (typically only when an error occurs).
- * Messages should NOT be presented to end users directly (although message codes could
- * translated and presented if they provide useful guidance on how to recover from an
- * error).
- *
- * @global
- * @typedef {object} Message
- * @property {string} code A unique code to identify this message. May be used during
- * translation to present recovery information to the end user.
- * @property {string} [severity=NONE] The message severity. Possible values are ERROR,
- * FATAL, and NONE.
- * @property {Array.<*>} data Any additional information the server believes may be useful
- * when triaging the error later.
- */
-
-/**
- * Additional Response information.
- *
- * @global
- * @typedef {object} MetaData
- * @property {boolean} error Whether the response should be considered a failure.
- * @property {boolean} cached Whether the response contains cached data.
- * @property {boolean} timeout Whether the response timed out. When this is true,
- * [Response.status]{@link Response} should be 0 and `meta.error` should be true.
- * @property {HeadersMap} headers Map of response headers returned by the network call.
- * @property {Message[]} messages Collection of {@link Message} instances; may be empty.
- */
-
-/**
- * Represents the results of an Adapter's data operation. Ensures each adapter returns
- * a consistent format to the data layer for further processing (caching, error handling,
- * etc.).
- *
- * **NOTE:** This entire object should be serializable (i.e. no functions or complex built-in
- * objects) so the caching layer can retrieve the full Response on subsequent calls.
- *
- * @global
- * @typedef {object} Response
- * @property {*} data The response payload; may be `null`. Can be modified by setting `'responseType`'
- * on the {@link DataDefinition} object. See {@link https://xhr.spec.whatwg.org/#the-response-attribute the spec}
- * for more information on the types that can be returned.
- * @property {number} status A standard status code the {@link DataLayer.fetch} method will
- * examine to determine how to proceed. For example, a status code of 0 indicates an aborted
- * request and may prompt network diagnostics or a dialog prompting the user to restore their
- * network connection.
- * @property {string} statusText A message that will be used to generate an Error message,
- * if [`meta.error`]{@link MetaData.error} is `true`.
- * @property {MetaData} meta Additional information about the response.
- */
-
-/**
- * Processes a Request and returns a Promise resolving to a Response object.
- *
- * @async
- * @global
- * @callback Adapter
- * @param {Request} request The data operation request to fulfill.
- * @returns {Promise<Response>} A Promise resolved with a Response instance.
- */
-
-/**
  * Creates a new DataLayer instance that can retrieve data from
  * various sources.
  *
- * @function
  * @param {Proxy} proxy The Proxy to use to construct requests.
  * @param {Adapter} adapter The default adapter to use for requests.
  * @returns {DataLayer} A DataLayer that can be used to retrieve
@@ -394,58 +293,21 @@ function getErrorMessage(response) {
  *   fetch: pipeline
  * }
  */
-export function createDataLayer(proxy, defaultAdapter, adapters = new Map()) {
+export function createDataLayer(proxy, adapter, adapters = new Map()) {
 
     if (!conformsTo(proxy, PROXY_SCHEMA))
         throw error('A proxy must be passed to createDataLayer.', fatal());
 
-    /**
-     * Converts a {@link Request} into a {@link Response} by running the
-     * request through an appropriate {@link Adapter}.
-     *
-     * @async
-     * @function DataLayer#fetch
-     * @param {Request} request The Request to pass to an {@link Adapter}
-     * and convert into a {@link Response}.
-     * @returns {Promise.<Response>} Information about the data operation.
-     * @throws Adapter not found.
-     * @throws Invalid request passed to fetch.
-     * @throws (if the Response.status is not 2xx)
-     * @example
-     * import { createDataLayer } from '@paychex/core/data';
-     * import xhr from '@paychex/adapter-xhr';
-     * import tracker from '~/path/to/tracker';
-     * import proxy from '~/path/to/proxy';
-     *
-     * // NOTE: you will probably already have access to
-     * // a datalayer and not need to create one yourself
-     * const { fetch, createRequest } = createDataLayer(proxy, xhr);
-     *
-     * const request = createRequest({
-     *   base: 'my-app',
-     *   path: '/live',
-     * });
-     *
-     * fetch(request)
-     *   .then(response => {
-     *     tracker.event('app is live', {
-     *       status: response.status,
-     *       message: response.statusText,
-     *       moreInfo: response.data,
-     *     });
-     *   })
-     *   .catch(tracker.error);
-     */
     async function fetch(request) {
 
         if (!conformsTo(request, REQUEST_SCHEMA))
             throw error('Invalid request passed to fetch.', fatal());
 
-        const adapter = adapters.get(request.adapter);
-        if (!isFunction(adapter))
+        const requestedAdapter = adapters.get(request.adapter);
+        if (!isFunction(requestedAdapter))
             throw error('Adapter not found.', fatal({ adapter: request.adapter }));
 
-        const response = await adapter(request);
+        const response = await requestedAdapter(request);
         if (isErrorResponse(response))
             throw error(getErrorMessage(response), { response });
 
@@ -453,63 +315,6 @@ export function createDataLayer(proxy, defaultAdapter, adapters = new Map()) {
 
     }
 
-    /**
-     * Converts a {@link DataDefinition} object into a {@link Request} object that can be
-     * passed to {@link DataLayer#fetch fetch}. The {@link Proxy} passed to
-     * {@link module:data.createDataLayer createDataLayer} will be used to fill out the
-     * Request using any configured {@link ProxyRule ProxyRules}.
-     *
-     * Keeping your data definition objects separate from request objects enables us to
-     * construct dynamic requests based on Proxy data at runtime. This means we can change
-     * the endpoints and protocols using configuration data rather than code.
-     *
-     * @function DataLayer#createRequest
-     * @param {DataDefinition} definition The DataDefinition to convert into a Request using ProxyRules.
-     * @param {object} [params={}] Optional parameters used to tokenize the URL or to append to the QueryString.
-     * @param {*} [body=null] Optional data to send with the request.
-     * @returns {Request} A fully formed Request that can be passed to {@link DataLayer#fetch fetch}.
-     * @throws A valid DataDefinition object must be passed to createRequest.
-     * @example
-     * // save modified user data using a PATCH
-     *
-     * import { createPatch } from 'some/json-patch/library';
-     * import { rethrow, fatal } from '@paychex/core/errors';
-     * import { createRequest, fetch } from '~/path/to/datalayer';
-     *
-     * const operation = {
-     *   base: 'my-app',
-     *   method: 'PATCH',
-     *   path: '/users/:id'
-     * };
-     *
-     * export async function saveUserData(id, modified, original) {
-     *   const params = { id };
-     *   const body = createPatch(original, modified);
-     *   const request = createRequest(operation, params, body);
-     *   const response = await fetch(request).catch(rethrow(fatal(params)));
-     *   return response.data;
-     * }
-     * @example
-     * // load data using the current domain and protocol
-     *
-     * import { rethrow } from '@paychex/core/errors';
-     * import { createRequest, fetch } from '~/path/to/datalayer';
-     *
-     * const operation = {
-     *   method: 'GET',
-     *   // by not specifying a `base` value the resulting
-     *   // URL will be relative to the current domain and
-     *   // protocol
-     *   path: '/users/:id'
-     * };
-     *
-     * export async function loadUserData(id) {
-     *   const params = { id };
-     *   const request = createRequest(operation, params);
-     *   const response = await fetch(request).catch(rethrow(params));
-     *   return response.data;
-     * }
-     */
     function createRequest(definition, params = {}, body = null) {
 
         if (!conformsTo(definition, DDO_SCHEMA))
@@ -534,72 +339,11 @@ export function createDataLayer(proxy, defaultAdapter, adapters = new Map()) {
 
     }
 
-    /**
-     * Registers an {@link Adapter} with the given name. The {@link DataLayer#fetch fetch}
-     * method will match the `'adapter'` value on the {@link Request} it is given with
-     * any Adapters registered here.
-     *
-     * **NOTE:** The default adapter for a Request is the adapter used to construct the
-     * data layer, which is always registered as `'default'`.
-     *
-     * @function DataLayer#setAdapter
-     * @param {string} name The name of the Adapter to register.
-     * @param {Adapter} adapter The Adapter to register.
-     * @example
-     * // create a custom Adapter that uses the
-     * // popular Axios library to make data calls
-     * // https://github.com/axios/axios
-     *
-     * import axios from 'axios';
-     * import cloneDeep from 'lodash/cloneDeep';
-     * import { setAdapter, createRequest, fetch } from '~/path/to/datalayer';
-     *
-     * const http = axios.create({
-     *   withCredentials: true,
-     *   headers: { accept: 'application/json' }
-     * });
-     *
-     * // construct and return a Response object
-     * // using the values provided by Axios
-     * function createResponseFromSuccess(axiosResponse) { ... }
-     * function createResponseFromFailure(axiosError) { ... }
-     *
-     * setAdapter('axios', function useAxios(request) {
-     *   // convert the Request into a config
-     *   // that Axios understands -- e.g. axios
-     *   // uses request.data instead of request.body
-     *   const config = cloneDeep(request);
-     *   config.data = request.body;
-     *   return axios(config)
-     *     // always resolve with a Response,
-     *     // regardless of any errors:
-     *     .then(createResponseFromSuccess)
-     *     .catch(createResponseFromFailure);
-     * });
-     *
-     * // usage:
-     * const definition = {
-     *   base: 'my-app',
-     *   path: '/path/to/data',
-     *   adapter: 'axios', // <-- use our custom adapter
-     *   method: 'POST',
-     * };
-     *
-     * export async function saveData(data) {
-     *   // our code looks the same regardless of which adapter
-     *   // is used to make the data call; the adapter could even
-     *   // be changed dynamically by the rules in our Proxy
-     *   const request = createRequest(definition, null, data);
-     *   const response = await fetch(request);
-     *   return response.meta.headers['e-tag'];
-     * }
-     *
-     */
-    function setAdapter(name, adapter) {
-        adapters.set(name, adapter);
+    function setAdapter(name, instance) {
+        adapters.set(name, instance);
     }
 
-    setAdapter('default', defaultAdapter);
+    setAdapter('default', adapter);
 
     return {
         fetch,

@@ -7,32 +7,20 @@ import conforms from 'lodash/conforms.js';
 import stubTrue from 'lodash/stubTrue.js';
 import cond from 'lodash/cond.js';
 
+import {
+    Cache,
+    Store,
+    EncryptionConfiguration,
+} from '../types/stores.js';
+
+class Unused extends Cache {}
+class UnusedStore extends Store {}
+class Configuration extends EncryptionConfiguration {}
+
 /**
  * Contains utility methods for working with Stores.
  *
  * @module stores/utils
- */
-
-/**
- * @global
- * @typedef {Object} EncryptionConfiguration
- * @property {string} key The private key to use to encrypt
- * values in the store. The same key will need to be provided
- * on subsequent encrypted store instantiations, so a value
- * that is unique to the user (and unguessable by other users)
- * is recommended. Any string of any length can be used.
- * @property {string} iv The initialization vector to use when
- * encrypting. Must be at least 7 characters long. The same value
- * should be provided on subsequent store instantiations, so a
- * value that is unique to the user (such as a GUID) is recommended.
- * @example
- * import { memoryStore } from '@paychex/core/stores';
- * import { withEncryption } from '@paychex/core/stores/utils';
- *
- * const iv = window.crypto.getRandomBytes(new UintArray(16));
- * const key = window.crypto.getRandomBytes(new UintArray(8));
- *
- * export const lockbox = withEncryption(memoryStore(), { key, iv });
  */
 
 /**
@@ -107,18 +95,18 @@ export function withEncryption(store, { key, iv }) {
 
     return {
 
-        async get(key) {
-            const cleartext = data => decrypt(data, key);
-            return await store.get(key).then(cleartext);
+        async get(item) {
+            const cleartext = data => decrypt(data, item);
+            return await store.get(item).then(cleartext);
         },
 
-        async set(key, value) {
-            const setInStore = data => store.set(key, data);
-            return await encrypt(value, key).then(setInStore);
+        async set(item, value) {
+            const setInStore = data => store.set(item, data);
+            return await encrypt(value, item).then(setInStore);
         },
 
-        async delete(key) {
-            return await store.delete(key);
+        async delete(item) {
+            return await store.delete(item);
         }
 
     };

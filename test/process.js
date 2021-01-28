@@ -172,15 +172,15 @@ describe('process', () => {
 
         it('promise has expected methods', () => {
             const promise = factory()();
-            ['update', 'cancel', 'stop'].forEach(method =>
-                expect(typeof promise[method]).toBe('function'));
+            ['update', 'cancel', 'stop'].forEach(name =>
+                expect(typeof promise[name]).toBe('function'));
         });
 
         it('context has expected methods', () => {
             a.execute = spy();
             return factory()().then(() =>
-                expect(['cancel', 'update', 'stop'].every(method =>
-                    expect(typeof a.execute.context[method]).toBe('function'))));
+                expect(['cancel', 'update', 'stop'].every(name =>
+                    expect(typeof a.execute.context[name]).toBe('function'))));
         });
 
         it('context includes action instance members', () => {

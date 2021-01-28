@@ -129,14 +129,14 @@ describe('stores', () => {
         });
 
         it('returns store interface', () => {
-            const wrapper = withEncryption(store, {});
+            wrapper = withEncryption(store, {});
             const methods = Object.keys(store);
             const isMethod = method => typeof wrapper[method] === 'function';
             expect(methods.every(isMethod)).toBe(true);
         });
 
         it('defers to store.delete', async () => {
-            const wrapper = withEncryption(store, {});
+            wrapper = withEncryption(store, {});
             await wrapper.delete('key');
             expect(store.delete.called).toBe(true);
             expect(store.delete.args).toEqual(['key']);

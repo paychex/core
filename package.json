@@ -1,6 +1,6 @@
 {
   "name": "@paychex/core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Provides framework-agnostic functionality for use in applications.",
   "main": "index.js",
   "license": "Apache-2.0",
@@ -32,7 +32,7 @@
   },
   "scripts": {
     "test": "mocha --recursive",
-    "coverage": "c8 --reporter=lcov mocha --recursive",
+    "coverage": "c8 --exclude=types --exclude=test --reporter=lcov mocha --recursive",
     "docs": "jsdoc -c jsdoc.json"
   },
   "dependencies": {
