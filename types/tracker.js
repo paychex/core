@@ -289,7 +289,7 @@ export class Tracker {
     *   tracker.context({ app, drawer });
     * });
     */
-    context() { }
+    context(data) { }
 
     /**
      * Logs an event. Events usually represent important points in an application's
@@ -298,7 +298,7 @@ export class Tracker {
      * **NOTE:** This method also creates a [browser performance mark]{@link https://developer.mozilla.org/en-US/docs/Web/API/PerformanceMark} with the given message name.
      *
      * @method Tracker#event
-     * @param {string} message The name of the event to log.
+     * @param {string} label The name of the event to log.
      * @param {Object.<string, any>} [data] Optional information to associate with this {@link TrackingInfo}.
      * @example
      * import { tracker } from '~/tracking';
@@ -315,7 +315,7 @@ export class Tracker {
      *   }
      * });
      */
-    event() { }
+    event(label, data) { }
 
     /**
     * Logs an [Error]{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error}.
@@ -332,7 +332,7 @@ export class Tracker {
     *     .catch(tracker.error);
     * }
     */
-    error() { }
+    error(err) { }
 
     /**
     * Starts a timer to measure performance.
@@ -350,7 +350,7 @@ export class Tracker {
     *   return results;
     * }
     */
-    start() { }
+    start(label) { }
 
 }
 
@@ -582,6 +582,6 @@ export class NestedTimingTracker extends Tracker {
      *   return results;
      * }
      */
-    start() { }
+    start(label) { }
 
 }
