@@ -542,7 +542,7 @@ class ProxyRule extends Request {
  * @global
  * @hideconstructor
  */
-export class Proxy {
+export class DataProxy {
 
     /**
      * Uses the current proxy rules to construct a URL based on the given arguments.

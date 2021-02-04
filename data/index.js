@@ -9,7 +9,7 @@ import { tokenize } from './utils.js';
 import { error, fatal } from '../errors/index.js';
 
 import {
-    Proxy,
+    DataProxy,
     Adapter,
     DataLayer,
 } from '../types/data.js';
@@ -17,7 +17,7 @@ import {
 export { createProxy } from './proxy.js';
 
 Adapter();
-class UnusedProxy extends Proxy {}
+class UnusedProxy extends DataProxy {}
 class UnusedDataLayer extends DataLayer {}
 
 /**

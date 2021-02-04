@@ -8,9 +8,9 @@ import constant from 'lodash/constant.js';
 import stubTrue from 'lodash/stubTrue.js';
 import mergeWith from 'lodash/mergeWith.js';
 
-import { Proxy } from '../types/data.js';
+import { DataProxy } from '../types/data.js';
 
-class Unused extends Proxy {}
+class Unused extends DataProxy {}
 
 const DOUBLE_SLASH = /\/\//g;
 const LEADING_SLASHES = /^\/+/;
@@ -69,7 +69,7 @@ const format = {
 * Creates a new proxy instance.
 *
 * @function module:data.createProxy
-* @returns {Proxy}
+* @returns {DataProxy}
 * @example
 * import {createProxy} from '@paychex/data'
 * import rules from '~/config/proxy'
