@@ -491,7 +491,7 @@ export class DataLayer {
  * @hideconstructor
  * @extends Request
  */
-class ProxyRule extends Request {
+export class ProxyRule extends Request {
 
     /**
      * 'http', 'https', 'file', etc.
