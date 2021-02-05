@@ -88,10 +88,11 @@ export function createProxy() {
                 port: 80,
                 protocol: '',
                 base: args.shift(),
-                path: args.join('/')
-                    .replace(DOUBLE_SLASH, '/')
-                    .replace(LEADING_SLASHES, ''),
+                path: args.join('/'),
             };
+            request.path = request.path
+                .replace(DOUBLE_SLASH, '/')
+                .replace(LEADING_SLASHES, '');
             const { protocol = '', host = request.base, port = 80 } = config
                 .filter(ruleMatches, request)
                 .reduce(merge, request);
