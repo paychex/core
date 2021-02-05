@@ -333,7 +333,7 @@ export function createDataLayer(proxy, adapter, adapters = new Map()) {
 
         proxy.apply(request);
 
-        request.url = tokenize(proxy.url(request.base, request.path), params);
+        request.url = tokenize(proxy.url(request), params);
 
         return Object.freeze(request);
 

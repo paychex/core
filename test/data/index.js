@@ -116,6 +116,15 @@ describe('data', () => {
                 expect(proxy.url('', 'some/path')).toBe('/some/path');
             });
 
+            it('passes through request properties', () => {
+                expect(proxy.url({
+                    port: 9000,
+                    path: 'path',
+                    protocol: 'https',
+                    base: 'www.test.com',
+                })).toBe('https://www.test.com:9000/path');
+            });
+
         });
 
         describe('apply', () => {
@@ -445,7 +454,7 @@ describe('data', () => {
                 proxy.apply.returns(definition);
                 dataLayer.createRequest(definition);
                 expect(proxy.url.called).toBe(true);
-                expect(proxy.url.args).toEqual(['base', 'path']);
+                expect(proxy.url.args[0]).toMatchObject(expect.objectContaining(definition));
             });
 
             it('tokenizes url params', () => {

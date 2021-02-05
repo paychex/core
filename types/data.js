@@ -547,10 +547,18 @@ export class DataProxy {
     /**
      * Uses the current proxy rules to construct a URL based on the given arguments.
      *
-     * @param {string} base A base value, e.g. 'cdn' or 'myapp'.
-     * @param {...string} paths One or more URL paths to combine into the final URL.
+     * @param {string|Request} base Either a Request instance, or a base value, e.g. 'cdn' or 'myapp'.
+     * @param {...string} [paths] If a `string` base value is provided, one or more URL paths to combine into the final URL.
      * @returns {string} A URL with the appropriate protocol, host, port, and paths
      * given the currently configured proxy rules.
+     * @example
+     * const url = proxy.url('cdn', 'images', 'logo.svg');
+     * @example
+     * const url = proxy.url({
+     *   base: 'cdn',
+     *   protocol: 'https',
+     *   path: '/some/path'
+     * });
      * @example
      * import { proxy } from '~/path/to/data';
      * import { tokenize } from '@paychex/core/data';
