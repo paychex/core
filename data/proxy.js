@@ -48,6 +48,7 @@ function withoutMatchObject(rule) {
 const equals = rhs => lhs => lhs === rhs;
 const suffix = after => value => `${value}${after}`;
 const prefix = before => value => `${before}${value}`;
+const clean = protocol => protocol.replace(/[^a-zA-Z]/g, '');
 
 const format = {
     protocol: cond([
@@ -97,7 +98,7 @@ export function createProxy() {
                 .filter(ruleMatches, request)
                 .reduce(merge, request);
             return [
-                host ? format.protocol(protocol) : '',
+                host ? format.protocol(clean(protocol)) : '',
                 host,
                 format.port(port),
                 format.path(request.path)
