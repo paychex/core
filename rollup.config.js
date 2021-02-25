@@ -35,10 +35,7 @@ module.exports = [
     },
     // ESM and CJS
     {
-        input: {
-            index: 'index.js',
-            types: 'types/index.js',
-        },
+        input: 'index.js',
         plugins: [
             nodeResolve(),
             commonjs({
@@ -57,6 +54,30 @@ module.exports = [
                 format: "cjs",
                 exports: "named",
                 sourcemap: true,
+            },
+        ],
+    },
+    // Types
+    {
+        input: 'types/index.js',
+        plugins: [
+            nodeResolve(),
+            commonjs({
+                include: /node_modules/,
+            })
+        ],
+        output: [
+            {
+                format: "esm",
+                exports: "named",
+                sourcemap: true,
+                file: 'dist/esm/types.mjs',
+            },
+            {
+                format: "cjs",
+                exports: "named",
+                sourcemap: true,
+                file: 'dist/cjs/types.js',
             },
         ],
     },
