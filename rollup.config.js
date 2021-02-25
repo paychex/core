@@ -35,7 +35,10 @@ module.exports = [
     },
     // ESM and CJS
     {
-        input: 'index.js',
+        input: {
+            index: 'index.js',
+            types: 'types/index.js',
+        },
         plugins: [
             nodeResolve(),
             commonjs({
