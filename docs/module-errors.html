@@ -898,7 +898,7 @@ indicating an Error that was expected and can be safely ignored.</p>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>import { isNil } from 'lodash-es';const { error, ignore, rethrow } = errors;const cache = stores.sessionStore();export async function cacheResults(key, data) {  if (isNil(key))    throw error('Argument key not provided.', ignore());  return await cache.set(key, data)    .catch(rethrow(ignore({ key })));}</code></pre>
+    <pre class="prettyprint"><code>import { isNil } from 'lodash-es';const { error, ignore, rethrow } = errors;const cache = stores.memoryStore();export async function cacheResults(key, data) {  if (isNil(key))    throw error('Argument key not provided.', ignore());  return await cache.set(key, data)    .catch(rethrow(ignore({ key })));}</code></pre>
 
 
 
