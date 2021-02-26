@@ -241,7 +241,7 @@ export function fatal(data = {}) {
  * import { isNil } from 'lodash-es';
  *
  * const { error, ignore, rethrow } = errors;
- * const cache = stores.sessionStore();
+ * const cache = stores.memoryStore();
  *
  * export async function cacheResults(key, data) {
  *   if (isNil(key))

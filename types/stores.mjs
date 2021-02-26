@@ -34,9 +34,7 @@ export class EncryptionConfiguration {
 }
 
 /**
- * Provides asynchronous storage on the client's machine.
- * Stores are created indirectly through methods such as
- * {@link module:stores.indexedDB} and {@link module:stores.sessionStore}.
+ * Provides asynchronous data storage.
  *
  * @class
  * @global
@@ -45,7 +43,7 @@ export class EncryptionConfiguration {
 export class Store {
 
     /**
-     * Retrieves data stored on the client's machine.
+     * Retrieves data from the Store.
      *
      * @async
      * @function Store#get
@@ -71,7 +69,7 @@ export class Store {
     get() { }
 
     /**
-     * Stores data on the client's machine.
+     * Puts data into the Store.
      *
      * @async
      * @function Store#set
@@ -92,7 +90,7 @@ export class Store {
     set() { }
 
     /**
-     * Removes an item from storage.
+     * Removes an item from the Store.
      *
      * @async
      * @function Store#delete

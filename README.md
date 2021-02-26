@@ -7,7 +7,7 @@ Provides framework-agnostic functionality for use in applications.
 To install the necessary dependencies:
 
 ```bash
-npm run install
+npm install
 ```
 
 To generate documentation files:
