@@ -36,6 +36,7 @@ module.exports = [
     // ESM and CJS
     {
         input: 'index.js',
+        external: ['lodash-es'],
         plugins: [
             nodeResolve(),
             commonjs({
