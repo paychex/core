@@ -2,14 +2,15 @@ const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
 const polyfills = require('rollup-plugin-node-polyfills');
 const commonjs = require('@rollup/plugin-commonjs');
-const replace = require('@rollup/plugin-replace');
 const { babel } = require("@rollup/plugin-babel");
 
 const pkg = require('./package.json');
+const external = ['lodash-es'];
 
 module.exports = [
     {
         // UMD
+        external,
         input: 'index.js',
         plugins: [
             nodeResolve({
@@ -32,12 +33,18 @@ module.exports = [
             esModule: false,
             exports: "named",
             sourcemap: true,
+            globals: {
+                'lodash-es': 'lodash',
+            },
+            paths: {
+                'lodash-es': 'lodash',
+            }
         },
     },
     // ESM
     {
         input: 'index.js',
-        external: ['lodash-es'],
+        external,
         plugins: [
             nodeResolve(),
             commonjs({
@@ -54,12 +61,8 @@ module.exports = [
     // CJS
     {
         input: 'index.js',
-        external: ['lodash'],
+        external,
         plugins: [
-            replace({
-                'lodash-es': 'lodash',
-                preventAssignment: true,
-            }),
             nodeResolve(),
             commonjs({
                 include: /node_modules/,
@@ -70,6 +73,9 @@ module.exports = [
             format: "cjs",
             exports: "named",
             sourcemap: true,
+            paths: {
+                'lodash-es': 'lodash'
+            }
         },
     },
     // Types
