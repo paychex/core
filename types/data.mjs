@@ -74,6 +74,7 @@ export class DataDefinition {
      * domain name for the resulting {@link Request} URL. If an empty string is provided then a relative
      * URL (one without a protocol or domain name) will be created using the existing domain name and protocol.
      *
+     * @type {string}
      * @memberof DataDefinition#
      */
     base = ''
@@ -81,6 +82,7 @@ export class DataDefinition {
     /**
      * Combined with the base path (if provided) to construct an absolute or relative URL.
      *
+     * @type {string}
      * @memberof DataDefinition#
      */
     path = ''
@@ -88,6 +90,7 @@ export class DataDefinition {
     /**
      * The adapter to use to complete the request.
      *
+     * @type {string}
      * @memberof DataDefinition#
      */
     adapter = 'default'
@@ -95,6 +98,7 @@ export class DataDefinition {
     /**
      * The HTTP headers to use on the request.
      *
+     * @type {Object.<string,string|string[]>}
      * @memberof DataDefinition#
      */
     headers = { accept: 'application/json, text/plain, */*' }
@@ -102,6 +106,7 @@ export class DataDefinition {
     /**
      * Can be used to skip certain behaviors. See documentation for details.
      *
+     * @type {Object.<string,boolean>}
      * @memberof DataDefinition#
      */
     ignore = {}
@@ -109,6 +114,7 @@ export class DataDefinition {
     /**
      * The HTTP verb to use.
      *
+     * @type {string}
      * @memberof DataDefinition#
      */
     method = 'GET'
@@ -118,6 +124,7 @@ export class DataDefinition {
      * `'text'`, `'json'`, `'arraybuffer'`, `'blob'` or `'document'`. See {@link https://xhr.spec.whatwg.org/#response-body the XHR spec}
      * for more information. Setting this will change the {@link Response Response.data} type.
      *
+     * @type {string}
      * @memberof DataDefinition#
      */
     responseType = ''
@@ -125,6 +132,7 @@ export class DataDefinition {
     /**
      * The number of milliseconds to wait before aborting the data call.
      *
+     * @type {number}
      * @memberof DataDefinition#
      */
     timeout = 0
@@ -132,6 +140,7 @@ export class DataDefinition {
     /**
      * Whether to send Cookies with the request.
      *
+     * @type {boolean}
      * @memberof DataDefinition#
      */
     withCredentials = false
@@ -161,6 +170,7 @@ export class Request extends DataDefinition {
      * {@link ProxyRule ProxyRules} that match the given Request properties as well as any optional
      * parameters passed to {@link DataLayer#createRequest createRequest()}.
      *
+     * @type {string}
      * @memberof Request#
      */
     url = ''
@@ -168,6 +178,7 @@ export class Request extends DataDefinition {
     /**
      * An optional payload to send to the URL, set when calling {@link DataLayer#createRequest createRequest()}.
      *
+     * @type {*}
      * @memberof Request#
      */
     body = null
@@ -190,6 +201,7 @@ export class Message {
      * A unique code to identify this message. May be used during
      * translation to present recovery information to the end user.
      *
+     * @type {string}
      * @memberof Message#
      */
     code = ''
@@ -197,6 +209,7 @@ export class Message {
     /**
      * The message severity. Possible values are ERROR, FATAL, and NONE.
      *
+     * @type {string}
      * @memberof Message
      */
     severity = 'NONE'
@@ -205,6 +218,7 @@ export class Message {
      * Any additional information the server believes may be useful
      * when triaging the error later.
      *
+     * @type {Array.<*>}
      * @memberof Message#
      */
     data = []
@@ -223,6 +237,7 @@ export class MetaData {
     /**
      * Whether the response should be considered a failure.
      *
+     * @type {boolean}
      * @memberof MetaData#
      */
     error = false
@@ -230,6 +245,7 @@ export class MetaData {
     /**
      * Whether the response contains cached data.
      *
+     * @type {boolean}
      * @memberof MetaData#
      */
     cached = false
@@ -238,6 +254,7 @@ export class MetaData {
      * Whether the response timed out. When this is true,
      * [Response.status]{@link Response} should be 0 and `meta.error` should be true.
      *
+     * @type {boolean}
      * @memberof MetaData#
      */
     timeout = false
@@ -290,6 +307,7 @@ export class Response {
     * request and may prompt network diagnostics or a dialog prompting the user to restore their
     * network connection.
      *
+     * @type {number}
      * @memberof Response#
      */
     status = 0
@@ -298,6 +316,7 @@ export class Response {
      * A message that will be used to generate an Error message,
      * if [`meta.error`]{@link MetaData#error} is `true`.
      *
+     * @type {string}
      * @memberof Response#
      */
     statusText = ''
@@ -765,6 +784,7 @@ export class XSRFOptions {
      * The name of the cookie sent by the server
      * that has the user's XSRF token value.
      *
+     * @type {string}
      * @memberof XSRFOptions#
      */
     cookie = 'XSRF-TOKEN'
@@ -772,6 +792,7 @@ export class XSRFOptions {
     /**
      * The name of the request header to set. The server should ensure this value matches the user's expected XSRF token.
      *
+     * @type {string}
      * @memberof XSRFOptions#
      */
     header = 'x-xsrf-token'

@@ -102,11 +102,21 @@ const DEFAULTS = {
 const IGNORE_KEYS = ['started', 'completed', ...keys(DEFAULTS)];
 
 /**
+ * Method that takes no arguments and can return any type. If it returns a Promise,
+ * the resolved value will be returned instead.
+ *
+ * @async
+ * @callback AsyncVoidFunction
+ * @returns {*} Any type, or a Promise that resolves to any type.
+ */
+function AsyncVoidFunction() {}
+
+/**
  * Creates a fully realized {@link Action} for use within a {@link module:process.process process}.
  *
  * @function
  * @param {string} name The name of the process action.
- * @param {Action#execute|Action} api The execute method or partial {@link Action} to fill out.
+ * @param {AsyncVoidFunction|Action} api The execute method or partial {@link Action} to fill out.
  * @returns {Action}
  * @example
  * async function loadData() {

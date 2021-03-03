@@ -7,6 +7,7 @@
  *
  * @class
  * @global
+ * @extends ProcessRunner
  * @hideconstructor
  * @example
  * import { start } from '../path/to/machine';
@@ -29,37 +30,7 @@
  * // of course, we can also chain off the execution promise:
  * execution.then(console.log, console.error);
  */
-export class ExecutionPromise extends Promise {
-
-    /**
-     * Invoked to update the set of conditions used within the running {@link module:process.process process}.
-     *
-     * **NOTE:** This method updates the conditions used by the {@link ProcessLogic}
-     * returned by {@link module:process.dependencies dependencies}.
-     *
-     * @type {ProcessContext#update}
-     * @param {Object.<string, any>} [conditions={}] The conditions to merge into the process' internal set of conditions.
-     * @memberof ExecutionPromise#
-     */
-    update(conditions) {}
-
-    /**
-     * Invoked to stop the running {@link module:process.process process}, immediately rejecting the promise. No further actions will be run.
-     *
-     * @type {ProcessContext#cancel}
-     * @memberof ExecutionPromise#
-     */
-    cancel() {}
-
-    /**
-     * Invoked to stop the running {@link module:process.process process}, immediately resolving the promise. No further actions will be run.
-     *
-     * @type {ProcessContext#stop}
-     * @memberof ExecutionPromise#
-     */
-    stop() {}
-
-}
+export class ExecutionPromise extends ProcessRunner {}
 
 /**
  * @class
@@ -103,6 +74,7 @@ class ProcessTransition extends Array {
     /**
      * The step that just completed.
      *
+     * @type {string}
      * @memberof ProcessTransition#
      */
     [0] = ''
@@ -110,6 +82,7 @@ class ProcessTransition extends Array {
     /**
      * The step that should be started next.
      *
+     * @type {string}
      * @memberof ProcessTransition#
      */
     [1] = ''
@@ -171,19 +144,53 @@ class ProcessTransition extends Array {
 export class ProcessTransitions extends Array {}
 
 /**
+ * @class
+ * @global
+ * @extends Promise
+ * @hideconstructor
+ */
+export class ProcessRunner extends Promise {
+
+    /**
+     * Invoked to stop the running {@link module:process.process process}, immediately rejecting the promise. No further actions will be run.
+     *
+     * @param {object} [data={}] Optional data to merge into the Error the promise will be rejected with.
+     */
+    cancel(data) { }
+
+    /**
+     * Invoked to stop the running {@link module:process.process process}, immediately resolving the promise. No further actions will be run.
+     */
+    stop() { }
+
+    /**
+     * Invoked to update the set of conditions used within the running {@link module:process.process process}.
+     *
+     * **NOTE:** This method updates the conditions used by the {@link ProcessLogic}
+     * returned by {@link module:process.dependencies dependencies}.
+     *
+     * @param {Object.<string, any>} [conditions={}] The conditions to merge into the process' internal set of conditions.
+     */
+    update(conditions) { }
+
+}
+
+/**
  * Contains information about the running {@link module:process.process process}.
  * In addition to the members listed here, the object returned by {@link ProcessLogic}'s
  * {@link ProcessLogic#contextFromArgs contextFromArgs} will be mixed in.
  *
  * @class
  * @global
+ * @extends ProcessRunner
  * @hideconstructor
  */
-export class ProcessContext {
+export class ProcessContext extends ProcessRunner {
 
     /**
      * The arguments passed to {@link ProcessStart}.
      *
+     * @type {Array.<*>}
      * @memberof ProcessContext#
      */
     args = []
@@ -192,6 +199,7 @@ export class ProcessContext {
      * Any values passed to {@link ExecutionUpdate update} or
      * provided as the 2nd argument to the {@link module:process.transitions transitions} {@link ProcessContext}.
      *
+     * @type {Object.<string,any>}
      * @memberof ProcessContext#
      */
     conditions = {}
@@ -199,6 +207,7 @@ export class ProcessContext {
     /**
      * A key-value map of the values returned by each {@link Action#execute execute} method.
      *
+     * @type {Object.<string,any>}
      * @memberof ProcessContext#
      */
     results = {}
@@ -218,32 +227,6 @@ export class ProcessContext {
      * @type {string[]}
      */
     completed = []
-
-    /**
-     * Invoked to stop the running {@link module:process.process process}, immediately rejecting the promise. No further actions will be run.
-     *
-     * @method ProcessContext#cancel
-     * @param {object} [data={}] Optional data to merge into the Error the promise will be rejected with.
-     */
-    cancel(data) {}
-
-    /**
-     * Invoked to stop the running {@link module:process.process process}, immediately resolving the promise. No further actions will be run.
-     *
-     * @method ProcessContext#stop
-     */
-    stop() {}
-
-    /**
-     * Invoked to update the set of conditions used within the running {@link module:process.process process}.
-     *
-     * **NOTE:** This method updates the conditions used by the {@link ProcessLogic}
-     * returned by {@link module:process.dependencies dependencies}.
-     *
-     * @method ProcessContext#update
-     * @param {Object.<string, any>} [conditions={}] The conditions to merge into the process' internal set of conditions.
-     */
-    update(conditions) {}
 
 }
 

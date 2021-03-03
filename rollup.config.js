@@ -45,6 +45,7 @@ module.exports = [
     {
         input: 'index.js',
         external,
+        treeshake: false,
         plugins: [
             nodeResolve(),
             commonjs({
@@ -61,6 +62,7 @@ module.exports = [
     // CJS
     {
         input: 'index.js',
+        treeshake: false,
         external,
         plugins: [
             nodeResolve(),

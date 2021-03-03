@@ -84,6 +84,7 @@ export class SpyCall {
     /**
      * The arguments passed to this invocation of the spy.
      *
+     * @type {Array<*>}
      * @memberof SpyCall#
      */
     args = []
@@ -91,6 +92,7 @@ export class SpyCall {
     /**
      * The `this` context used for this invocation of the spy.
      *
+     * @type {*}
      * @memberof SpyCall#
      */
     context = null
@@ -98,6 +100,7 @@ export class SpyCall {
     /**
      * When the spy was invoked.
      *
+     * @type {Date}
      * @memberof SpyCall#
      */
     callTime = new Date()
@@ -164,6 +167,7 @@ export class Spy extends SpyBehaviors {
     /**
      * The number of times the spy was invoked.
      *
+     * @type {number}
      * @memberof Spy#
      */
     callCount = 0
@@ -171,6 +175,7 @@ export class Spy extends SpyBehaviors {
     /**
      * `true` if the spy was invoked.
      *
+     * @type {boolean}
      * @memberof Spy#
      */
     called = false

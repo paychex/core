@@ -17,6 +17,7 @@ export class EncryptionConfiguration {
      * that is unique to the user (and unguessable by other users)
      * is recommended. Any string of any length can be used.
      *
+     * @type {string}
      * @memberof EncryptionConfiguration
      */
     key = ''
@@ -27,6 +28,7 @@ export class EncryptionConfiguration {
      * should be provided on subsequent store instantiations, so a
      * value that is unique to the user (such as a GUID) is recommended.
      *
+     * @type {string}
      * @memberof EncryptionConfiguration
      */
     iv = ''

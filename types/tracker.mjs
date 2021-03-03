@@ -12,6 +12,7 @@ export class TrackingInfo {
     /**
      * A random [RFC 4122 UUID]{@link https://tools.ietf.org/html/rfc4122#section-4.4}.
      *
+     * @type {string}
      * @memberof TrackingInfo#
      */
     id = ''
@@ -19,6 +20,7 @@ export class TrackingInfo {
     /**
      * The type of tracking information provided in this object. Either `'event'`, `'timer'`, or `'error'`.
      *
+     * @type {string}
      * @memberof TrackingInfo#
      */
     type = ''
@@ -26,6 +28,7 @@ export class TrackingInfo {
     /**
      * The description of this tracking entry.
      *
+     * @type {string}
      * @memberof TrackingInfo#
      */
     label = ''
@@ -33,6 +36,7 @@ export class TrackingInfo {
     /**
      * The number of milliseconds between January 1, 1970 00:00:00 UTC and when this entry was created.
      *
+     * @type {number}
      * @memberof TrackingInfo#
      */
     start = 0
@@ -40,6 +44,7 @@ export class TrackingInfo {
     /**
      * The number of milliseconds between January 1, 1970 00:00:00 UTC and when this entry was ended.
      *
+     * @type {number}
      * @memberof TrackingInfo#
      */
     stop = 0
@@ -47,6 +52,7 @@ export class TrackingInfo {
     /**
      * The difference in milliseconds between start and stop.
      *
+     * @type {number}
      * @memberof TrackingInfo#
      */
     duration = 0
@@ -54,6 +60,7 @@ export class TrackingInfo {
     /**
      * The number of times this entry has been logged.
      *
+     * @type {number}
      * @memberof TrackingInfo#
      */
     count = 0
