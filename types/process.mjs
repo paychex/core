@@ -489,3 +489,44 @@ export class ProcessLogic {
     getContextFromArgs(args) { }
 
 }
+
+/**
+ * Method that takes no arguments and can return any type. If it returns a Promise,
+ * the resolved value will be returned instead.
+ *
+ * @async
+ * @callback AsyncVoidFunction
+ * @returns {*} Any type, or a Promise that resolves to any type.
+ */
+function AsyncVoidFunction() { }
+
+/**
+ * The method you invoke to begin an asynchronous process.
+ *
+ * @async
+ * @global
+ * @callback ProcessStart
+ * @param {...any} [args] The arguments to invoke the process with. Which
+ * arguments you pass will depend on the {@link ProcessLogic} instance
+ * you passed to {@link module:process.process process}.
+ * @returns {ExecutionPromise} A Promise that will be resolved or rejected
+ * based on the process' running {@link Action actions}. In addition to
+ * typical Promise methods, a few additional methods have been added to this
+ * instance to interact with the running process.
+ * @example
+ * const actions = [
+ *   process.action('a', () => console.log('a')),
+ *   process.action('b', () => console.log('b')),
+ *   process.action('c', () => console.log('c')),
+ * ];
+ *
+ * const deps = process.dependencies({ 'b': ['a', 'c'] });
+ * const trans = process.transitions([ ['a', 'c'], ['c', 'b']]);
+ *
+ * const dispatch = process.create('workflow', actions, deps);
+ * const start = process.create('state machine', actions, trans);
+ *
+ * const workflowPromise = dispatch('arg 1', 'arg 2');
+ * const machinePromise = start('a', { condition: 'value' });
+ */
+async function ProcessStart(...args) {}

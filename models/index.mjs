@@ -3,10 +3,6 @@ import { isEmpty } from 'lodash-es';
 import { mixin } from './shared.mjs';
 import * as events from '../events/index.mjs';
 
-import { ModelCollection } from '../types/models.mjs';
-
-class UnusedModelCollection extends ModelCollection {}
-
 export * as utils from './utils.mjs';
 
 /**

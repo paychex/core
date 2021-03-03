@@ -31,14 +31,6 @@ import {
 
 import { customizer } from './shared.mjs';
 
-import {
-    Tracker,
-    NestedTimingTracker,
-} from '../types/tracker.mjs';
-
-class UnusedTracker extends Tracker { }
-class UnusedNestedTimingTracker extends NestedTimingTracker { }
-
 function newInstanceOf(value) {
     return cloneDeep(Object.getPrototypeOf(value));
 }

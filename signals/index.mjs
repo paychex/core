@@ -1,17 +1,5 @@
 import { attempt, isEmpty } from 'lodash-es';
 
-import {
-    Semaphore,
-    AutoResetSignal,
-    CountdownSignal,
-    ManualResetSignal,
-} from '../types/signals.mjs';
-
-class UnusedSemaphore extends Semaphore {}
-class UnusedAuto extends AutoResetSignal {}
-class UnusedManual extends ManualResetSignal {}
-class UnusedCountdown extends CountdownSignal {}
-
 const readonly = (get) => ({ get, enumerable: true });
 
 /**

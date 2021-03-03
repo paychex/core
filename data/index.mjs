@@ -19,17 +19,7 @@ import {
 import { tokenize } from './utils.mjs';
 import { error, fatal } from '../errors/index.mjs';
 
-import {
-    Adapter,
-    DataLayer,
-    DataProxy,
-} from '../types/data.mjs';
-
 export * as utils from './utils.mjs';
-
-Adapter();
-class UnusedProxy extends DataProxy {}
-class UnusedDataLayer extends DataLayer {}
 
 /**
  * A Promise is an object representing the eventual completion or failure of an asynchronous operation.

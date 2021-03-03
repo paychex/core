@@ -1,9 +1,6 @@
 import { isString } from 'lodash-es';
-import { Store } from '../types/stores.mjs';
 
 export * as utils from './utils.mjs';
-
-class Unused extends Store {}
 
 /**
  * Provides methods for storing information on the client's

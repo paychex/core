@@ -812,3 +812,71 @@ export class XSRFOptions {
     hosts = []
 
 }
+
+/**
+ * Determines whether a failed data operation should be
+ * retried. Returning a resolved promise means to retry
+ * the data operation. A rejected promise means not to
+ * retry the data operation.
+ *
+ * @global
+ * @async
+ * @callback RetryFunction
+ * @param {Request} request The Request object.
+ * @param {Response} response The Response object.
+ * @returns {Promise} Resolving the promise means to
+ * retry the data operation. Rejecting the promise means
+ * not to retry the data operation.
+ */
+async function RetryFunction(request, response) { }
+
+/**
+ * Invoked when a network connection is lost. Should resolve when the
+ * network connection is re-established. NOTE: This method may be called
+ * multiple times while the connection is down; its logic should handle
+ * this scenario (e.g. only showing a dialog to the user once per outage).
+ *
+ * @async
+ * @global
+ * @callback Reconnect
+ * @returns {Promise} A promise that will be resolved when the user's
+ * network connection is restored.
+ */
+async function Reconnect() { }
+
+/**
+ * Invoked when a 401 error is returned on a {@link Response}. Indicates that
+ * the user's authentication token is invalid and should be regenerated.
+ * Typically, a reauth function will add a {@link ProxyRule Proxy rule} to ensure
+ * the token is applied in the correct format (e.g. as an Authorize header) and on
+ * the correct {@link Request Requests} (e.g. Requests with a specific `base`).
+ * Another approach is to make a network call that returns an updated Set-Cookie
+ * response header so that future requests contain an updated JWT value.
+ *
+ * @async
+ * @global
+ * @callback Reauthenticate
+ * @returns {Promise} A promise that will be resolved when the user's
+ * authentication token has been retrieved and any corresponding Proxy
+ * rules have been applied.
+ */
+async function Reauthenticate() { }
+
+/**
+ * Invoked when a data call is aborted ({@link Response} status is 0) but the user
+ * has a connection to the Internet. NOTE: This method may be called multiple
+ * times; its logic should ensure it only runs diagnostics the desired number of
+ * times (e.g. once per failed domain). Also, this method is responsible for logging
+ * results (or for caching the results if a connection could not be established).
+ *
+ * @async
+ * @global
+ * @callback Diagnostics
+ * @param {Request} request The request that failed without receiving
+ * a response. The user still has a network connection, so we need to
+ * determine why the connection may have failed.
+ * @returns {Promise} A Promise resolved when the diagnostics suite has
+ * completed. NOTE: {@link module:data/utils.withDiagnostics withDiagnostics}
+ * will proceed without waiting for this promise to resolve.
+ */
+async function Diagnostics(request) { }

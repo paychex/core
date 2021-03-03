@@ -1,8 +1,5 @@
 import { rethrow } from '../errors/index.mjs';
 import { parallel } from '../functions/index.mjs';
-import { EventBus } from '../types/events.mjs';
-
-class UnusedEventBus extends EventBus {}
 
 /**
  * ```js

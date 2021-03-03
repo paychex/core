@@ -11,17 +11,9 @@ import {
     defaultsDeep,
 } from 'lodash-es';
 
-import {
-    Tracker,
-    TrackingInfo,
-} from '../types/tracker.mjs';
-
 import { customizer } from './shared.mjs';
 
 export * as utils from './utils.mjs';
-
-class UnusedTracker extends Tracker {}
-class UnusedTrackingInfo extends TrackingInfo {}
 
 /**
  * Provides event, error, and performance logging for applications.
@@ -70,30 +62,6 @@ function tryMark(label) {
 function tryMeasure(label, start) {
     invoke(globalThis, 'performance.measure', label, start);
 }
-
-/**
- * Invoked each time a {@link Tracker} (or child Tracker) method produces
- * a new {@link TrackingInfo} instance.
- *
- * @global
- * @callback TrackingSubscriber
- * @param {TrackingInfo} info
- * @example
- * const tracker = trackers.create((info) => {
- *   console.log(JSON.stringify(info));
- * });
- * @example
- * // delegating tracking entries to a Redux store
- *
- * import { store } from '~/path/to/actions';
- *
- * const tracker = trackers.create((info) => {
- *   store.dispatch({
- *     type: `track:${info.type}`,
- *     payload: info
- *   });
- * });
- */
 
 /**
  * Creates a new {@link Tracker} instance. The specified subscriber will

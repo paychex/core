@@ -194,3 +194,36 @@ export class Cache {
     set() { }
 
 }
+
+/**
+ * Method used to modify a key for use in a Store. Used primarily by
+ * {@link module:stores/utils.withPrefix withPrefix}.
+ *
+ * @global
+ * @callback Prefixer
+ * @param {string} key The key to modify before passing to a Store.
+ * @returns {string} The modified key to use in a Store.
+ * @example
+ * import { user } from '../data/user';
+ *
+ * const store = stores.utils.withPrefix(stores.localStore(), function(key) {
+ *   return `${key}|${user.guid}`;
+ * });
+ */
+function Prefixer(key) { }
+
+/**
+ * Factory method that returns a new Date instance on each invocation.
+ *
+ * @global
+ * @callback DateFactory
+ * @returns {Date} A Date object.
+ * @see {@link module:stores/utils.withExpiration withExpiration}
+ * @example
+ * export const store = stores.utils.withExpiration(stores.localStore(), function sevenDays() {
+ *   const now = Date.now();
+ *   const days = 24 * 60 * 60 * 1000;
+ *   return new Date(now + 7 * days);
+ * });
+ */
+function DateFactory() {}

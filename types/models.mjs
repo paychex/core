@@ -659,3 +659,17 @@ export class UpdatingModelCollection extends UniqueModelCollection {
     merge() { }
 
 }
+
+
+/**
+ * Returns a boolean value given the specified inputs.
+ *
+ * @global
+ * @callback ModelCollectionPredicate
+ * @param {any} value The incoming value.
+ * @param {number|string} key The key or index of the value in the collection.
+ * @param {Array} collection The collection the value came from.
+ * @returns {boolean} true or false
+ * @see {@link FilteredModelCollection#filterBy ModelCollection filterBy example}
+ */
+function ModelCollectionPredicate(value, key, collection) { }

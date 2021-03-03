@@ -1,3 +1,5 @@
+import './types';
+
 export * as data from './data';
 export * as errors from './errors';
 export * as events from './events';

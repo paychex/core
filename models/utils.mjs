@@ -50,29 +50,7 @@ import {
     negate,
 } from 'lodash-es';
 
-import {
-    ModelCollection,
-    ActiveModelCollection,
-    OrderedModelCollection,
-    FilteredModelCollection,
-    GroupedModelCollection,
-    SelectionModelCollection,
-    PagedModelCollection,
-    UniqueModelCollection,
-    UpdatingModelCollection,
-} from '../types/models.mjs';
-
 import { mixin } from './shared.mjs';
-
-class UnusedModelCollection extends ModelCollection { }
-class UnusedActiveModelCollection extends ActiveModelCollection { }
-class UnusedOrderedModelCollection extends OrderedModelCollection { }
-class UnusedFilteredModelCollection extends FilteredModelCollection { }
-class UnusedGroupedModelCollection extends GroupedModelCollection { }
-class UnusedSelectionModelCollection extends SelectionModelCollection { }
-class UnusedPagedModelCollection extends PagedModelCollection { }
-class UnusedUniqueModelCollection extends UniqueModelCollection { }
-class UnusedUpdatingModelCollection extends UpdatingModelCollection { }
 
 function readonly(getter) {
     return {
@@ -133,18 +111,6 @@ export function withOrdering(list, ...args) {
     };
 
 }
-
-/**
- * Returns a boolean value given the specified inputs.
- *
- * @global
- * @callback ModelCollectionPredicate
- * @param {any} value The incoming value.
- * @param {number|string} key The key or index of the value in the collection.
- * @param {Array} collection The collection the value came from.
- * @returns {boolean} true or false
- * @see {@link FilteredModelCollection#filterBy ModelCollection filterBy example}
- */
 
 /**
  * Filters the specified ModelCollection's items.

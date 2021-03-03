@@ -86,6 +86,7 @@ export class TrackingInfo {
  * @callback TimerStopFunction
  * @param {Object.<string, any>} [data] Optional data to include in the timer entry.
  */
+function TimerStopFunction(data) {}
 
 /**
  * Starts a timing tree. Unlike the normal {@link Tracker#start start} method, this
@@ -126,6 +127,7 @@ export class TrackingInfo {
  *   return results;
  * }
  */
+function NestedStart(label) {}
 
 /**
  * Array of functions returned by calling {@link NestedTimingTracker#start start}
@@ -580,3 +582,28 @@ export class NestedTimingTracker extends Tracker {
     start(label) { }
 
 }
+
+/**
+ * Invoked each time a {@link Tracker} (or child Tracker) method produces
+ * a new {@link TrackingInfo} instance.
+ *
+ * @global
+ * @callback TrackingSubscriber
+ * @param {TrackingInfo} info
+ * @example
+ * const tracker = trackers.create((info) => {
+ *   console.log(JSON.stringify(info));
+ * });
+ * @example
+ * // delegating tracking entries to a Redux store
+ *
+ * import { store } from '~/path/to/actions';
+ *
+ * const tracker = trackers.create((info) => {
+ *   store.dispatch({
+ *     type: `track:${info.type}`,
+ *     payload: info
+ *   });
+ * });
+ */
+function TrackingSubscriber(info) {}
