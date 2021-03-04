@@ -326,7 +326,7 @@ export class CountdownSignal extends Signal {
      *   return signal.ready();
      * }
      */
-    increment() { }
+    increment(count) { }
 
     /**
      * Subtracts the specified amount from the counter. When the counter reaches 0 it
@@ -360,7 +360,7 @@ export class CountdownSignal extends Signal {
      *   return signal.ready();
      * }
      */
-    decrement() { }
+    decrement(count) { }
 
     /**
      * Queues the caller until the counter reaches 0. Once the counter reaches 0, all
@@ -505,7 +505,7 @@ export class Semaphore extends Signal {
      *   }
      * }
      */
-    release() { }
+    release(count) { }
 
     /**
      * Queues the caller until a spot is available.

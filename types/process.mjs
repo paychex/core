@@ -327,7 +327,7 @@ export class Action {
      *   }
      * });
      */
-    retry() { }
+    retry(error) { }
 
     /**
      * This method is invoked if the action ran but the process was aborted.
@@ -374,7 +374,7 @@ export class Action {
      *   }
      * });
      */
-    failure() { }
+    failure(error) { }
 
     /**
      * This method runs if and when the entire process resolves. It provides a

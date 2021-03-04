@@ -28,7 +28,7 @@ export class ModelCollection extends EventBus {
     * list.add(4, 5, 6);
     * console.log(list.items()); // [1, 2, 3, 4, 5, 6]
     */
-    add() { }
+    add(...items) { }
 
     /**
      * Removes items from the ModelCollection.
@@ -42,7 +42,7 @@ export class ModelCollection extends EventBus {
      * list.remove(5, 1);
      * console.log(list.items()); // [2, 3, 4, 6]
      */
-    remove() { }
+    remove(...items) { }
 
     /**
      * Removes all items from the ModelCollection.
@@ -116,7 +116,7 @@ export class ActiveModelCollection extends ModelCollection {
     * console.log(list.active(2)); // 2
     * console.log(list.active(5)); // 2
     */
-    active() { }
+    active(item) { }
 
     /**
      * @method ActiveModelCollection#next
@@ -131,7 +131,7 @@ export class ActiveModelCollection extends ModelCollection {
     * list.next(); // null (at end of list)
     * list.next(true); // 1 (wraps to start)
     */
-    next() { }
+    next(wrap) { }
 
     /**
      * @method ActiveModelCollection#prev
@@ -146,7 +146,7 @@ export class ActiveModelCollection extends ModelCollection {
      * list.prev(); // null (at start of list)
      * list.prev(true); // 3 (wraps to end)
      */
-    prev() { }
+    prev(wrap) { }
 
     /**
      * Returns `true` if the currently active item is the last item in the list.
@@ -234,7 +234,7 @@ export class OrderedModelCollection extends ModelCollection {
      *   return list;
      * }
      */
-    orderBy() { }
+    orderBy(iteratees, orders) { }
 
 }
 
@@ -272,7 +272,7 @@ export class FilteredModelCollection extends ModelCollection {
     * list.filterBy(); // reset filtering
     * list.items(); // [1, 2, 3, 4, 5]
     */
-    filterBy() { }
+    filterBy(filterer) { }
 
 }
 
@@ -325,7 +325,7 @@ export class GroupedModelCollection extends ModelCollection {
     * clients.groupBy(['region']);
     * clients.groups(); // { 'east': [...], 'north': [...], 'south': [...] }
     */
-    groupBy() { }
+    groupBy(grouper) { }
 
     /**
      * Returns the groups from the underlying collection. Groups are returned
@@ -383,7 +383,7 @@ export class SelectionModelCollection extends ModelCollection {
     * list.selected(2); // [2]
     * list.selected(2, 3); // [2, 3]
     */
-    selected() { }
+    selected(...items) { }
 
     /**
      * Select all, none, or some of the ModelCollection items, depending on which
@@ -422,7 +422,7 @@ export class SelectionModelCollection extends ModelCollection {
      * list.toggle(); // []
      * list.toggle(1, 2); // [1, 2]
      */
-    toggle() { }
+    toggle(...items) { }
 
 }
 
@@ -468,7 +468,7 @@ export class PagedModelCollection extends ModelCollection {
      * list.pageSize(3); // 3
      * list.items(); // [1, 2, 3]
      */
-    pageSize() { }
+    pageSize(size) { }
 
     /**
      * Moves to the next page of items. Does nothing if called on the last page.
@@ -526,7 +526,7 @@ export class PagedModelCollection extends ModelCollection {
      * list.pageIndex(15); // 2
      * list.pageIndex(-1); // 0
      */
-    pageIndex() { }
+    pageIndex(index) { }
 
     /**
      * Returns the number of pages based on the number of {@link ModelCollection#items items}
@@ -594,7 +594,7 @@ export class UniqueModelCollection extends ModelCollection {
      * list.uniqueBy(Math.floor);
      * list.items(); // [1, 2, 3, 4]
      */
-    uniqueBy() { }
+    uniqueBy(iteratee) { }
 
 }
 
@@ -628,7 +628,7 @@ export class UpdatingModelCollection extends UniqueModelCollection {
      * // update the first entry, keeping the second entry
      * list.upsert({ id: 123, name: 'Alicia' });
      */
-    upsert() { }
+    upsert(...items) { }
 
     /**
      * Adds, updates, _and_ removes items in the underlying collection based on
@@ -656,7 +656,7 @@ export class UpdatingModelCollection extends UniqueModelCollection {
      * users = [ { id: 123, name: 'Alicia' } ];
      * list.merge(...users);
      */
-    merge() { }
+    merge(...items) { }
 
 }
 

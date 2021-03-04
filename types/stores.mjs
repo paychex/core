@@ -68,7 +68,7 @@ export class Store {
      *     .catch(errors.rethrow({ tags: ['legal'] }));
      * }
      */
-    get() { }
+    get(key) { }
 
     /**
      * Puts data into the Store.
@@ -89,7 +89,7 @@ export class Store {
      *     .catch(errors.rethrow({ tags: ['legal'] }));
      * }
      */
-    set() { }
+    set(key, value) { }
 
     /**
      * Removes an item from the Store.
@@ -110,7 +110,7 @@ export class Store {
      *     .catch(errors.rethrow({ tags: ['legal'] }));
      * }
      */
-    delete() { }
+    delete(key) { }
 
 }
 
@@ -163,7 +163,7 @@ export class Cache {
     *   }
     * }
     */
-    get() { }
+    get(request) { }
 
     /**
      * Stores a Response object in the cache. Resolve the returned promise
@@ -191,7 +191,7 @@ export class Cache {
      *   }
      * }
      */
-    set() { }
+    set(request, response) { }
 
 }
 

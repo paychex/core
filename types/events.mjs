@@ -112,7 +112,7 @@ export class EventBus {
     * // parallel bus returns array
     * await bus2.fire('event'); // [1, 2]
     */
-    fire() { }
+    fire(event, ...args) { }
 
     /**
      * Registers a subscriber for the given event. The subscriber will be invoked
@@ -138,7 +138,7 @@ export class EventBus {
      *   console.log(this === obj); // true
      * });
      */
-    on() { }
+    on(event, subscriber) { }
 
     /**
      * Similar to {@link EventBus#on on}, except the subscriber
@@ -149,7 +149,7 @@ export class EventBus {
      * @param {Function} subscriber The subscriber to invoke when the event is fired.
      * @returns {Function} Method to invoke to remove the subscriber.
      */
-    one() { }
+    one(event, subscriber) { }
 
     /**
      * Resumes notifying subscribers after {@link EventBus#stop stop} was called. Any
