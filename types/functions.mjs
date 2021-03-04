@@ -24,60 +24,13 @@ export class InvocationData extends Array {
 }
 
 /**
- * Allows the consumer to invoke one or more functions together, passing any
- * supplied arguments to the underlying functions. The consumer can also add
- * or remove functions from the underlying Set dynamically.
+ * Invokes the specified functions in parallel, handling any returned Promises correctly.
  *
- * @class
- * @extends Function
- * @hideconstructor
- */
-export class CollectionFunction extends Function {
-
-    /**
-     * Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original CollectionFunction for chaining.
-     *
-     * @param {...Function} fns One or more functions to add to the underlying collection.
-     * @returns {CollectionFunction} The original CollectionFunction instance.
-     */
-    add(...fns) {}
-
-    /**
-     * Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original CollectionFunction for chaining.
-     *
-     * @param {...Function} fns One or more functions to remove from the underlying Set.
-     * @returns {CollectionFunction} The original CollectionFunction instance.
-     */
-    remove(...fns) {}
-
-    /**
-     * Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original CollectionFunction for chaining.
-     *
-     * @param {number} index The position at which to begin inserting functions.
-     * @param {...Function} fns One or more functions to insert into the underlying Set.
-     * @returns {CollectionFunction} The original CollectionFunction instance.
-     */
-    insert(index, ...fns) {}
-
-    /**
-     * Creates and returns a new copy of the CollectionFunction. Methods can be added or removed
-     * from this function without modifying the original.
-     */
-    clone() {}
-
-}
-
-/**
  * @async
  * @global
- * @callback ParallelFunction
- * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
- * @property {Function} remove Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
- * @property {Function} insert Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original ParallelFunction for chaining.
- * @property {Function} clone Creates and returns a new copy of the ParallelFunction. Methods can be added or removed
- * from this function without modifying the original.
+ * @function ParallelFunction
  * @param {...any} args The arguments to pass to the original functions.
- * @returns {Promise} A Promise resolved with the array of settled return
+ * @returns {Promise.<Array>} A Promise resolved with the array of settled return
  * values or else rejecting with the first rejection reason or thrown error.
  * @example
  * const isValidUserName = functions.parallel(isNonEmpty, allCharactersValid);
@@ -94,19 +47,48 @@ export class CollectionFunction extends Function {
  *   }
  * }
  */
-export class ParallelFunction extends CollectionFunction {}
+export function ParallelFunction(...args) { }
+
+/**
+ * Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
+ *
+ * @param {...Function} fns One or more functions to add to the underlying collection.
+ * @returns {ParallelFunction} The original ParallelFunction instance.
+ */
+ParallelFunction.add = function add(...fns) { };
+
+/**
+ * Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original ParallelFunction for chaining.
+ *
+ * @param {...Function} fns One or more functions to remove from the underlying Set.
+ * @returns {ParallelFunction} The original ParallelFunction instance.
+ */
+ParallelFunction.remove = function remove(...fns) { };
+
+/**
+ * Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original ParallelFunction for chaining.
+ *
+ * @param {number} index The position at which to begin inserting functions.
+ * @param {...Function} fns One or more functions to insert into the underlying Set.
+ * @returns {ParallelFunction} The original ParallelFunction instance.
+ */
+ParallelFunction.insert = function insert(index, ...fns) { };
+
+/**
+ * Creates and returns a new copy of the ParallelFunction. Methods can be added or removed
+ * from this function without modifying the original.
+ *
+ * @returns {ParallelFunction} A new copy of the original ParallelFunction that can be
+ * modified without affecting the original.
+ */
+ParallelFunction.clone = function clone() { };
 
 /**
  * @async
  * @global
- * @callback SequentialFunction
- * @property {Function} add Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
- * @property {Function} remove Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
- * @property {Function} insert Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original SequentialFunction for chaining.
- * @property {Function} clone Creates and returns a new copy of the SequentialFunction. Methods can be added or removed
- * from this function without modifying the original.
+ * @function
  * @param {...any} args The arguments to pass to the original functions.
- * @returns {Promise} A Promise resolved with the last function's settled
+ * @returns {Promise.<*>} A Promise resolved with the last function's settled
  * return value, or rejected if any function rejects or throws an error.
  * The functions will be passed the incoming arguments along with the value
  * returned by the previous function.
@@ -148,8 +130,41 @@ export class ParallelFunction extends CollectionFunction {}
  * bus.on('event', functions.sequence(handler1, handler2));
  * await bus.fire('event', 'arg1', 'arg2'); // [true]
  */
-export class SequentialFunction extends CollectionFunction {}
+export function SequentialFunction(...args) { }
 
+/**
+ * Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
+ *
+ * @param {...Function} fns One or more functions to add to the underlying collection.
+ * @returns {SequentialFunction} The original SequentialFunction instance.
+ */
+SequentialFunction.add = function add(...fns) { };
+
+/**
+ * Removes one or more functions from the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set} and returns the original SequentialFunction for chaining.
+ *
+ * @param {...Function} fns One or more functions to remove from the underlying Set.
+ * @returns {SequentialFunction} The original SequentialFunction instance.
+ */
+SequentialFunction.remove = function remove(...fns) { };
+
+/**
+ * Adds one or more functions to the underlying {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set Set}, starting at the given index, and returns the original SequentialFunction for chaining.
+ *
+ * @param {number} index The position at which to begin inserting functions.
+ * @param {...Function} fns One or more functions to insert into the underlying Set.
+ * @returns {SequentialFunction} The original SequentialFunction instance.
+ */
+SequentialFunction.insert = function insert(index, ...fns) { };
+
+/**
+ * Creates and returns a new copy of the SequentialFunction. Methods can be added or removed
+ * from this function without modifying the original.
+ *
+ * @returns {SequentialFunction} A new copy of the original SequentialFunction that can be
+ * modified without affecting the original.
+ */
+SequentialFunction.clone = function clone() { };
 
 /**
  * Function returned by {@link module:index~buffer buffer}.

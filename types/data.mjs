@@ -166,7 +166,7 @@ export class DataDefinition {
 export class Request extends DataDefinition {
 
     /**
-     * The URL to open, constructed using {@link Proxy#url Proxy.url()} and any
+     * The URL to open, constructed using {@link DataProxy#url Proxy.url()} and any
      * {@link ProxyRule ProxyRules} that match the given Request properties as well as any optional
      * parameters passed to {@link DataLayer#createRequest createRequest()}.
      *

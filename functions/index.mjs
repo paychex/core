@@ -21,6 +21,12 @@ import { iteratee, identity } from 'lodash-es';
  * @module functions
  */
 
+/**
+* @ignore
+* @param {function():T} invoker
+* @returns {T}
+* @template T
+*/
 function getInvocationPattern(invoker) {
     return function pattern(...functions) {
         let set = new Set(functions);
@@ -48,10 +54,35 @@ function getInvocationPattern(invoker) {
 }
 
 /**
+ * @ignore
+ * @param {function[]} methods The methods to invoke.
+ * @param {Array.<*>} args The args to provide.
+ * @returns {Parallel}
+ */
+function inParallel(methods, args) {
+    return Promise.all(methods.map(fn =>
+        new Promise(resolve =>
+            resolve(fn.apply(this, args)))));
+}
+
+/**
+ * @ignore
+ * @param {function[]} methods The methods to invoke.
+ * @param {Array.<*>} args The args to provide.
+ * @returns {Sequence}
+ */
+function inSequence(methods, args) {
+    return methods.reduce((promise, fn) =>
+        promise.then((result) => fn.call(this, ...args, result)),
+        Promise.resolve());
+}
+
+/**
  * Invokes the specified functions in parallel, handling any
  * returned Promises correctly.
  *
- * @function
+ * @static
+ * @function parallel
  * @param {...Function} fns The functions to invoke in parallel.
  * @returns {ParallelFunction} A function that will invoke the
  * given functions in parallel, waiting for any returned Promises
@@ -76,17 +107,16 @@ function getInvocationPattern(invoker) {
  *
  * await workflow('some args');
  */
-export const parallel = getInvocationPattern(function invoker(methods, args) {
-    return Promise.all(methods.map(fn =>
-        new Promise(resolve =>
-            resolve(fn.apply(this, args)))));
-});
+function Parallel(...fns) { }
+
+export const parallel = getInvocationPattern(inParallel);
 
 /**
  * Invokes the specified functions in sequence, handling any
  * returned Promises correctly.
  *
- * @function
+ * @static
+ * @function sequence
  * @param {...Function} fns The functions to invoke in sequence.
  * @returns {SequentialFunction} A function that will invoke the
  * given functions in sequence, waiting for any returned Promises
@@ -123,11 +153,9 @@ export const parallel = getInvocationPattern(function invoker(methods, args) {
  *
  * await workflow('some args');
  */
-export const sequence = getInvocationPattern(function invoker(methods, args) {
-    return methods.reduce((promise, fn) =>
-        promise.then((result) => fn.call(this, ...args, result)),
-        Promise.resolve());
-});
+function Sequence(...fns) { }
+
+export const sequence = getInvocationPattern(inSequence);
 
 /**
  * Queues invocations of a function until the specified signals are ready.
@@ -205,11 +233,12 @@ export function buffer(fn, signals, filter = identity) {
  * Conditionally invokes the supplied function if the given predicate returns `true`.
  *
  * @function
- * @param {Function} fn The function to invoke conditionally.
- * @param {Function} predicate A predicate function that returns `true` or `false`
+ * @template T
+ * @param {function(...any):T} fn The function to invoke conditionally.
+ * @param {function(...any):boolean} predicate A predicate function that returns `true` or `false`
  * depending on whether the passed function should be invoked. Will be called with
  * the original set of arguments and context.
- * @returns {Function} A function that will invoke `fn` only if `predicate` returns `true`.
+ * @returns {function(...any):T?} A function that will invoke `fn` only if `predicate` returns `true`.
  * @example
  * const collectors = functions.parallel();
  *

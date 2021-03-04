@@ -75,6 +75,7 @@ module.exports = [
             format: "cjs",
             exports: "named",
             sourcemap: true,
+            interop: 'esModule',
             paths: {
                 'lodash-es': 'lodash'
             }
