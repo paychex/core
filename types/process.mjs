@@ -1,4 +1,36 @@
 /**
+ * @class
+ * @global
+ * @extends Promise
+ * @hideconstructor
+ */
+export class ProcessRunner extends Promise {
+
+    /**
+     * Invoked to stop the running {@link module:process.process process}, immediately rejecting the promise. No further actions will be run.
+     *
+     * @param {object} [data={}] Optional data to merge into the Error the promise will be rejected with.
+     */
+    cancel(data) { }
+
+    /**
+     * Invoked to stop the running {@link module:process.process process}, immediately resolving the promise. No further actions will be run.
+     */
+    stop() { }
+
+    /**
+     * Invoked to update the set of conditions used within the running {@link module:process.process process}.
+     *
+     * **NOTE:** This method updates the conditions used by the {@link ProcessLogic}
+     * returned by {@link module:process.dependencies dependencies}.
+     *
+     * @param {Object.<string, any>} [conditions={}] The conditions to merge into the process' internal set of conditions.
+     */
+    update(conditions) { }
+
+}
+
+/**
  * Provides normal Promise functionality plus the ability to update,
  * cancel, or stop a running {@link module:process.process process}.
  *
@@ -142,38 +174,6 @@ class ProcessTransition extends Array {
  * ];
  */
 export class ProcessTransitions extends Array {}
-
-/**
- * @class
- * @global
- * @extends Promise
- * @hideconstructor
- */
-export class ProcessRunner extends Promise {
-
-    /**
-     * Invoked to stop the running {@link module:process.process process}, immediately rejecting the promise. No further actions will be run.
-     *
-     * @param {object} [data={}] Optional data to merge into the Error the promise will be rejected with.
-     */
-    cancel(data) { }
-
-    /**
-     * Invoked to stop the running {@link module:process.process process}, immediately resolving the promise. No further actions will be run.
-     */
-    stop() { }
-
-    /**
-     * Invoked to update the set of conditions used within the running {@link module:process.process process}.
-     *
-     * **NOTE:** This method updates the conditions used by the {@link ProcessLogic}
-     * returned by {@link module:process.dependencies dependencies}.
-     *
-     * @param {Object.<string, any>} [conditions={}] The conditions to merge into the process' internal set of conditions.
-     */
-    update(conditions) { }
-
-}
 
 /**
  * Contains information about the running {@link module:process.process process}.
