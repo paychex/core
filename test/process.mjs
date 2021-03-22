@@ -504,8 +504,8 @@ describe('process', () => {
                 setTimeout(promise.update, 20, { goB: true });
                 setTimeout(promise.update, 40, { goTo: 'c' });
                 return promise.then(() => {
-                    expect(within(a.execute.callTime, b.execute.callTime, 15)).toBe(false);
-                    expect(within(b.execute.callTime, c.execute.callTime, 15)).toBe(false);
+                    expect(within(a.execute.callTime, b.execute.callTime, 10)).toBe(false);
+                    expect(within(b.execute.callTime, c.execute.callTime, 10)).toBe(false);
                 });
             });
 
