@@ -80,6 +80,15 @@ describe('trackers', () => {
                     expect(subscriber.args[0].data).toMatchObject({ a: [1, 2] });
                 });
 
+                it('does not use references', () => {
+                    const ref = Object.create(null);
+                    tracker.context(ref);
+                    ref.a = 1;
+                    ref.b = 2;
+                    tracker.event('message');
+                    expect(subscriber.args[0].data).toEqual({});
+                });
+
             });
 
             describe('event', () => {

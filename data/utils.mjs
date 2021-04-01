@@ -12,7 +12,7 @@ import {
     memoize,
     defaults,
     cloneDeep,
-    conformsTo,
+    conforms,
     isFunction,
 } from 'lodash-es';
 
@@ -97,10 +97,10 @@ import { error } from '../errors/index.mjs';
 const rxToken = /:(\w+)/g;
 const rxTrailing = /[&?]+$/;
 
-const CACHE_SCHEMA = {
+const isCache = conforms({
     get: isFunction,
     set: isFunction,
-};
+});
 
 const replacer = params => (token, key) => {
     const value = params[key] || token;
@@ -312,7 +312,7 @@ export function withRetry(fetch, retry, retries = new Map()) {
  */
 export function withCache(fetch, cache) {
 
-    if (!conformsTo(cache, CACHE_SCHEMA))
+    if (!isCache(cache))
         throw error('An invalid cache was provided to withCache.');
 
     return async function useCache(request, ...args) {

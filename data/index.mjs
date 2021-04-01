@@ -3,7 +3,6 @@ import {
     cond,
     omit,
     defaults,
-    conformsTo,
     isEmpty,
     isString,
     isFunction,
@@ -14,6 +13,7 @@ import {
     constant,
     stubTrue,
     mergeWith,
+    conforms,
 } from 'lodash-es';
 
 import { tokenize } from './utils.mjs';
@@ -188,21 +188,21 @@ export * as utils from './utils.mjs';
 
 const isNonEmptyString = value => isString(value) && !isEmpty(value);
 
-const PROXY_SCHEMA = {
+const isProxy = conforms({
     url: isFunction,
     apply: isFunction,
-};
+});
 
-const DDO_SCHEMA = {
-    base: isString,
-    path: isNonEmptyString,
-};
-
-const REQUEST_SCHEMA = {
+const isRequest = conforms({
     url: isNonEmptyString,
     method: isNonEmptyString,
     adapter: isNonEmptyString,
-};
+});
+
+const isDataDefinition = conforms({
+    base: isString,
+    path: isNonEmptyString,
+});
 
 const STATUS_MESSAGES = {
     100: "Continue",
@@ -303,12 +303,12 @@ function getErrorMessage(response) {
  */
 export function createDataLayer(proxy, adapter, adapters = new Map()) {
 
-    if (!conformsTo(proxy, PROXY_SCHEMA))
+    if (!isProxy(proxy))
         throw error('A proxy must be passed to createDataLayer.', fatal());
 
     async function fetch(request) {
 
-        if (!conformsTo(request, REQUEST_SCHEMA))
+        if (!isRequest(request))
             throw error('Invalid request passed to fetch.', fatal());
 
         const requestedAdapter = adapters.get(request.adapter);
@@ -325,7 +325,7 @@ export function createDataLayer(proxy, adapter, adapters = new Map()) {
 
     function createRequest(definition, params = {}, body = null) {
 
-        if (!conformsTo(definition, DDO_SCHEMA))
+        if (!isDataDefinition(definition))
             throw error('A valid DataDefinition object must be passed to createRequest.');
 
         const request = defaults({}, definition, {
