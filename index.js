@@ -1,3 +1,4 @@
+import '@ungap/global-this';
 import './types';
 
 export * as data from './data';
