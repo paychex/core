@@ -478,6 +478,16 @@ describe('trackers', () => {
                     });
                 });
 
+                it('does not replace values if specified', () => {
+                    replace = withReplacement(collector, map, true);
+                    replace({ data: { lang: 'en' }, key: 'en' });
+                    const info = collector.args[0];
+                    expect(info).toMatchObject({
+                        key: 'en',
+                        data: { Language: 'en' },
+                    });
+                });
+
                 it('does not replace substrings', () => {
                     replace({
                         lang: 'eng',

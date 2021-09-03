@@ -55,6 +55,8 @@ function replace(value, rx) {
  * Be sure to use `\b` to indicate word boundaries, `^` and `$` to indicate
  * the start and end of a string, `/g` to enable multiple replacements
  * within a string, and `/i` to ignore case.
+ * @param {boolean} keysOnly Whether to replace only object keys; if not
+ * specified, object keys *and* values will be replaced.
  * @example
  * const map = new Map([
  *   [/^lang$/, 'language'],
@@ -81,7 +83,7 @@ function replace(value, rx) {
  *   }
  * }`
  */
-export function withReplacement(collector, map) {
+export function withReplacement(collector, map, keysOnly) {
 
     function substitute(value) {
         if (!isString(value))
@@ -99,7 +101,7 @@ export function withReplacement(collector, map) {
         if (isObjectLike(value)) {
             return transform(value, transformer, newInstanceOf(value));
         }
-        return substitute(value);
+        return keysOnly ? value : substitute(value);
     }
 
     return function collect(info, ...args) {
