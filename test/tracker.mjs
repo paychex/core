@@ -8,16 +8,6 @@ describe('trackers', () => {
 
     describe('create', () => {
 
-        let mark, measure;
-
-        beforeEach(() => {
-            mark = spy();
-            measure = spy();
-            set(globalThis, 'performance', { mark, measure });
-        });
-
-        afterEach(() => unset(globalThis, 'performance'));
-
         describe('createTracker', () => {
 
             it('returns Tracker instance', () => {
@@ -188,6 +178,34 @@ describe('trackers', () => {
                     tracker.context({ a: 1, b: 1 });
                     tracker.start('timer')({ b: 2, c: 3 });
                     expect(subscriber.args[0].data).toMatchObject({ a: 1, b: 2, c: 3 });
+                });
+
+            });
+
+            describe('browser compatibility', () => {
+
+                it('times correctly using Date.now', () => {
+                    const now = Date.now();
+                    const performance = globalThis.performance;
+                    unset(globalThis, 'performance');
+                    tracker.event();
+                    expect(subscriber.args[0].start).not.toBeLessThan(now);
+                    set(globalThis, 'performance', performance);
+                    expect(globalThis.performance.now).toBeInstanceOf(Function);
+                });
+
+                it('times correctly using Date#getTime', () => {
+                    const orig = Date.now;
+                    const performance = globalThis.performance;
+                    const now = new Date().getTime();
+                    unset(Date, 'now');
+                    unset(globalThis, 'performance');
+                    tracker.event();
+                    expect(subscriber.args[0].start).not.toBeLessThan(now);
+                    set(Date, 'now', orig);
+                    set(globalThis, 'performance', performance);
+                    expect(Date.now).toBeInstanceOf(Function);
+                    expect(globalThis.performance.now).toBeInstanceOf(Function);
                 });
 
             });

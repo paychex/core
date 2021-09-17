@@ -109,6 +109,20 @@ function tryMeasure(label, start) {
     invoke(globalThis, 'performance.measure', label, start);
 }
 
+function systemNow() {
+    return invoke(Date, 'now') || new Date().getTime();
+}
+
+function absoluteNow() {
+    const epoch = systemNow();
+    const fallback = get(globalThis, 'performance.timing.navigationStart', loadTime);
+    const base = get(globalThis, 'performance.timeOrigin', fallback);
+    const offset = invoke(globalThis, 'performance.now') || epoch - loadTime;
+    return base + offset;
+}
+
+const loadTime = systemNow();
+
 /**
  * Creates a new {@link Tracker} instance. The specified subscriber will
  * be notified when new {@link TrackingInfo} entries are created.
@@ -150,7 +164,7 @@ export function create(subscriber) {
 
         event(message, data) {
             const id = uuid();
-            const now = Date.now();
+            const now = absoluteNow();
             tryMark(message);
             subscriber(Object.freeze({
                 id,
@@ -166,7 +180,7 @@ export function create(subscriber) {
 
         error(err) {
             const id = uuid();
-            const now = Date.now();
+            const now = absoluteNow();
             if (!isError(err))
                 return console.warn('A non-Error was passed to tracker.error:', err);
             set(err, 'count', get(err, 'count', 0) + 1);
@@ -191,10 +205,10 @@ export function create(subscriber) {
         start(label) {
             let count = 0;
             const id = uuid();
-            const start = Date.now();
+            const start = absoluteNow();
             tryMark(id);
             return function end(data) {
-                const stop = Date.now();
+                const stop = absoluteNow();
                 const duration = stop - start;
                 tryMeasure(label, id);
                 subscriber(Object.freeze({
