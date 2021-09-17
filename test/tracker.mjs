@@ -191,7 +191,6 @@ describe('trackers', () => {
                     tracker.event();
                     expect(subscriber.args[0].start).not.toBeLessThan(now);
                     set(globalThis, 'performance', performance);
-                    expect(globalThis.performance.now).toBeInstanceOf(Function);
                 });
 
                 it('times correctly using Date#getTime', () => {
@@ -204,8 +203,6 @@ describe('trackers', () => {
                     expect(subscriber.args[0].start).not.toBeLessThan(now);
                     set(Date, 'now', orig);
                     set(globalThis, 'performance', performance);
-                    expect(Date.now).toBeInstanceOf(Function);
-                    expect(globalThis.performance.now).toBeInstanceOf(Function);
                 });
 
             });
