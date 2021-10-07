@@ -51,11 +51,11 @@ export class AggregateValidationError extends ValidationError {
  *
  * @global
  * @async
- * @callback Validator
+ * @function Validator
  * @template ErrorType
  * @param {*} proposed The value to validate.
- * @param {*} current The current value, if known.
- * @param {*} source The source of the value change, if available.
+ * @param {*} [current] The current value, if known.
+ * @param {*} [source] The source of the value change, if available.
  * @returns {Promise<any,ErrorType>} A promise that is rejected if the value is not valid.
  * @example
  * export function valueMatches(field, message) {
@@ -79,6 +79,6 @@ export class AggregateValidationError extends ValidationError {
  *   confirm: valueMatches('email', 'emails do not match'),
  * });
  */
-function Validator(proposed, current, source) {
+export async function Validator(proposed, current, source) {
     return Promise.resolve();
 }
