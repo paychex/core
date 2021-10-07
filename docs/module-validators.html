@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>data/utils - Documentation</title>
+    <title>validators - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -34,7 +34,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">data/utils</h1>
+    <h1 class="page-title">validators</h1>
     
 
     
@@ -57,72 +57,20 @@
         <div class="container-overview">
         
             
-                <div class="description usertext"><p>Functionality used to customize a <a href="DataLayer.html">DataLayer</a> pipeline.</p>
-<p>A DataLayer provides only basic functionality for fetching data. These
-utility methods help you extend the data pipeline with powerful features.
-They work by wrapping the DataLayer's <a href="DataLayer.html#fetch">fetch()</a> method
-to process <a href="Request.html">Requests</a> and <a href="Response.html">Responses</a> based
-on various conditions you supply.</p>
-<p>You should use this same approach in your own applications to provide easy
-cross-cutting functionality for data operations.</p>
-<pre class="prettyprint source lang-javascript"><code>// datalayer.js
+                <div class="description usertext"><p>Contains <a href="global.html#Validator">Validator</a> factories useful for verifying that
+values conform to desired specifications.</p>
+<pre class="prettyprint source lang-js"><code>// esm
+import { validators } from '@paychex/core';
 
-import rules from '~/config/proxy';
+// cjs
+const { validators } = require('@paychex/core');
 
-const proxy = data.createProxy();
-const { fetch, createRequest } = data.createDataLayer(proxy);
+// iife
+const { validators } = window['@paychex/core'];
 
-proxy.use(...rules);
-
-// we extend the functionality of `fetch` by wrapping
-// it and returning a function with the same signature
-// that proxies to the real fetch while adding custom
-// error handling logic
-function withCustomErrors(fetch) {
-  return async function useCustomErrors(request) {
-    return await fetch(request)
-      .catch(errors.rethrow({ app: 'my app' }));
-  };
-}
-
-let pipeline = fetch;
-// add custom error handling
-pipeline = withCustomErrors(pipeline);
-// add default request headers
-pipeline = data.utils.withHeaders(pipeline, {
-  'x-app-name': 'my-app'
-});
-
-export {
-  proxy,
-  createRequest,
-  fetch: pipeline // return our extended pipeline
-}
-</code></pre>
-<pre class="prettyprint source lang-javascript"><code>// consumer.js
-
-import { fetch, createRequest } from './datalayer.mjs';
-
-const datacall = {
-  base: 'endpoint',
-  path: '/:id/info'
-};
-
-// automatically retry failed requests using
-// an exponential falloff between attempts;
-// the version of fetch we bring in has already
-// been wrapped to add custom error data and
-// request headers; this shows how we can combine
-// cross-cutting logic with custom one-off logic
-const load = data.utils.withRetry(fetch, data.utils.falloff());
-
-export async function loadData(id) {
-  const params = { id };
-  const request = createRequest(datacall, params);
-  const response = await load(request)
-    .catch(errors.rethrow(errors.fatal(params)));
-  return response.data;
-}
+// amd
+require(['@paychex/core'], function({ validators }) { ... });
+define(['@paychex/core'], function({ validators }) { ... });
 </code></pre></div>
             
 
@@ -137,7 +85,7 @@ export async function loadData(id) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line21">line 21</a>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -230,7 +178,7 @@ export async function loadData(id) {
 
     
 
-    <h4 class="name" id=".falloff"><span class="type-signature">(static) </span>falloff<span class="signature">(times<span class="signature-attributes">opt</span>, base<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#RetryFunction">RetryFunction</a>}</span></h4>
+    <h4 class="name" id=".array"><span class="type-signature">(static) </span>array<span class="signature">(validator<span class="signature-attributes">opt</span>, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>>}</span></h4>
 
     
 
@@ -242,7 +190,7 @@ export async function loadData(id) {
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line196">line 196</a>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line255">line 255</a>
     </li></ul></dd>
     
 
@@ -273,13 +221,6 @@ export async function loadData(id) {
     
 
     
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="module-data_utils.html#.withRetry">withRetry()</a></li>
-        </ul>
-    </dd>
-    
 
     
 </dl>
@@ -289,9 +230,8 @@ export async function loadData(id) {
 
 
 <div class="description usertext">
-    <p>Creates a <a href="global.html#RetryFunction">RetryFunction</a> that will retry a failed
-request the specified number of times, using the given
-exponential base as a falloff interval.</p>
+    <p>Ensures the value is an array and that each item in the array matches
+the specified validator.</p>
 </div>
 
 
@@ -302,9 +242,11 @@ exponential base as a falloff interval.</p>
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>import { fetch, createRequest } from '~/path/to/datalayer';const getUser = {  base: 'users',  method: 'GET',  path: '/users/:id',};const attempt = data.utils.withRetry(fetch, data.utils.falloff(5, 100));export async function loadUserData(id) {  const params = { id };  const request = createRequest(getUser, params);  const response = await attempt(request)    .catch(errors.rethrow(params));  return response.data;}</code></pre>
+    <pre class="prettyprint"><code>// if you do not specify a validator to apply, the// value will still be validated as an arrayconst items = validators.array('items must be an array');// invaliditems({}).catch(console.log);> ValidationError: items must be an array</code></pre>
+
+    <pre class="prettyprint"><code>const item = validators.object({  sku: validators.string('sku is required'),  amount: validators.number('amount is missing'),});const cart = validators.object({  items: validators.array(item, 'invalid cart items'),}, 'cart is invalid');// non-conforming valuecart({  items: [{ amount: 2 }], // missing sku}).catch(console.error);> ValidationError: cart is invalid  - inner: [ValidationError: invalid cart items]    - inner: [ValidationError: sku is required]// conforming valueconst valid = await cart({  items: [{ sku: '123', amount: 2 }]}).then(() => true, () => false);</code></pre>
 
 
 
@@ -326,7 +268,239 @@ exponential base as a falloff interval.</p>
         
 
         
-        <th>Default</th>
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>validator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Validator">Validator</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The validation function to apply to each
+element in the array.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".date"><span class="type-signature">(static) </span>date<span class="signature">(message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line364">line 364</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures a value is a date.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const timestamp = validators.date('timestamp is required');// non-conforming valuetimestamp('123').catch(console.error);> ValidationError: timestamp is required// conforming valueconst valid = await timestamp(new Date())  .then(() => true, () => false);// as part of object schemaconst record = validators.object({  id: validators.string('id is required'),  created: validators.date('creation date is missing'),}, 'record is invalid');</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
         
 
         <th class="last">Description</th>
@@ -338,13 +512,416 @@ exponential base as a falloff interval.</p>
 
         <tr>
             
-                <td class="name"><code>times</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".empty"><span class="type-signature">(static) </span>empty<span class="signature">(message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line720">line 720</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures the proposed value is <em>empty</em>. Empty values include <code>null</code> and <code>undefined</code>.
+Objects are considered empty if they have no own enumerable string keyed properties.
+Array-like values such as arguments objects, arrays, buffers, strings, or jQuery-like
+collections are considered empty if they have a length of 0. Similarly, maps and sets
+are considered empty if they have a size of 0.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>const validResult = validators.object({  data: validators.every('any value is allowed'),  error: validators.empty('should not have an error'),}, 'result is invalid');</code></pre>
+
+    <pre class="prettyprint"><code>// use not(empty(''), '...') to ensure a value is providedconst feedback = validators.object({  timestamp: validators.date('valid timestamp required'),  comments: validators.not(validators.empty(''), 'comments are required'),}, 'invalid feedback');</code></pre>
+
+    <pre class="prettyprint"><code>// combine validators together to ensure a value of a specific// type is provided _and_ is not emptyexport const nonEmptyString = (name) => validators.every([  validators.string(`${name} must be a string`),  validators.not(validators.empty(''), `${name} is required`),], `${name} must be a non-empty string`);</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".every"><span class="type-signature">(static) </span>every<span class="signature">(&hellip;validators, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line674">line 674</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures the proposed value passes all of the specified validators.</p>
+<p><strong>NOTE:</strong> If no validators are specified, the value will always be valid.
+You can use this to indicate that <em>any</em> value is acceptable.</p>
+<p><strong>NOTE:</strong> You can use this validator to <em>extend</em> an existing set of validations
+with additional validation checks.</p>
+<p>See the examples for details.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>// compose multiple validators togetherexport const nonEmptyString = (name) => validators.every([  validators.string(`${name} must be a string`),  validators.not(validators.empty(''), `${name} is required`),], `${name} must be a non-empty string`);// usage:const user = validators.object({  id: nonEmptyString('user id'),}, 'user is invalid');</code></pre>
+
+    <pre class="prettyprint"><code>// extend an existing validationconst auditEntry = validators.object({  timestamp: validators.date('timestamp is invalid'),  message: validators.string('message must be a string'),  allowed: validators.oneOf([true, false], 'allowed must be a boolean'),}, 'invalid audit entry');export const baseUser = validators.object({  id: validators.string('user id is required'),  access: validators.oneOf(['user', 'admin'], 'invalid access level'),}, 'base user is invalid');export const auditedUser = validators.every([  baseUser, // all the validations of a base user, plus...  validators.object({    audits: validators.array(auditEntry, 'invalid audit trail'),  }, 'audit trail missing'),], 'audited user is invalid');</code></pre>
+
+    <pre class="prettyprint"><code>// data responses can have optional payloadsconst validateResponse = validators.object({  meta: validators.object({}, 'object expected'),  data: validators.every('any value is allowed'),}, 'response is invalid');async function throwIfInvalid(response) {  await validateResponse(response);  return response.data;}export function loadData(arg1, arg2) {  const params = { arg1, arg2 };  const request = data.createRequest(operation, params);  return fetch(request)    .then(throwIfInvalid)    .catch(errors.rethrow(params));}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>validators</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#Validator">Validator</a>></span>
 
 
             
@@ -353,38 +930,33 @@ exponential base as a falloff interval.</p>
             
                 <td class="attributes">
                 
-                    &lt;optional><br>
-                
 
                 
 
+                
+                    &lt;repeatable><br>
                 
                 </td>
             
 
             
-                <td class="default">
-                
-                    <code>3</code>
-                
-                </td>
-            
 
-            <td class="description last"><p>The number of times to retry the
-failed data operation before giving up.</p></td>
+            <td class="description last"><p>Zero or more <a href="global.html#Validator">Validator</a>
+functions to apply. You can specify an array or just pass the
+validators as direct arguments.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>base</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">string</span>
 
 
             
@@ -393,8 +965,6 @@ failed data operation before giving up.</p></td>
             
                 <td class="attributes">
                 
-                    &lt;optional><br>
-                
 
                 
 
@@ -403,49 +973,90 @@ failed data operation before giving up.</p></td>
             
 
             
-                <td class="default">
-                
-                    <code>200</code>
-                
-                </td>
-            
 
-            <td class="description last"><p>The base number of milliseconds
-to use as the exponential falloff period. On each invocation
-of the retry function, the falloff period will be increased
-by a power of 2 and multiplied by this base. For example:</p>
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
 <ul>
-<li>retry #1: 200ms</li>
-<li>retry #2: 400ms</li>
-<li>retry #3: 800ms</li>
-</ul></td>
-        </tr>
+        <li>
 
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
     
-    </tbody>
-</table>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>A non-validator was provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
 
 
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
 
-
-
-
-
-
-
-
-
-
-
-
+</li>
+    </ul>
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    <p>Invoked to determine
-whether the data operation should be retried.</p>
+    <p>A validation function</p>
 </div>
 
 
@@ -456,7 +1067,7 @@ whether the data operation should be retried.</p>
     </dt>
     <dd>
         
-<span class="param-type"><a href="global.html#RetryFunction">RetryFunction</a></span>
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>></span>
 
 
     </dd>
@@ -471,7 +1082,7 @@ whether the data operation should be retried.</p>
 
     
 
-    <h4 class="name" id=".tokenize"><span class="type-signature">(static) </span>tokenize<span class="signature">(url<span class="signature-attributes">opt</span>, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id=".instanceOf"><span class="type-signature">(static) </span>instanceOf<span class="signature">(type, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
 
     
 
@@ -483,7 +1094,7 @@ whether the data operation should be retried.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line151">line 151</a>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line756">line 756</a>
     </li></ul></dd>
     
 
@@ -523,37 +1134,7 @@ whether the data operation should be retried.</p>
 
 
 <div class="description usertext">
-    <p>Replaces tokens in a string with values from the provided lookup,
-and then appends any unmatched key-value pairs in the lookup as
-a querystring.</p>
-<p><strong>NOTE:</strong> Nested objects will not be serialized; if you need to
-pass complex objects to your endpoint, you should be doing it
-through the request body; alternatively, use JSON.stringify on
-the object yourself before passing it to serialize.</p>
-<p><strong>NOTE:</strong> different falsy values are treated differently when
-appending to the querystring:</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">input params</th>
-<th style="text-align:left">result string</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><code>{ key: false }</code></td>
-<td style="text-align:left"><code>key=false</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>{ key: null }</code></td>
-<td style="text-align:left"><code>key</code></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>{ key: undefined }</code></td>
-<td style="text-align:left">(no output)</td>
-</tr>
-</tbody>
-</table>
+    <p>Ensures the proposed value is an instance of the specified type.</p>
 </div>
 
 
@@ -566,11 +1147,9 @@ appending to the querystring:</p>
 
     <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>const url = tokenize('/clients/:id/apps', {id: '0012391'});assert.equals(url, '/clients/0012391/apps');</code></pre>
+    <pre class="prettyprint"><code>const regex = validators.instanceOf(RegExp, 'invalid regular expression');// conformingawait regex(/rx/);// non-conformingregex('abc').catch(console.error);> ValidationError: invalid regular expression</code></pre>
 
-    <pre class="prettyprint"><code>const url = tokenize('/my/endpoint', {offset: 1, pagesize: 20});assert.equals(url, '/my/endpoint?offset=1&amp;pagesize=20');</code></pre>
-
-    <pre class="prettyprint"><code>const url = tokenize('/users/:guid/clients', {  guid: '00123456789123456789',  order: ['displayName', 'branch']});assert.equals(url, '/users/00123456789123456789/clients?order=displayName&amp;order=branch');</code></pre>
+    <pre class="prettyprint"><code>// utility validatorconst error = (message) => validators.instanceOf(Error, message);// usageconst bugReport = validators.object({  failure: error('failure reason expected'),  comments: validators.string('invalid user comments'),}, 'invalid bug report');</code></pre>
 
 
 
@@ -588,11 +1167,7 @@ appending to the querystring:</p>
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -604,7 +1179,30 @@ appending to the querystring:</p>
 
         <tr>
             
-                <td class="name"><code>url</code></td>
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The type function to check against.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
@@ -617,68 +1215,10 @@ appending to the querystring:</p>
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    <code>''</code>
-                
-                </td>
-            
 
-            <td class="description last"><p>A URL that may contain tokens in the <code>:name</code> format. Any
-tokens found in this format will be replaced with corresponding named values in
-the <code>params</code> argument.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <code>{}</code>
-                
-                </td>
-            
-
-            <td class="description last"><p>Values to use to replace named tokens in the URL. Any
-unmatched values will be appended to the URL as a properly encoded querystring.</p></td>
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
         </tr>
 
     
@@ -698,14 +1238,69 @@ unmatched values will be appended to the URL as a properly encoded querystring.<
 
 
 
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>A class type must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    <p>A tokenized string with additional URL-encoded values
-appened to the querystring.</p>
+    <p>A validation function</p>
 </div>
 
 
@@ -716,9 +1311,251 @@ appened to the querystring.</p>
     </dt>
     <dd>
         
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".matches"><span class="type-signature">(static) </span>matches<span class="signature">(rx, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line516">line 516</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Matches the proposed value against a regular expression.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const rx = /^[\da-f]{8}-[\da-f]{4}-[0-5][\da-f]{3}-[089ab][\da-f]{3}-[\da-f]{12}$/i;const uuid = validators.matches(rx, 'a uuid is required');// conformingconst valid = await uuid('35543cdb-5ac3-477f-ac86-ce8796b68cc6')  .then(() => true, () => false);// non-conforminguuid('abc').catch(console.error);> ValidationError: a uuid is required</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rx</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">RegExp</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The Regular Expression to match against.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
 <span class="param-type">string</span>
 
 
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>A regular expression must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
     </dd>
 </dl>
 
@@ -731,7 +1568,7 @@ appened to the querystring.</p>
 
     
 
-    <h4 class="name" id=".withAuthentication"><span class="type-signature">(static) </span>withAuthentication<span class="signature">(fetch, reauthenticate)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
+    <h4 class="name" id=".not"><span class="type-signature">(static) </span>not<span class="signature">(validator, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
 
     
 
@@ -743,7 +1580,7 @@ appened to the querystring.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line533">line 533</a>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line443">line 443</a>
     </li></ul></dd>
     
 
@@ -783,14 +1620,9 @@ appened to the querystring.</p>
 
 
 <div class="description usertext">
-    <p>Wraps a fetch method so a reauthentication method is invoked if
-a <a href="Response.html">Response</a> status 401 is returned. The reauthentication
-method is responsible for ensuring future requests are authenticated.</p>
-<p>One way to do this is by adding a <a href="ProxyRule.html">ProxyRule</a> to the Proxy
-that sets an Authorize header to an updated value on specific <a href="Request.html">Requests</a>.
-A simpler approach is to rely on a Set-Cookie response header to update the
-cookies sent with future requests (if <a href="DataDefinition.html">withCredentials</a>
-is true).</p>
+    <p>Negates the specified validator. In other words, if the validator
+rejects, this validation will resolve. If the validator resolves,
+this validation will reject with the specified error message.</p>
 </div>
 
 
@@ -803,7 +1635,7 @@ is true).</p>
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>import { fetch, createRequest } from '~/path/to/datalayer';const getUserToken = {  base: 'auth',  path: '/refreshToken',  withCredentials: true,};// a 401 has occurred; get a new JWT token// for the current userasync function reauthenticate() {  // a Set-Cookie response header will update  // the JWT that we send on future requests,  // so we don't need to do anything else here  return await fetch(createRequest(getUserToken));}export const pipeline = data.utils.withAuthentication(fetch, reauthenticate);</code></pre>
+    <pre class="prettyprint"><code>const isEmpty = validators.empty('value is not empty');const isNotEmpty = validators.not(isEmpty, 'value is empty');// conformingawait isNotEmpty([1, 2, 3]);// not conformingisNotEmpty([]).catch(console.error);> ValidationError: value is emptyisNotEmpty({}).catch(console.error);> ValidationError: value is emptyisNotEmpty(null).catch(console.error);> ValidationError: value is empty</code></pre>
 
 
 
@@ -833,13 +1665,13 @@ is true).</p>
 
         <tr>
             
-                <td class="name"><code>fetch</code></td>
+                <td class="name"><code>validator</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Fetch</span>
+<span class="param-type"><a href="global.html#Validator">Validator</a></span>
 
 
             
@@ -849,20 +1681,20 @@ is true).</p>
 
             
 
-            <td class="description last"><p>The fetch method to wrap.</p></td>
+            <td class="description last"><p>The validator to negate.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>reauthenticate</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Reauthenticate">Reauthenticate</a></span>
+<span class="param-type">string</span>
 
 
             
@@ -872,7 +1704,192 @@ is true).</p>
 
             
 
-            <td class="description last"><p>Method to invoke to reauthenticate the user.</p></td>
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+    <div class="param-desc usertext">
+    
+        <p>An error message must be provided.</p>
+    
+    </div>
+
+</li>
+    
+        <li>
+
+    <div class="param-desc usertext">
+    
+        <p>A validator function must be provided.</p>
+    
+    </div>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".number"><span class="type-signature">(static) </span>number<span class="signature">(message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line331">line 331</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures a value is a number.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const age = validators.number('age is required');// non-conforming valueage('123').catch(console.error);> ValidationError: age is required// conforming valueconst valid = await age(29)  .then(() => true, () => false);// as part of object schemaconst cartItem = validators.object({  sku: validators.string('sku is required'),  name: validators.string('item name is required'),  amount: validators.number('amount is required'),}, 'cart item is invalid');</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
         </tr>
 
     
@@ -896,11 +1913,28 @@ is true).</p>
 
         
 
-    <div class="param-desc usertext">
-    
-        <p>Argument <code>reauthenticate</code> must be a function.</p>
-    
-    </div>
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
 
 
     
@@ -910,7 +1944,7 @@ is true).</p>
 
         
 <div class="param-desc">
-    <p>The wrapped fetch method.</p>
+    <p>A validation function</p>
 </div>
 
 
@@ -921,7 +1955,7 @@ is true).</p>
     </dt>
     <dd>
         
-<span class="param-type">Fetch</span>
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
 
 
     </dd>
@@ -936,7 +1970,7 @@ is true).</p>
 
     
 
-    <h4 class="name" id=".withCache"><span class="type-signature">(static) </span>withCache<span class="signature">(fetch, cache)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
+    <h4 class="name" id=".object"><span class="type-signature">(static) </span>object<span class="signature">(schema, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>>}</span></h4>
 
     
 
@@ -948,214 +1982,7 @@ is true).</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line313">line 313</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="module-stores_utils.html#.asDataCache">asDataCache()</a> in @paychex/core/stores</li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Wraps the fetch method to cache successful Responses within a data pipeline.</p>
-<p><strong>NOTE:</strong> You can easily create <a href="Store.html">Store</a>-backed data caches for this method
-using <a href="module-stores_utils.html#.asDataCache">asDataCache()</a>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { createRequest, fetch } from '~/path/to/datalayer';const getReportHistory = {  method: 'GET',  base: 'reports',  path: '/history/:id'};// NOTE: use withEncryption(store, options) if the response// might contain personal or sensitive information that you// wish to keep secretconst store = stores.indexedDB({ store: 'reports' });const attempt = data.utils.withCache(fetch, stores.utils.asDataCache(store));export async function loadReportHistory(id) {  const params = { id };  const request = createRequest(getReportHistory, params);  const response = await attempt(request)    .catch(errors.rethrow(params));  return response.data;}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fetch</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Fetch</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The fetch method to wrap.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>cache</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Cache.html">Cache</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The cache used to store <a href="Response.html">Responses</a>.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Throws:</h5>
-
-        
-
-    <div class="param-desc usertext">
-    
-        <p>An invalid cache was provided to withCache.</p>
-    
-    </div>
-
-
-    
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The wrapped fetch method.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Fetch</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".withConnectivity"><span class="type-signature">(static) </span>withConnectivity<span class="signature">(fetch, reconnect)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line424">line 424</a>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line196">line 196</a>
     </li></ul></dd>
     
 
@@ -1195,794 +2022,13 @@ using <a href="module-stores_utils.html#.asDataCache">asDataCache()</a>.</p>
 
 
 <div class="description usertext">
-    <p>Wraps the fetch operation to wait for a network connection prior to
-attempting the data operation.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { showDialog, connectToNetwork } from '~/path/to/dialogs';import { fetch, createRequest } from '~/path/to/datalayer';const operation = {  base: 'my-app',  path: '/path/to/data'};async function waitForConnect() {  return await showDialog(connectToNetwork, { modal: true });}const attempt = data.utils.withConnectivity(fetch, waitForConnect);export async function loadData() {  const request = createRequest(operation);  const response = await attempt(request);  return response.data;}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fetch</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Fetch</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The fetch method to wrap.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>reconnect</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Reconnect">Reconnect</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Returns a Promise that resolves
-when the user's network connection has been re-established.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Throws:</h5>
-
-        
-
-    <div class="param-desc usertext">
-    
-        <p>Argument <code>reconnect</code> must be a function.</p>
-    
-    </div>
-
-
-    
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The wrapped fetch method.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Fetch</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".withDiagnostics"><span class="type-signature">(static) </span>withDiagnostics<span class="signature">(fetch, diagnostics)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line475">line 475</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Invokes the specified method when a call is aborted (<a href="Response.html">Response</a>
-status = 0).</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { noop } from 'lodash-es';import { fetch, createRequest } from '~/path/to/datalayer';import { tracker } from '~/path/to/tracker';import operations from '~/config/diagnostics.mjson';function trackResults(results) {  tracker.event('diagnostics run', { results });}function asResultPromise(request) {  const fromResponse = (response) =>    `${request.url}: ${response.status} (${response.statusText})`;  const fromError = (error) => fromResponse(error.response);  return fetch(request).then(fromResponse, fromError).catch(noop);}function performNetworkTests(request) {  // only perform diagnostics for calls that  // were aborted between the user and our servers  if (!request.url.includes('mydomain.com')) return;  const requests = operations.map(createRequest);  const responses = requests.map(asResultPromise);  Promise.all(responses).then(trackResults);}export const fetchWithDiagnostics =  data.utils.withDiagnostics(fetch, performNetworkTests);</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fetch</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Fetch</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The fetch method to wrap.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>diagnostics</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Diagnostics">Diagnostics</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Invoked when a data call is aborted.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Throws:</h5>
-
-        
-
-    <div class="param-desc usertext">
-    
-        <p>Argument <code>diagnostics</code> must be a function.</p>
-    
-    </div>
-
-
-    
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The wrapped fetch method.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Fetch</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".withHeaders"><span class="type-signature">(static) </span>withHeaders<span class="signature">(fetch, headers)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line584">line 584</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Applies default <a href="Request.html">Request</a> headers.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { fetch, createRequest } from '~/path/to/datalayer';const operation = {  base: 'my-app',  path: '/users/:id'};const attempt = data.utils.withHeaders(fetch, {  'x-app-name': 'my-app',  'x-platform': 'android',});export function getUser(id) {  const params = { id };  const request = createRequest(operation, params);  const response = await attempt(request);  return response.data;}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fetch</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Fetch</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The fetch method to wrap.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>headers</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#HeadersMap">HeadersMap</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The headers to apply to the <a href="Request.html">Request</a> headers
-collection. Request headers with will override any default headers with the same
-names specified here.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The wrapped fetch method.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Fetch</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".withRetry"><span class="type-signature">(static) </span>withRetry<span class="signature">(fetch, retry)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line250">line 250</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="module-data_utils.html#.falloff">falloff()</a></li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Wraps <a href="DataLayer.html#fetch">fetch</a> to provide automatic
-retry functionality when the operation fails. You can provide
-pre-defined retry logic using <a href="module-data_utils.html#.falloff">existing</a>
-<a href="global.html#RetryFunction">RetryFunction</a> factories or by passing your own custom
-RetryFunction to this method.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import { fetch, createRequest } from '~/path/to/datalayer';const getUser = {  base: 'users',  method: 'GET',  path: '/users/:id',};function retryOnAbort(request, response) {  // aborted and timed-out calls  // should return status 0  if (response.status === 0)    return Promise.resolve(); // retry  return Promise.reject(); // don't retry}const attempt = data.utils.withRetry(fetch, retryOnAbort);export async function loadUserData(id) {  const params = { id };  const request = createRequest(getUser, params);  const response = await attempt(request)    .catch(errors.rethrow(params));  return response.data;}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fetch</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Fetch</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The operation to wrap.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>retry</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#RetryFunction">RetryFunction</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Invoked to determine
-whether the data operation should be retried.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The wrapped fetch method.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Fetch</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".withSignal"><span class="type-signature">(static) </span>withSignal<span class="signature">(fetch, signal)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line708">line 708</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Coordinates and synchronizes access to the data pipeline through
-the specified ManualResetSignal
-or AutoResetSignal.</p>
+    <p>Ensures an object conforms to the specified schema, where each property
+is run against the associated Validator.</p>
+<p><strong>NOTE:</strong> The proposed object will only be checked against the property
+names specified in the schema. If the object has additional properties,
+it will still be considered conforming so long as the schema is satisfied.
+<em>However</em>, if the object has fewer properties than specified in the schema,
+it will be considered invalid.</p>
 </div>
 
 
@@ -1995,9 +2041,11 @@ or AutoResetSignal.</p>
 
     <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>// delay calls until the user is authenticatedimport fetch from 'path/to/datalayer';const authenticated = signals.manualReset(false);export const pipeline = data.utils.withSignal(fetch, authenticated);export function setAuthenticated() {  authenticated.set();}</code></pre>
+    <pre class="prettyprint"><code>// use an empty schema to allow _any_ object typeconst isobject = validators.object({}, 'object expected');// conformingawait isobject({ key: 'value' });// non-conformingisobject([]).catch(console.error);> ValidationError: object expected</code></pre>
 
-    <pre class="prettyprint"><code>// prevent concurrent data calls from reaching the// server out of order by enforcing a sequence (i.e.// the first call must complete before a second call// is sent)import fetch from 'path/to/datalayer';// start the pipeline in a signaled state; each call will// automatically reset the signal, which will be set again// when the call completes, allowing the next call to proceedexport const pipeline = data.utils.withSignal(fetch, signals.autoReset(true));</code></pre>
+    <pre class="prettyprint"><code>const user = validators.object({  age: validators.number('age must be numeric'),  name: validators.string('name must be a string'),}, 'user is invalid');// non-object provideduser([]).catch(console.error);> ValidationError: user is invalid// object is missing a `name` property,// which was defined in the schemauser({ age: 41 }).catch(console.error);> ValidationError: user is invalid</code></pre>
+
+    <pre class="prettyprint"><code>const user = validators.object({  age: validators.number('age must be numeric'),  name: validators.string('name must be a string'),}, 'user is invalid');// non-conforming valueuser({  age: 21,  name: new Date(),}).catch(console.error);> ValidationError: user is invalid  - inner: [ValidationError: name must be a string]// conforming valueconst valid = await user({  age: 21,  name: 'John',  created: new Date(), // not in schema; ignored}).then(() => true, () => false);</code></pre>
 
 
 
@@ -2027,13 +2075,13 @@ or AutoResetSignal.</p>
 
         <tr>
             
-                <td class="name"><code>fetch</code></td>
+                <td class="name"><code>schema</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Fetch</span>
+<span class="param-type">Object.&lt;string, <a href="global.html#Validator">Validator</a>></span>
 
 
             
@@ -2043,23 +2091,22 @@ or AutoResetSignal.</p>
 
             
 
-            <td class="description last"><p>The fetch method to wrap.</p></td>
+            <td class="description last"><p>A map of property
+names to Validator functions. Each validator will be run for
+the value of the associated property on the proposed object.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>signal</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="AutoResetSignal.html">AutoResetSignal</a></span>
-|
-
-<span class="param-type"><a href="ManualResetSignal.html">ManualResetSignal</a></span>
+<span class="param-type">string</span>
 
 
             
@@ -2069,8 +2116,7 @@ or AutoResetSignal.</p>
 
             
 
-            <td class="description last"><p>The ManualResetSignal
-or AutoResetSignal to use to synchronize data calls.</p></td>
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
         </tr>
 
     
@@ -2090,13 +2136,69 @@ or AutoResetSignal to use to synchronize data calls.</p></td>
 
 
 
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>Schema must be an object whose values are Validator functions.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    <p>The wrapped fetch method.</p>
+    <p>A validation function</p>
 </div>
 
 
@@ -2107,7 +2209,7 @@ or AutoResetSignal to use to synchronize data calls.</p></td>
     </dt>
     <dd>
         
-<span class="param-type">Fetch</span>
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>></span>
 
 
     </dd>
@@ -2122,7 +2224,7 @@ or AutoResetSignal to use to synchronize data calls.</p></td>
 
     
 
-    <h4 class="name" id=".withTransform"><span class="type-signature">(static) </span>withTransform<span class="signature">(fetch, transformer)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
+    <h4 class="name" id=".oneOf"><span class="type-signature">(static) </span>oneOf<span class="signature">(&hellip;values, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
 
     
 
@@ -2134,7 +2236,7 @@ or AutoResetSignal to use to synchronize data calls.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line378">line 378</a>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line404">line 404</a>
     </li></ul></dd>
     
 
@@ -2174,213 +2276,7 @@ or AutoResetSignal to use to synchronize data calls.</p></td>
 
 
 <div class="description usertext">
-    <p>Wraps the given fetch method to add optional request and response
-transformations to the data pipeline.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>import pako from 'pako'; // compressionimport { fetch, createRequest } from '~/path/to/datalayer';const saveUser = {  method: 'POST',  base: 'my-app',  path: '/users/:id',  headers: {    'content-encoding': 'deflate'  }};// NOTE: `request` and `response` are optional;// see the Transformer documentation for detailsconst compressor = {  request(body, headers) {    const json = JSON.stringify(body);    if (headers['content-encoding'] === 'deflate')      return pako.deflate(json);    return json;  }};const attempt = data.utils.withTransform(fetch, compressor);export async function saveUserData(id, user) {  const params = { id };  const request = createRequest(saveUser, params, user);  const response = await attempt(request);  return response.meta.headers['e-tag'];}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fetch</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Fetch</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The fetch method to wrap.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>transformer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Transformer.html">Transformer</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Determines how the <a href="Request.html">Request</a>
-and <a href="Response.html">Response</a> should be transformed before being passed to
-the next stage in the data pipeline.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>The wrapped fetch method.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Fetch</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".withXSRF"><span class="type-signature">(static) </span>withXSRF<span class="signature">(fetch, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Fetch}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="data_utils.mjs.html">data/utils.mjs</a>, <a href="data_utils.mjs.html#line652">line 652</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-see">See:</dt>
-    <dd class="tag-see">
-        <ul>
-            <li><a href="https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md">OWASP XSRF Cheat Sheet</a></li>
-        </ul>
-    </dd>
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Adds Cross-Site Request Forgery protection to <a href="Request.html">Requests</a> made
-to the same origin where the app is hosted. For this to work, the server and
-client agree on a unique token to identify the user and prevent cross-site
-requests from being sent without the user's knowledge.</p>
-<p>By default, this method reads the <code>XSRF-TOKEN</code> cookie value sent by the server
-and adds it as the <code>X-XSRF-TOKEN</code> request header on any requests sent to the
-same origin. You can configure the cookie and/or the header name by passing your
-own values in the <code>options</code> argument. You can also specify a whitelist of cross-origin
-hostnames the header should be sent to (e.g. to subdomains of the host domain).
-See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
-<p>Read more about XSRF and implementation best practices <a href="https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md">here</a>.</p>
+    <p>Ensures a value equals one of the given expected values.</p>
 </div>
 
 
@@ -2393,9 +2289,9 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
 
     <h5>Examples</h5>
     
-    <pre class="prettyprint"><code>import { fetch } from '~/path/to/datalayer';export const safeFetch = data.utils.withXSRF(fetch);</code></pre>
+    <pre class="prettyprint"><code>// you can specify the expected values as an array or as parameters:const bool = validators.oneOf(true, false, 'boolean expected');const same = validators.oneOf([true, false], 'boolean expected');</code></pre>
 
-    <pre class="prettyprint"><code>import { fetch } from '~/path/to/datalayer';export const safeFetch = data.utils.withXSRF(fetch, {  cookie: 'XSRF-MY-APP',  header: 'X-XSRF-MY-APP',  hosts: ['*.my-app.com']});</code></pre>
+    <pre class="prettyprint"><code>const level = validators.oneOf(['admin', 'user', 'poweruser'], 'invalid level');// non-conforming valuelevel('sudo').catch(console.error);> ValidationError: invalid level// conforming valueconst valid = await level('user')  .then(() => true, () => false);// as part of object schemaconst user = validators.object({  username: validators.string('username is required'),  level: validators.oneOf('admin', 'user', 'poweruser', 'invalid level'),}, 'user is invalid');</code></pre>
 
 
 
@@ -2427,13 +2323,13 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
 
         <tr>
             
-                <td class="name"><code>fetch</code></td>
+                <td class="name"><code>values</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Fetch</span>
+<span class="param-type">Array.&lt;any></span>
 
 
             
@@ -2446,25 +2342,27 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
                 
 
                 
+                    &lt;repeatable><br>
+                
                 </td>
             
 
             
 
-            <td class="description last"><p>The fetch method to wrap.</p></td>
+            <td class="description last"><p>The allowed set of values that the proposed value can be one of.</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>message</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="XSRFOptions.html">XSRFOptions</a></span>
+<span class="param-type">string</span>
 
 
             
@@ -2472,8 +2370,6 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
 
             
                 <td class="attributes">
-                
-                    &lt;optional><br>
                 
 
                 
@@ -2484,7 +2380,7 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
 
             
 
-            <td class="description last"><p>Optional overrides for cookie and header names.</p></td>
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
         </tr>
 
     
@@ -2504,13 +2400,69 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
 
 
 
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>A non-empty array of expected values must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
 
 
 <h5>Returns:</h5>
 
         
 <div class="param-desc">
-    <p>The wrapped fetch method.</p>
+    <p>A validation function</p>
 </div>
 
 
@@ -2521,7 +2473,696 @@ See <a href="XSRFOptions.html">XSRFOptions</a> for details.</p>
     </dt>
     <dd>
         
-<span class="param-type">Fetch</span>
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".range"><span class="type-signature">(static) </span>range<span class="signature">(min, max, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line485">line 485</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures the value is in the specified range. If no minimum value is
+specified, no lower limit will be applied. Same if no maximum value
+is specified. The bounds are inclusive, so think of it as <code>[min, max]</code>,
+not <code>(min, max)</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const isAdult = validators.range(18, null, 'not an adult');const isTodayOrEarlier = validators.range(null, new Date(), 'after today');// conformingawait isAdult(31);// not conformingisAdult(4).catch(console.error);> ValidationError: not an adult// non-conforming dateconst ONE_DAY = 24 * 60 * 60 * 1000;const tomorrow = new Date(Date.now() + ONE_DAY);isTodayOrEarlier(tomorrow).catch(console.error);> ValidationError: after today</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>min</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The minimum value in the range, inclusive.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">any</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The maximum value in the range, inclusive.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc usertext">
+    
+        <p>An error message must be provided.</p>
+    
+    </div>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".some"><span class="type-signature">(static) </span>some<span class="signature">(&hellip;validators, message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line587">line 587</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures the proposed value passes at least one of the specified
+validators.</p>
+<p><strong>NOTE:</strong> If no validators are specified, the value will always
+be considered invalid.</p>
+<p><strong>NOTE:</strong> You can use this validator to extend existing validations.
+For example, you can enable multiple versions of a schema until
+support for older versions can be removed.</p>
+<p>See the examples for details.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+    <pre class="prettyprint"><code>// if provided, feedback must be a stringconst bugReport = validators.object({  error: validators.instanceOf(Error, 'error is required'),  feedback: validators.some(    validators.empty(''),    validators.string('feedback should be a string'),    'invalid feedback',  ),}, 'invalid bug report');</code></pre>
+
+    <pre class="prettyprint"><code>// allowing multiple versions of a schema// compose validators for re-usefunction isRequiredString(name) {  return validators.every(    validators.not(validators.empty(''), `${name} is required`),    validators.string(`${name} must be a string`),    `${name} is a required string`,  )}const version1 = validators.object({  fullname: isRequiredString('fullname'),});// version 2 split fullname into firstname and lastname:const version2 = validators.object({  firstname: isRequiredString('firstname'),  lastname: isRequiredString('lastname'),});const isKnownVersion = validators.some([  version1, // single fullname field  version2, // firstname and lastname fields], 'invalid version provided');export async function validatePerson(person) {  await isKnownVersion(person);}</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>validators</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#Validator">Validator</a>></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Zero or more <a href="global.html#Validator">Validator</a>
+functions to apply. You can specify an array or just pass the
+validators as direct arguments.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+<ul>
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    
+        <li>
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>A non-validator was provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+</li>
+    </ul>
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="AggregateValidationError.html">AggregateValidationError</a>></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".string"><span class="type-signature">(static) </span>string<span class="signature">(message)</span><span class="type-signature"> &rarr; {<a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>>}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="validators_index.mjs.html">validators/index.mjs</a>, <a href="validators_index.mjs.html#line297">line 297</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    <p>Ensures a value is a string.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>const name = validators.string('name must be a string');// non-conforming valuename(123).catch(console.error);> ValidationError: name must be a string// conforming valueconst valid = await name('John')  .then(() => true, () => false);// as part of object schemaconst user = validators.object({  firstname: validators.string('string firstname expected'),  lastname: validators.string('string lastname expected'),}, 'user is invalid');</code></pre>
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The error message to use if the validation fails.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc usertext">
+        <p>An error message must be provided.</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl class="param-type">
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A validation function</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Validator">Validator</a>.&lt;<a href="ValidationError.html">ValidationError</a>></span>
 
 
     </dd>

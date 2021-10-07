@@ -41,6 +41,7 @@ name | description
 [stores/utils]{@link module:stores/utils} | Utility methods for working with Stores.
 [trackers]{@link module:trackers} | Provides event, error, and performance logging for applications.
 [trackers/utils]{@link module:trackers/utils} | Provides utility methods for working with Tracker instances or collectors.
+[validators]{@link module:validators} | Provides validation factories to enforce data quality.
 [test]{@link module:test} | Provides functionality useful during unit testing.
 
 All code is exported through a top-level namespace you can access in the following ways:
