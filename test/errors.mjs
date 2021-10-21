@@ -30,6 +30,15 @@ describe('errors', () => {
             expect(err.severity).toBe(ERROR);
         });
 
+        it('has enumerable stack and message', () => {
+            const err = error('message');
+            expect(JSON.parse(JSON.stringify(err))).toMatchObject({
+                name: 'Error',
+                message: 'message',
+                stack: expect.anything(),
+            });
+        });
+
     });
 
     describe('fatal', () => {

@@ -161,6 +161,15 @@ export const rethrow = curry(function throwWithProps() {
     throw Object.assign(err, data);
 }, 2);
 
+function enumerable(value) {
+    return {
+        value,
+        writable: true,
+        enumerable: true,
+        configurable: true,
+    };
+}
+
 /**
  * Creates a new Error instance with the optional key-value pairs mixed in.
  * The returned Error will have the default severity of {@link module:errors.ERROR ERROR},
@@ -191,7 +200,13 @@ export const rethrow = curry(function throwWithProps() {
  * }
  */
 export function error(message, data = {}) {
-    return Object.assign(new Error(message), { severity: ERROR }, data);
+    const err = new Error(message);
+    Object.defineProperties(err, {
+        name: enumerable(err.name),
+        stack: enumerable(err.stack),
+        message: enumerable(err.message),
+    });
+    return Object.assign(err, { severity: ERROR }, data);
 }
 
 /**
