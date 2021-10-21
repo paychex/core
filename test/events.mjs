@@ -74,6 +74,12 @@ describe('events', () => {
                 expect(() => bus.fire('does not exist')).not.toThrow();
             });
 
+            it('resolves if no subscribers', (done) => {
+                const promise = bus.fire('does not exist');
+                expect(promise).toBeInstanceOf(Promise);
+                promise.then(() => done());
+            });
+
             it('invokes "on" subscriber with specified context', () => {
                 const handler = spy();
                 const context = Object.create(null);
