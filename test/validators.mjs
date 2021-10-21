@@ -315,6 +315,12 @@ describe('validators', () => {
             expect(result).not.toBeInstanceOf(Error);
         });
 
+        it('resolves if value is JSON-encoded', async () => {
+            const validator = date('invalid');
+            const result = await validator(JSON.parse(JSON.stringify(new Date())));
+            expect(result).not.toBeInstanceOf(Error);
+        });
+
         it('rejects if non-date provided', async () => {
             try {
                 await date('invalid')('123');

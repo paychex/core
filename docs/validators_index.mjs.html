@@ -86,6 +86,12 @@ import { error, rethrow } from '../errors/index.mjs';
  * @module validators
  */
 
+const rxISO8601 = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
+
+function isJSONEncoded(value) {
+    return rxISO8601.test(String(value));
+}
+
 function asKeyValuePromise([property, value]) {
     const { schema, current, source } = this;
     const currentValue = get(current, property);
@@ -410,6 +416,8 @@ export function number(message) {
 export function date(message) {
     validate(message, isString, 'An error message must be provided.');
     return async function validDate(proposed, current) {
+        if (isJSONEncoded(proposed))
+            proposed = new Date(proposed);
         if (!isDate(proposed))
             throw validationError(message, { proposed, current });
     };
