@@ -32,6 +32,7 @@ name | description
 [data/utils]{@link module:data/utils} | Functionality used to customize a DataLayer pipeline.
 [errors]{@link module:errors} | Provides utility methods for working with Errors.
 [events]{@link module:events} | Provides an event bus for publish/subscribe behavior.
+[formatters]{@link module:formatters} | Provides functionality to control text output.
 [functions]{@link module:functions} | Provides wrappers for functions to extend behavior.
 [models]{@link module:models} | Provides utilities for working with collections of structured data.
 [models/utils]{@link module:models/utils} | Extends ModelCollection instances with helpful functionality.
