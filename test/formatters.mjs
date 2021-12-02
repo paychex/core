@@ -205,6 +205,20 @@ describe('formatters', () => {
 
     });
 
+    describe('toParts', () => {
+
+        it('bound correctly', () => {
+            expect(() => format.toDate(Date.now())).not.toThrow();
+            expect(() => format.toTime(Date.now())).not.toThrow();
+            expect(() => format.toNumber(123)).not.toThrow();
+            expect(() => format.toCurrency(123)).not.toThrow();
+            expect(() => format.toNumberParts(123)).not.toThrow();
+            expect(() => format.toDateParts(Date.now())).not.toThrow();
+            expect(() => format.toTimeParts(Date.now())).not.toThrow();
+        });
+
+    });
+
     describe('toCurrency', () => {
 
         let $;

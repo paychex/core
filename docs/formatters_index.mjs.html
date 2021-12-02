@@ -189,9 +189,11 @@ export function create({
 
     const toDigits = utils.withReplacement(String, /\D/g, '');
 
-    const toDateParts = dateFormatter.formatToParts;
+    const toDateParts = dateFormatter.formatToParts.bind(dateFormatter);
 
-    const toTimeParts = timeFormatter.formatToParts;
+    const toTimeParts = timeFormatter.formatToParts.bind(dateFormatter);
+
+    const toNumberParts = numberFormatter.formatToParts.bind(numberFormatter);
 
     const toList = (items = [], conjunction = true) => {
         const listFormatter = new Intl.ListFormat(locale, {
@@ -220,6 +222,7 @@ export function create({
         toList,
         toDigits,
         toNumber,
+        toNumberParts,
         toCurrency,
         toDateParts,
         toTimeParts,
