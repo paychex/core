@@ -441,9 +441,22 @@ export function createProxy() {
             request.path = request.path
                 .replace(DOUBLE_SLASH, '/')
                 .replace(LEADING_SLASHES, '');
-            const { protocol = '', host = request.base, port = 80 } = config
+            let {
+                origin = '',
+                protocol = '',
+                host = '',
+                port = 80,
+            } = config
                 .filter(ruleMatches, request)
                 .reduce(merge, request);
+            if (origin) {
+                try {
+                    const url = new URL(origin);
+                    host = url.host;
+                    port = url.port;
+                    protocol = url.protocol;
+                } catch (e) {}
+            }
             return [
                 host ? format.protocol(clean(protocol)) : '',
                 host,

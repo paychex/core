@@ -515,6 +515,15 @@ export class DataLayer {
 export class ProxyRule extends Request {
 
     /**
+     * Can be used to specify the protocol, host name, and port number
+     * in one setting, rather than 3 different settings.
+     *
+     * @memberof ProxyRule#
+     * @type {string}
+     */
+    origin = ''
+
+    /**
      * 'http', 'https', 'file', etc.
      *
      * @memberof ProxyRule#
