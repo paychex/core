@@ -138,14 +138,14 @@ describe('data', () => {
                 })).toBe('https://www.test.com:9000/path');
             });
 
-            it('uses existing protocol, host, and port if origin invalid', () => {
-                expect(proxy.url({
+            it('throws error if origin invalid', () => {
+                expect(() => proxy.url({
                     port: 9000,
                     path: 'path',
                     protocol: 'https',
                     host: 'www.test.com',
                     origin: 'invalid',
-                })).toBe('https://www.test.com:9000/path');
+                })).toThrow('invalid origin in proxy rules');
             });
 
         });

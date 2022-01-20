@@ -455,7 +455,9 @@ export function createProxy() {
                     host = url.host;
                     port = url.port;
                     protocol = url.protocol;
-                } catch (e) {}
+                } catch (e) {
+                    throw error(`invalid origin in proxy rules`, { origin });
+                }
             }
             return [
                 host ? format.protocol(clean(protocol)) : '',
