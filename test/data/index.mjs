@@ -25,7 +25,7 @@ describe('data', () => {
 
             it('returns default url if no rules set', () => {
                 const url = proxy.url('base', 'path1', 'path2');
-                expect(url).toBe('//base/path1/path2');
+                expect(url).toBe('/path1/path2');
             });
 
             it('returns default url if no rules match', () => {
@@ -35,12 +35,18 @@ describe('data', () => {
                     }
                 });
                 const url = proxy.url('base', 'path1', 'path2');
-                expect(url).toBe('//base/path1/path2');
+                expect(url).toBe('/path1/path2');
             });
 
             it('strips trailing slash if no paths provided', () => {
+                proxy.use({
+                    origin: 'http://test.com',
+                    match: {
+                        base: 'base'
+                    }
+                });
                 const url = proxy.url('base');
-                expect(url).toBe('//base');
+                expect(url).toBe('http://test.com');
             });
 
             it('returns modified url if one rule matches', () => {
@@ -121,8 +127,25 @@ describe('data', () => {
                     port: 9000,
                     path: 'path',
                     protocol: 'https',
-                    base: 'www.test.com',
+                    host: 'www.test.com',
                 })).toBe('https://www.test.com:9000/path');
+            });
+
+            it('parses origin if provided', () => {
+                expect(proxy.url({
+                    path: 'path',
+                    origin: 'https://www.test.com:9000',
+                })).toBe('https://www.test.com:9000/path');
+            });
+
+            it('throws error if origin invalid', () => {
+                expect(() => proxy.url({
+                    port: 9000,
+                    path: 'path',
+                    protocol: 'https',
+                    host: 'www.test.com',
+                    origin: 'invalid',
+                })).toThrow('invalid origin in proxy rules');
             });
 
         });
@@ -313,20 +336,20 @@ describe('data', () => {
 
             beforeEach(() => invalid = 'Invalid request passed to fetch.');
 
-            it('rejects if no request provided', (done) => {
-                dataLayer.fetch().catch(e => {
+            function catchHandler(done) {
+                return (e) => {
                     expect(e.severity).toBe(FATAL);
                     expect(e.message).toBe(invalid);
                     done();
-                });
+                };
+            }
+
+            it('rejects if no request provided', (done) => {
+                dataLayer.fetch().catch(catchHandler(done));
             });
 
             it('rejects if invalid request provided', (done) => {
-                dataLayer.fetch({ method: 123, url: '' }).catch(e => {
-                    expect(e.severity).toBe(FATAL);
-                    expect(e.message).toBe(invalid);
-                    done();
-                });
+                dataLayer.fetch({ method: 123, url: '' }).catch(catchHandler(done));
             });
 
             it('rejects if adapter not found', (done) => {
