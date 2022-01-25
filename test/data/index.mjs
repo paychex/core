@@ -448,10 +448,7 @@ describe('data', () => {
             });
 
             it('throws if invalid definition provided', () => {
-                expect(() => dataLayer.createRequest({
-                    base: '',
-                    path: 123,
-                })).toThrow(invalid);
+                expect(() => dataLayer.createRequest(123)).toThrow(invalid);
             });
 
             it('sets defaults', () => {

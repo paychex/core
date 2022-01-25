@@ -14,6 +14,7 @@ import {
     stubTrue,
     mergeWith,
     conforms,
+    isObjectLike,
 } from 'lodash-es';
 
 import { tokenize } from './utils.mjs';
@@ -199,11 +200,6 @@ const isRequest = conforms({
     adapter: isNonEmptyString,
 });
 
-const isDataDefinition = conforms({
-    base: isString,
-    path: isNonEmptyString,
-});
-
 const STATUS_MESSAGES = {
     100: "Continue",
     101: "Switching Protocols",
@@ -325,7 +321,7 @@ export function createDataLayer(proxy, adapter, adapters = new Map()) {
 
     function createRequest(definition, params = {}, body = null) {
 
-        if (!isDataDefinition(definition))
+        if (!isObjectLike(definition))
             throw error('A valid DataDefinition object must be passed to createRequest.');
 
         const request = defaults({}, definition, {
