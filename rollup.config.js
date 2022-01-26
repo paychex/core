@@ -1,5 +1,8 @@
 const path = require('path');
 
+const copy = require('rollup-plugin-copy');
+
+const typescript = require('@rollup/plugin-typescript');
 const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const { terser } = require("rollup-plugin-terser");
 const polyfills = require('rollup-plugin-node-polyfills');
@@ -7,7 +10,7 @@ const commonjs = require('@rollup/plugin-commonjs');
 const { babel } = require("@rollup/plugin-babel");
 
 const pkg = require('./package.json');
-const external = ['lodash-es'];
+const external = ['lodash'];
 
 const output = {
     format: "umd",
@@ -20,18 +23,18 @@ const output = {
         return `${pkg.name}/${path.relative(path.resolve('.'), path.resolve(path.dirname(sourcemapPath), relativeSourcePath))}`;
     },
     globals: {
-        'lodash-es': '_',
+        'lodash': '_',
     },
     paths: {
-        'lodash-es': 'lodash',
+        'lodash': 'lodash',
     }
 };
 
 module.exports = [
     {
-        // UMD
+        // umd
         external,
-        input: 'index.js',
+        input: 'index.ts',
         plugins: [
             nodeResolve({
                 browser: true,
@@ -39,6 +42,9 @@ module.exports = [
             }),
             commonjs({
                 include: /node_modules/,
+            }),
+            typescript({
+                tsconfig: './tsconfig.json',
             }),
             babel({
                 babelHelpers: "bundled",
@@ -48,43 +54,47 @@ module.exports = [
         output: [{
             ...output,
             plugins: [terser()],
-            file: `dist/paychex.core.min.js`,
+            file: pkg.browser.replace('.js', '.min.js'),
         },{
             ...output,
-            file: `dist/paychex.core.js`,
+            file: pkg.browser,
         }],
     },
-    // ESM
     {
-        input: 'index.js',
+        // esm
+        input: 'index.ts',
         external,
-        treeshake: false,
         plugins: [
+            typescript({
+                tsconfig: './tsconfig.json',
+            }),
             nodeResolve(),
             commonjs({
                 include: /node_modules/,
-            })
+            }),
         ],
         output: {
-            dir: "dist/esm",
+            file: pkg.module,
             format: "esm",
             exports: "named",
             sourcemap: true,
         },
     },
-    // CJS
     {
-        input: 'index.js',
-        treeshake: false,
+        // commonjs
+        input: 'index.ts',
         external,
         plugins: [
+            typescript({
+                tsconfig: './tsconfig.json',
+            }),
             nodeResolve(),
             commonjs({
                 include: /node_modules/,
-            })
+            }),
         ],
         output: {
-            dir: "dist/cjs",
+            file: pkg.main,
             format: "cjs",
             exports: "named",
             sourcemap: true,
@@ -93,4 +103,24 @@ module.exports = [
             }
         },
     },
+    {
+        // test bundles
+        input: 'spec/index.ts',
+        plugins: [
+            typescript({
+                tsconfig: './tsconfig.test.json',
+                declaration: true,
+                declarationDir: '.',
+            }),
+            copy({
+                targets: [
+                    { src: './package-test.json', dest: 'test', rename: 'package.json' },
+                ]
+            })
+        ],
+        output: [
+            { format: 'cjs', file: 'test/index.js' },
+            { format: 'esm', file: 'test/index.mjs' },
+        ]
+    }
 ];

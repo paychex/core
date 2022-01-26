@@ -1,0 +1,31 @@
+{
+    "name": "@paychex/core~test",
+    "version": "1.0.0",
+    "description": "Provides agnostic unit test functionality.",
+    "main": "index.js",
+    "module": "index.mjs",
+    "types": "index.d.ts",
+    "license": "Apache-2.0",
+    "author": "Paychex, Inc.",
+    "contributors": [
+        {
+            "name": "Dan Barnes",
+            "email": "dbarnes1@paychex.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/paychex/core.git"
+    },
+    "bugs": {
+        "url": "https://github.com/paychex/core/issues"
+    },
+    "homepage": "https://paychex.github.io/core/",
+    "devDependencies": {},
+    "dependencies": {},
+    "engines": {
+        "node": ">= 13.2.0",
+        "npm": ">= 7.0.0"
+    },
+    "scripts": {}
+}
