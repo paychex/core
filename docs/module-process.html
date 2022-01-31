@@ -1,1264 +1,0 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    
-    <meta charset="utf-8">
-    <title>process - Documentation</title>
-    
-    
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
-    <script src="scripts/nav.js" defer></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
-
-<label for="nav-trigger" class="overlay"></label>
-
-<nav >
-    
-    <input type="text" id="nav-search" placeholder="Search" />
-    
-    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/paychex/core" target="_blank" class="menu-item" id="repository" >Source Code</a></h2><h3>Classes</h3><ul><li><a href="Action.html">Action</a><ul class='methods'><li data-type='method'><a href="Action.html#execute">execute</a></li><li data-type='method'><a href="Action.html#failure">failure</a></li><li data-type='method'><a href="Action.html#init">init</a></li><li data-type='method'><a href="Action.html#retry">retry</a></li><li data-type='method'><a href="Action.html#rollback">rollback</a></li><li data-type='method'><a href="Action.html#success">success</a></li></ul></li><li><a href="ActiveModelCollection.html">ActiveModelCollection</a><ul class='methods'><li data-type='method'><a href="ActiveModelCollection.html#active">active</a></li><li data-type='method'><a href="ActiveModelCollection.html#add">add</a></li><li data-type='method'><a href="ActiveModelCollection.html#clear">clear</a></li><li data-type='method'><a href="ActiveModelCollection.html#fire">fire</a></li><li data-type='method'><a href="ActiveModelCollection.html#items">items</a></li><li data-type='method'><a href="ActiveModelCollection.html#next">next</a></li><li data-type='method'><a href="ActiveModelCollection.html#on">on</a></li><li data-type='method'><a href="ActiveModelCollection.html#one">one</a></li><li data-type='method'><a href="ActiveModelCollection.html#prev">prev</a></li><li data-type='method'><a href="ActiveModelCollection.html#remove">remove</a></li><li data-type='method'><a href="ActiveModelCollection.html#resume">resume</a></li><li data-type='method'><a href="ActiveModelCollection.html#stop">stop</a></li></ul></li><li><a href="AggregateValidationError.html">AggregateValidationError</a></li><li><a href="AutoResetSignal.html">AutoResetSignal</a><ul class='methods'><li data-type='method'><a href="AutoResetSignal.html#ready">ready</a></li><li data-type='method'><a href="AutoResetSignal.html#reset">reset</a></li><li data-type='method'><a href="AutoResetSignal.html#set">set</a></li></ul></li><li><a href="Cache.html">Cache</a><ul class='methods'><li data-type='method'><a href="Cache.html#get">get</a></li><li data-type='method'><a href="Cache.html#set">set</a></li></ul></li><li><a href="CountdownSignal.html">CountdownSignal</a><ul class='methods'><li data-type='method'><a href="CountdownSignal.html#decrement">decrement</a></li><li data-type='method'><a href="CountdownSignal.html#increment">increment</a></li><li data-type='method'><a href="CountdownSignal.html#ready">ready</a></li></ul></li><li><a href="DataDefinition.html">DataDefinition</a></li><li><a href="DataLayer.html">DataLayer</a><ul class='methods'><li data-type='method'><a href="DataLayer.html#createRequest">createRequest</a></li><li data-type='method'><a href="DataLayer.html#fetch">fetch</a></li><li data-type='method'><a href="DataLayer.html#setAdapter">setAdapter</a></li></ul></li><li><a href="DataProxy.html">DataProxy</a><ul class='methods'><li data-type='method'><a href="DataProxy.html#apply">apply</a></li><li data-type='method'><a href="DataProxy.html#url">url</a></li><li data-type='method'><a href="DataProxy.html#use">use</a></li></ul></li><li><a href="EncryptionConfiguration.html">EncryptionConfiguration</a></li><li><a href="EventBus.html">EventBus</a><ul class='methods'><li data-type='method'><a href="EventBus.html#fire">fire</a></li><li data-type='method'><a href="EventBus.html#on">on</a></li><li data-type='method'><a href="EventBus.html#one">one</a></li><li data-type='method'><a href="EventBus.html#resume">resume</a></li><li data-type='method'><a href="EventBus.html#stop">stop</a></li></ul></li><li><a href="ExecutionPromise.html">ExecutionPromise</a><ul class='methods'><li data-type='method'><a href="ExecutionPromise.html#cancel">cancel</a></li><li data-type='method'><a href="ExecutionPromise.html#stop">stop</a></li><li data-type='method'><a href="ExecutionPromise.html#update">update</a></li></ul></li><li><a href="FilteredModelCollection.html">FilteredModelCollection</a><ul class='methods'><li data-type='method'><a href="FilteredModelCollection.html#add">add</a></li><li data-type='method'><a href="FilteredModelCollection.html#clear">clear</a></li><li data-type='method'><a href="FilteredModelCollection.html#filterBy">filterBy</a></li><li data-type='method'><a href="FilteredModelCollection.html#fire">fire</a></li><li data-type='method'><a href="FilteredModelCollection.html#items">items</a></li><li data-type='method'><a href="FilteredModelCollection.html#on">on</a></li><li data-type='method'><a href="FilteredModelCollection.html#one">one</a></li><li data-type='method'><a href="FilteredModelCollection.html#remove">remove</a></li><li data-type='method'><a href="FilteredModelCollection.html#resume">resume</a></li><li data-type='method'><a href="FilteredModelCollection.html#stop">stop</a></li></ul></li><li><a href="Formats.html">Formats</a><ul class='methods'><li data-type='method'><a href="Formats.html#toCurrency">toCurrency</a></li><li data-type='method'><a href="Formats.html#toDate">toDate</a></li><li data-type='method'><a href="Formats.html#toDateParts">toDateParts</a></li><li data-type='method'><a href="Formats.html#toDigits">toDigits</a></li><li data-type='method'><a href="Formats.html#toList">toList</a></li><li data-type='method'><a href="Formats.html#toNumber">toNumber</a></li><li data-type='method'><a href="Formats.html#toRelativeDateTime">toRelativeDateTime</a></li><li data-type='method'><a href="Formats.html#toRelativeDateTimeParts">toRelativeDateTimeParts</a></li><li data-type='method'><a href="Formats.html#toTime">toTime</a></li><li data-type='method'><a href="Formats.html#toTimeParts">toTimeParts</a></li></ul></li><li><a href="FormatterOptions.html">FormatterOptions</a></li><li><a href="GroupedModelCollection.html">GroupedModelCollection</a><ul class='methods'><li data-type='method'><a href="GroupedModelCollection.html#add">add</a></li><li data-type='method'><a href="GroupedModelCollection.html#clear">clear</a></li><li data-type='method'><a href="GroupedModelCollection.html#fire">fire</a></li><li data-type='method'><a href="GroupedModelCollection.html#groupBy">groupBy</a></li><li data-type='method'><a href="GroupedModelCollection.html#groups">groups</a></li><li data-type='method'><a href="GroupedModelCollection.html#items">items</a></li><li data-type='method'><a href="GroupedModelCollection.html#on">on</a></li><li data-type='method'><a href="GroupedModelCollection.html#one">one</a></li><li data-type='method'><a href="GroupedModelCollection.html#remove">remove</a></li><li data-type='method'><a href="GroupedModelCollection.html#resume">resume</a></li><li data-type='method'><a href="GroupedModelCollection.html#stop">stop</a></li></ul></li><li><a href="InvocationData.html">InvocationData</a></li><li><a href="ManualResetSignal.html">ManualResetSignal</a><ul class='methods'><li data-type='method'><a href="ManualResetSignal.html#ready">ready</a></li><li data-type='method'><a href="ManualResetSignal.html#reset">reset</a></li><li data-type='method'><a href="ManualResetSignal.html#set">set</a></li></ul></li><li><a href="Mask.html">Mask</a><ul class='methods'><li data-type='method'><a href="Mask.html#rxToken">rxToken</a></li><li data-type='method'><a href="Mask.html#test">test</a></li></ul></li><li><a href="Message.html">Message</a></li><li><a href="MetaData.html">MetaData</a></li><li><a href="ModelCollection.html">ModelCollection</a><ul class='methods'><li data-type='method'><a href="ModelCollection.html#add">add</a></li><li data-type='method'><a href="ModelCollection.html#clear">clear</a></li><li data-type='method'><a href="ModelCollection.html#fire">fire</a></li><li data-type='method'><a href="ModelCollection.html#items">items</a></li><li data-type='method'><a href="ModelCollection.html#on">on</a></li><li data-type='method'><a href="ModelCollection.html#one">one</a></li><li data-type='method'><a href="ModelCollection.html#remove">remove</a></li><li data-type='method'><a href="ModelCollection.html#resume">resume</a></li><li data-type='method'><a href="ModelCollection.html#stop">stop</a></li></ul></li><li><a href="module-formatters_utils.MASKS.html">MASKS</a></li><li><a href="NestedStartResult.html">NestedStartResult</a></li><li><a href="NestedTimingTracker.html">NestedTimingTracker</a><ul class='methods'><li data-type='method'><a href="NestedTimingTracker.html#child">child</a></li><li data-type='method'><a href="NestedTimingTracker.html#context">context</a></li><li data-type='method'><a href="NestedTimingTracker.html#error">error</a></li><li data-type='method'><a href="NestedTimingTracker.html#event">event</a></li><li data-type='method'><a href="NestedTimingTracker.html#start">start</a></li><li data-type='method'><a href="NestedTimingTracker.html#uuid">uuid</a></li></ul></li><li><a href="OrderedModelCollection.html">OrderedModelCollection</a><ul class='methods'><li data-type='method'><a href="OrderedModelCollection.html#add">add</a></li><li data-type='method'><a href="OrderedModelCollection.html#clear">clear</a></li><li data-type='method'><a href="OrderedModelCollection.html#fire">fire</a></li><li data-type='method'><a href="OrderedModelCollection.html#items">items</a></li><li data-type='method'><a href="OrderedModelCollection.html#on">on</a></li><li data-type='method'><a href="OrderedModelCollection.html#one">one</a></li><li data-type='method'><a href="OrderedModelCollection.html#orderBy">orderBy</a></li><li data-type='method'><a href="OrderedModelCollection.html#remove">remove</a></li><li data-type='method'><a href="OrderedModelCollection.html#resume">resume</a></li><li data-type='method'><a href="OrderedModelCollection.html#stop">stop</a></li></ul></li><li><a href="PagedModelCollection.html">PagedModelCollection</a><ul class='methods'><li data-type='method'><a href="PagedModelCollection.html#add">add</a></li><li data-type='method'><a href="PagedModelCollection.html#clear">clear</a></li><li data-type='method'><a href="PagedModelCollection.html#fire">fire</a></li><li data-type='method'><a href="PagedModelCollection.html#items">items</a></li><li data-type='method'><a href="PagedModelCollection.html#nextPage">nextPage</a></li><li data-type='method'><a href="PagedModelCollection.html#on">on</a></li><li data-type='method'><a href="PagedModelCollection.html#one">one</a></li><li data-type='method'><a href="PagedModelCollection.html#pageIndex">pageIndex</a></li><li data-type='method'><a href="PagedModelCollection.html#pageSize">pageSize</a></li><li data-type='method'><a href="PagedModelCollection.html#prevPage">prevPage</a></li><li data-type='method'><a href="PagedModelCollection.html#remove">remove</a></li><li data-type='method'><a href="PagedModelCollection.html#resume">resume</a></li><li data-type='method'><a href="PagedModelCollection.html#stop">stop</a></li></ul></li><li><a href="ProcessContext.html">ProcessContext</a><ul class='methods'><li data-type='method'><a href="ProcessContext.html#cancel">cancel</a></li><li data-type='method'><a href="ProcessContext.html#stop">stop</a></li><li data-type='method'><a href="ProcessContext.html#update">update</a></li></ul></li><li><a href="ProcessLogic.html">ProcessLogic</a><ul class='methods'><li data-type='method'><a href="ProcessLogic.html#contextFromArgs">contextFromArgs</a></li><li data-type='method'><a href="ProcessLogic.html#getInitialActions">getInitialActions</a></li><li data-type='method'><a href="ProcessLogic.html#getNextActions">getNextActions</a></li></ul></li><li><a href="ProcessRunner.html">ProcessRunner</a><ul class='methods'><li data-type='method'><a href="ProcessRunner.html#cancel">cancel</a></li><li data-type='method'><a href="ProcessRunner.html#stop">stop</a></li><li data-type='method'><a href="ProcessRunner.html#update">update</a></li></ul></li><li><a href="ProcessTransition.html">ProcessTransition</a></li><li><a href="ProcessTransitions.html">ProcessTransitions</a></li><li><a href="ProxyRule.html">ProxyRule</a></li><li><a href="Request.html">Request</a></li><li><a href="Response.html">Response</a></li><li><a href="SelectionModelCollection.html">SelectionModelCollection</a><ul class='methods'><li data-type='method'><a href="SelectionModelCollection.html#add">add</a></li><li data-type='method'><a href="SelectionModelCollection.html#clear">clear</a></li><li data-type='method'><a href="SelectionModelCollection.html#fire">fire</a></li><li data-type='method'><a href="SelectionModelCollection.html#items">items</a></li><li data-type='method'><a href="SelectionModelCollection.html#on">on</a></li><li data-type='method'><a href="SelectionModelCollection.html#one">one</a></li><li data-type='method'><a href="SelectionModelCollection.html#remove">remove</a></li><li data-type='method'><a href="SelectionModelCollection.html#resume">resume</a></li><li data-type='method'><a href="SelectionModelCollection.html#selected">selected</a></li><li data-type='method'><a href="SelectionModelCollection.html#stop">stop</a></li><li data-type='method'><a href="SelectionModelCollection.html#toggle">toggle</a></li></ul></li><li><a href="Semaphore.html">Semaphore</a><ul class='methods'><li data-type='method'><a href="Semaphore.html#ready">ready</a></li><li data-type='method'><a href="Semaphore.html#release">release</a></li></ul></li><li><a href="Signal.html">Signal</a><ul class='methods'><li data-type='method'><a href="Signal.html#ready">ready</a></li></ul></li><li><a href="Spy.html">Spy</a><ul class='methods'><li data-type='method'><a href="Spy.html#invokes">invokes</a></li><li data-type='method'><a href="Spy.html#onCall">onCall</a></li><li data-type='method'><a href="Spy.html#returns">returns</a></li><li data-type='method'><a href="Spy.html#throws">throws</a></li></ul></li><li><a href="SpyBehaviors.html">SpyBehaviors</a><ul class='methods'><li data-type='method'><a href="SpyBehaviors.html#invokes">invokes</a></li><li data-type='method'><a href="SpyBehaviors.html#returns">returns</a></li><li data-type='method'><a href="SpyBehaviors.html#throws">throws</a></li></ul></li><li><a href="SpyCall.html">SpyCall</a></li><li><a href="Store.html">Store</a><ul class='methods'><li data-type='method'><a href="Store.html#delete">delete</a></li><li data-type='method'><a href="Store.html#get">get</a></li><li data-type='method'><a href="Store.html#set">set</a></li></ul></li><li><a href="Tracker.html">Tracker</a><ul class='methods'><li data-type='method'><a href="Tracker.html#child">child</a></li><li data-type='method'><a href="Tracker.html#context">context</a></li><li data-type='method'><a href="Tracker.html#error">error</a></li><li data-type='method'><a href="Tracker.html#event">event</a></li><li data-type='method'><a href="Tracker.html#start">start</a></li><li data-type='method'><a href="Tracker.html#uuid">uuid</a></li></ul></li><li><a href="TrackingInfo.html">TrackingInfo</a></li><li><a href="Transformer.html">Transformer</a><ul class='methods'><li data-type='method'><a href="Transformer.html#request">request</a></li><li data-type='method'><a href="Transformer.html#response">response</a></li></ul></li><li><a href="UniqueModelCollection.html">UniqueModelCollection</a><ul class='methods'><li data-type='method'><a href="UniqueModelCollection.html#add">add</a></li><li data-type='method'><a href="UniqueModelCollection.html#clear">clear</a></li><li data-type='method'><a href="UniqueModelCollection.html#fire">fire</a></li><li data-type='method'><a href="UniqueModelCollection.html#items">items</a></li><li data-type='method'><a href="UniqueModelCollection.html#on">on</a></li><li data-type='method'><a href="UniqueModelCollection.html#one">one</a></li><li data-type='method'><a href="UniqueModelCollection.html#remove">remove</a></li><li data-type='method'><a href="UniqueModelCollection.html#resume">resume</a></li><li data-type='method'><a href="UniqueModelCollection.html#stop">stop</a></li><li data-type='method'><a href="UniqueModelCollection.html#uniqueBy">uniqueBy</a></li></ul></li><li><a href="UpdatingModelCollection.html">UpdatingModelCollection</a><ul class='methods'><li data-type='method'><a href="UpdatingModelCollection.html#add">add</a></li><li data-type='method'><a href="UpdatingModelCollection.html#clear">clear</a></li><li data-type='method'><a href="UpdatingModelCollection.html#fire">fire</a></li><li data-type='method'><a href="UpdatingModelCollection.html#items">items</a></li><li data-type='method'><a href="UpdatingModelCollection.html#merge">merge</a></li><li data-type='method'><a href="UpdatingModelCollection.html#on">on</a></li><li data-type='method'><a href="UpdatingModelCollection.html#one">one</a></li><li data-type='method'><a href="UpdatingModelCollection.html#remove">remove</a></li><li data-type='method'><a href="UpdatingModelCollection.html#resume">resume</a></li><li data-type='method'><a href="UpdatingModelCollection.html#stop">stop</a></li><li data-type='method'><a href="UpdatingModelCollection.html#uniqueBy">uniqueBy</a></li><li data-type='method'><a href="UpdatingModelCollection.html#upsert">upsert</a></li></ul></li><li><a href="ValidationError.html">ValidationError</a></li><li><a href="XSRFOptions.html">XSRFOptions</a></li></ul><h3>Modules</h3><ul><li><a href="module-data.html">data</a><ul class='methods'><li data-type='method'><a href="module-data.html#.createDataLayer">createDataLayer</a></li><li data-type='method'><a href="module-data.html#.createProxy">createProxy</a></li></ul></li><li><a href="module-data_utils.html">data/utils</a><ul class='methods'><li data-type='method'><a href="module-data_utils.html#.falloff">falloff</a></li><li data-type='method'><a href="module-data_utils.html#.tokenize">tokenize</a></li><li data-type='method'><a href="module-data_utils.html#.withAuthentication">withAuthentication</a></li><li data-type='method'><a href="module-data_utils.html#.withCache">withCache</a></li><li data-type='method'><a href="module-data_utils.html#.withConnectivity">withConnectivity</a></li><li data-type='method'><a href="module-data_utils.html#.withDiagnostics">withDiagnostics</a></li><li data-type='method'><a href="module-data_utils.html#.withHeaders">withHeaders</a></li><li data-type='method'><a href="module-data_utils.html#.withRetry">withRetry</a></li><li data-type='method'><a href="module-data_utils.html#.withSignal">withSignal</a></li><li data-type='method'><a href="module-data_utils.html#.withTransform">withTransform</a></li><li data-type='method'><a href="module-data_utils.html#.withXSRF">withXSRF</a></li></ul></li><li><a href="module-errors.html">errors</a><ul class='methods'><li data-type='method'><a href="module-errors.html#.error">error</a></li><li data-type='method'><a href="module-errors.html#.fatal">fatal</a></li><li data-type='method'><a href="module-errors.html#.ignore">ignore</a></li><li data-type='method'><a href="module-errors.html#.rethrow">rethrow</a></li></ul></li><li><a href="module-events.html">events</a><ul class='methods'><li data-type='method'><a href="module-events.html#.bus">bus</a></li></ul></li><li><a href="module-formatters.html">formatters</a><ul class='methods'><li data-type='method'><a href="module-formatters.html#.create">create</a></li></ul></li><li><a href="module-formatters_utils.html">formatters/utils</a><ul class='methods'><li data-type='method'><a href="module-formatters_utils.html#.tokens">tokens</a></li><li data-type='method'><a href="module-formatters_utils.html#.withMask">withMask</a></li><li data-type='method'><a href="module-formatters_utils.html#.withReplacement">withReplacement</a></li></ul></li><li><a href="module-functions.html">functions</a><ul class='methods'><li data-type='method'><a href="module-functions.html#.buffer">buffer</a></li><li data-type='method'><a href="module-functions.html#.invokeIf">invokeIf</a></li><li data-type='method'><a href="module-functions.html#.parallel">parallel</a></li><li data-type='method'><a href="module-functions.html#.sequence">sequence</a></li></ul></li><li><a href="module-models.html">models</a><ul class='methods'><li data-type='method'><a href="module-models.html#.collection">collection</a></li></ul></li><li><a href="module-models_utils.html">models/utils</a><ul class='methods'><li data-type='method'><a href="module-models_utils.html#.withActive">withActive</a></li><li data-type='method'><a href="module-models_utils.html#.withFiltering">withFiltering</a></li><li data-type='method'><a href="module-models_utils.html#.withGrouping">withGrouping</a></li><li data-type='method'><a href="module-models_utils.html#.withOrdering">withOrdering</a></li><li data-type='method'><a href="module-models_utils.html#.withPaging">withPaging</a></li><li data-type='method'><a href="module-models_utils.html#.withSelection">withSelection</a></li><li data-type='method'><a href="module-models_utils.html#.withUnique">withUnique</a></li><li data-type='method'><a href="module-models_utils.html#.withUpdating">withUpdating</a></li></ul></li><li><a href="module-process.html">process</a><ul class='methods'><li data-type='method'><a href="module-process.html#.action">action</a></li><li data-type='method'><a href="module-process.html#.create">create</a></li><li data-type='method'><a href="module-process.html#.dependencies">dependencies</a></li><li data-type='method'><a href="module-process.html#.run">run</a></li><li data-type='method'><a href="module-process.html#.transitions">transitions</a></li></ul></li><li><a href="module-signals.html">signals</a><ul class='methods'><li data-type='method'><a href="module-signals.html#.autoReset">autoReset</a></li><li data-type='method'><a href="module-signals.html#.countdown">countdown</a></li><li data-type='method'><a href="module-signals.html#.manualReset">manualReset</a></li><li data-type='method'><a href="module-signals.html#.semaphore">semaphore</a></li></ul></li><li><a href="module-stores.html">stores</a><ul class='methods'><li data-type='method'><a href="module-stores.html#.memoryStore">memoryStore</a></li></ul></li><li><a href="module-stores_utils.html">stores/utils</a><ul class='methods'><li data-type='method'><a href="module-stores_utils.html#.asDataCache">asDataCache</a></li><li data-type='method'><a href="module-stores_utils.html#.days">days</a></li><li data-type='method'><a href="module-stores_utils.html#.hours">hours</a></li><li data-type='method'><a href="module-stores_utils.html#.minutes">minutes</a></li><li data-type='method'><a href="module-stores_utils.html#.weeks">weeks</a></li><li data-type='method'><a href="module-stores_utils.html#.withEncryption">withEncryption</a></li><li data-type='method'><a href="module-stores_utils.html#.withExpiration">withExpiration</a></li><li data-type='method'><a href="module-stores_utils.html#.withPrefix">withPrefix</a></li></ul></li><li><a href="module-test.html">test</a><ul class='methods'><li data-type='method'><a href="module-test.html#.spy">spy</a></li></ul></li><li><a href="module-trackers.html">trackers</a><ul class='methods'><li data-type='method'><a href="module-trackers.html#.create">create</a></li></ul></li><li><a href="module-trackers_utils.html">trackers/utils</a><ul class='methods'><li data-type='method'><a href="module-trackers_utils.html#.withNesting">withNesting</a></li><li data-type='method'><a href="module-trackers_utils.html#.withReplacement">withReplacement</a></li></ul></li><li><a href="module-validators.html">validators</a><ul class='methods'><li data-type='method'><a href="module-validators.html#.array">array</a></li><li data-type='method'><a href="module-validators.html#.date">date</a></li><li data-type='method'><a href="module-validators.html#.empty">empty</a></li><li data-type='method'><a href="module-validators.html#.every">every</a></li><li data-type='method'><a href="module-validators.html#.instanceOf">instanceOf</a></li><li data-type='method'><a href="module-validators.html#.matches">matches</a></li><li data-type='method'><a href="module-validators.html#.not">not</a></li><li data-type='method'><a href="module-validators.html#.number">number</a></li><li data-type='method'><a href="module-validators.html#.object">object</a></li><li data-type='method'><a href="module-validators.html#.oneOf">oneOf</a></li><li data-type='method'><a href="module-validators.html#.range">range</a></li><li data-type='method'><a href="module-validators.html#.some">some</a></li><li data-type='method'><a href="module-validators.html#.string">string</a></li></ul></li></ul><h3>Externals</h3><ul><li><a href="external-Promise.html">Promise</a></li></ul><h3>Events</h3><ul><li><a href="ActiveModelCollection.html#~event:active-change">active-change</a></li><li><a href="FilteredModelCollection.html#~event:filter-change">filter-change</a></li><li><a href="GroupedModelCollection.html#~event:group-change">group-change</a></li><li><a href="ModelCollection.html#~event:items-add">items-add</a></li><li><a href="ModelCollection.html#~event:items-remove">items-remove</a></li><li><a href="OrderedModelCollection.html#~event:order-change">order-change</a></li><li><a href="PagedModelCollection.html#~event:page-change">page-change</a></li><li><a href="SelectionModelCollection.html#~event:selection-change">selection-change</a></li><li><a href="UniqueModelCollection.html#~event:unique-change">unique-change</a></li><li><a href="UpdatingModelCollection.html#~event:items-update">items-update</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Formatter">Formatter</a></li><li><a href="global.html#MaskFactory">MaskFactory</a></li><li><a href="global.html#ParallelFunction">ParallelFunction</a></li><li><a href="global.html#SequentialFunction">SequentialFunction</a></li><li><a href="global.html#Validator">Validator</a></li></ul>
-</nav>
-
-<div id="main">
-    
-    <h1 class="page-title">process</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        
-            
-        
-    
-</header>
-
-<article>
-    
-        <div class="container-overview">
-        
-            
-                <div class="description usertext"><p>Provides utilities for running complex, multi-step asynchronous processes.</p>
-<pre class="prettyprint source lang-js"><code>// esm
-import { process } from '@paychex/core';
-
-// cjs
-const { process } = require('@paychex/core');
-
-// iife
-const { process } = window['@paychex/core'];
-
-// amd
-require(['@paychex/core'], function({ process }) { ... });
-define(['@paychex/core'], function({ process }) { ... });
-</code></pre>
-<p><strong>Overview</strong></p>
-<p>A process consists of 2 things:</p>
-<ul>
-<li>a collection of actions to invoke</li>
-<li>the logic for picking which actions should run at any given time</li>
-</ul>
-<p>This abstraction enables both workflow-style processes (multiple steps running in
-parallel, with some steps dependent on the completion of earlier steps) as well as
-state machine-style processes (one state active at a time, with the next state
-determined by examining the process' current set of conditions).</p>
-<p>You can even set up custom process logic by providing your own <a href="ProcessLogic.html">ProcessLogic</a> instance
-to the process method. See the example <a href="ProcessLogic.html">here</a>.</p>
-<p><strong>Action Methods</strong></p>
-<p>Each <a href="Action.html">Action</a> in a process can implement methods that the process will
-invoke at the appropriate time. These methods can be broken down into 2 categories:</p>
-<ol>
-<li>exec methods</li>
-<li>post-exec methods</li>
-</ol>
-<p>The &quot;exec&quot; methods are run when the action is invoked. These include <a href="Action.html#init">init</a>,
-<a href="Action.html#execute">execute</a> and <a href="Action.html#retry">retry</a>.</p>
-<p>The &quot;post-exec&quot; methods are run after the process completes. These include
-<a href="Action.html#rollback">rollback</a>, <a href="Action.html#failure">failure</a>, and
-<a href="Action.html#success">success</a>.</p>
-<p><strong>IMPORTANT!</strong> The post-exec methods are run <em>in parallel</em> and <em>at the same time</em> that
-the <a href="ExecutionPromise.html">ExecutionPromise</a> returned by <a href="global.html#ProcessStart">ProcessStart</a> is resolved or rejected,
-meaning there is no guaranteed order between your process callbacks and your actions'
-post-exec methods.</p></div>
-            
-
-            
-                
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_index.mjs.html">process/index.mjs</a>, <a href="process_index.mjs.html#line18">line 18</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-        
-        </div>
-    
-
-    
-
-    
-
-    
-    
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".action"><span class="type-signature">(static) </span>action<span class="signature">(name, api)</span><span class="type-signature"> &rarr; {<a href="Action.html">Action</a>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_index.mjs.html">process/index.mjs</a>, <a href="process_index.mjs.html#line117">line 117</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Creates a fully realized <a href="Action.html">Action</a> for use within a process.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>async function loadData() {  // make a data call}function processResults() {  // access this.results.load  // value returned will be assigned  // to this.results.process}const actions = models.collection();actions.add(process.action('load', loadData));actions.add(process.action('process', processResults));// "load" should transition to "process" automatically:const criteria = [ ['load', 'process'] ];export const start = process.create('get data', actions, process.transitions(criteria));</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The name of the process action.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>api</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#AsyncVoidFunction">AsyncVoidFunction</a></span>
-|
-
-<span class="param-type"><a href="Action.html">Action</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The execute method or partial <a href="Action.html">Action</a> to fill out.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="Action.html">Action</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".create"><span class="type-signature">(static) </span>create<span class="signature">(name, actions, logic)</span><span class="type-signature"> &rarr; {<a href="global.html#ProcessStart">ProcessStart</a>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_index.mjs.html">process/index.mjs</a>, <a href="process_index.mjs.html#line318">line 318</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Returns a method you can invoke to begin a complex asynchronous process.
-The order of actions taken is determined using the <a href="ProcessLogic.html">ProcessLogic</a>
-object passed as the last argument. You can use the built-in dependencies
-and transitions logic factories to create this object for you,
-or supply your own logic to create custom process behaviors.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Examples</h5>
-    
-    <pre class="prettyprint"><code>// workflowimport { loadUserInfo } from '../data/user';import { loadClientData } from '../data/clients';import { start } from '../path/to/machine';const actions = models.collection();actions.add(process.action('loadUserInfo', loadUserInfo));actions.add(process.action('loadClientData', {  async execute() {    const clientId = this.args[0];    return await loadClientData(clientId)      .catch(errors.rethrow({ clientId }));  }}));actions.add(process.action('merge', {  execute() {    const user = this.results.loadUserInfo;    const clients = this.results.loadClientData;    return Object.assign({}, user, { clients });  }}));actions.add(process.action('eula', function execute() {  const conditions = this.results;  return start('initial', conditions);}));export const dispatch = process.create('load user clients', actions, process.dependencies({  'eula': ['merge'],  'merge': ['loadUserInfo', 'loadClientData'],}));// USAGE: dispatch(clientId);</code></pre>
-
-    <pre class="prettyprint"><code>// state machineimport { tracker } from '~/tracking';import { showDialog } from '../some/dialog';import { dispatch } from '../some/workflow';const actions = new Set();// if no start state is explicitly passed to the start()// method then this first action will be used automaticallyactions.add(process.action('start', {  success() {    tracker.event(`${this.process} succeeded`);  },  failure(err) {    Object.assign(err, errors.fatal());    tracker.error(err);  }}));actions.add(process.action('show dialog', {  execute() {    return showDialog('accept.cookies');  }}));// we can dispatch a workflow in one of our actionsactions.add(process.action('run workflow', function execute() {  const cookiesEnabled = this.results['show dialog'];  const ignoreError = errors.rethrow(errors.ignore({ cookiesEnabled }));  return dispatch(cookiesEnabled).catch(ignoreError);}));actions.add(process.action('stop', function() {  this.stop(); // stop the machine}));const transitions = process.transitions([  // show the dialog after starting the machine  ['start', 'show dialog'],  // only run the workflow if the user has not  // logged in within the past 2 weeks  ['show dialog', 'run workflow', function notRecentlyLoggedIn() {    const TWO_WEEKS = 1000 * 60 * 60 * 24 * 7 * 2;    const lastLogin = Date.parse(localStorage.getItem('lastLogin'));    return lastLogin &lt; Date.now() - TWO_WEEKS;  }],  // only if the above transition's condition returns  // false (i.e. the user has recently logged in) will  // this next transition will be evaluated; and since  // this next transition always returns true, the machine  // will always have a path forward  ['show dialog', 'stop'],  // if we did get into the "run workflow" state, make  // sure we stop the workflow afterwards  ['run workflow', 'stop']]);export const start = process.create('intro', actions, transitions);</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The name of the process to run.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>actions</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Iterable.&lt;<a href="Action.html">Action</a>></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>An interable collection (e.g. Set, array, or ModelList) of <a href="Action.html">Action</a>s to run.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>logic</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="ProcessLogic.html">ProcessLogic</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The logic that determines how to start and continue a process.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A method you can invoke to begin the process. The arguments will
-depend in part on the <a href="ProcessLogic.html">ProcessLogic</a> object you passed.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#ProcessStart">ProcessStart</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".dependencies"><span class="type-signature">(static) </span>dependencies<span class="signature">(deps<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="ProcessLogic.html">ProcessLogic</a>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_index.mjs.html">process/index.mjs</a>, <a href="process_index.mjs.html#line476">line 476</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Creates a <a href="ProcessLogic.html">ProcessLogic</a> instance that can be passed to the process
-method. When started, the process will use the dependency map to determine which <a href="Action.html">actions</a>
-can be invoked immediately (having no dependencies) and which should be run when their dependent actions
-have completed.</p>
-<p>This method results in the process running like a <em>workflow</em>, with some actions run in parallel
-and the execution order of actions dependent upon the stated dependencies.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Examples</h5>
-    
-    <pre class="prettyprint"><code>const dependencies = process.dependencies({  'step b': ['step a'], // action b runs after action a  'step c': ['step b', 'step d'] // action c runs after actions b and d});const actions = [  process.action('step a', () => console.log('step a run')),  process.action('step b', () => console.log('step b run')),  process.action('step c', () => console.log('step c run')),  process.action('step d', () => console.log('step d run')),];export const dispatch = process.create('my workflow', actions, dependencies);</code></pre>
-
-    <pre class="prettyprint"><code>const actions = [  process.action('start', function execute() {    console.log('args:', this.args);  }),  process.action('parallel 1', function execute() {    console.log('in', this.name);  }),  process.action('parallel 2', function execute() {    console.log('in', this.name);  }),];const order = process.dependencies({  'parallel 1': ['start'],  'parallel 2': ['start'],});export const dispatch = process('my workflow', actions, order);// USAGE:// dispatch(123, 'abc');</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>deps</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object.&lt;string, Array.&lt;string>></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <code>{}</code>
-                
-                </td>
-            
-
-            <td class="description last"><p>The dependency map that should be used
-to determine the initial and follow-up <a href="Action.html">actions</a> to invoke in this
-process.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A ProcessLogic instance that process
-can use to determine how to run the ModelList <a href="Action.html">actions</a> it was provided.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="ProcessLogic.html">ProcessLogic</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".run"><span class="type-signature">(static) </span>run<span class="signature">(item, context, initialize<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_index.mjs.html">process/index.mjs</a>, <a href="process_index.mjs.html#line184">line 184</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Utility method to run a single <a href="Action.html">Action</a> in isolation.
-This method is used internally by process
-but is made available publicly for unusual situations.</p>
-<p><strong>NOTE:</strong> The success and failure methods will not be run using this
-method since their invocation depends on whether or not a collection
-of Actions has completed successfully. If you want to invoke
-the success and failure methods, you should do so manually. See the
-example for details.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const step = process.action('something', {  count: 0,  init() { this.count = 0; },  execute() {    console.log(this.args);    this.count = this.count + 1;    return this.count * this.factor;  },  success() {}, // must be invoked manually  failure(err) {}, // must be invoked manually});export async function invokeSomething(...args) {  const context = { args, factor: 3 };  const promise = process.run(step, context);  // invoke success and failure methods  // on separate promise chain than the  // one we return to callers; we don't  // care if these fail and we don't want  // their return values to override the  // return value from the execute method  promise.then(    () => step.success.call(context),    (err) => step.failure.call(context, err)  );  return await promise; // value returned by execute()}</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>item</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Action.html">Action</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>The Action whose methods should be invoked.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>context</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="ProcessContext.html">ProcessContext</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>The context accessed using <code>this</code> within an action method.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>initialize</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <code>true</code>
-                
-                </td>
-            
-
-            <td class="description last"><p>Whether to run the Action's init method.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".transitions"><span class="type-signature">(static) </span>transitions<span class="signature">(criteria<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="ProcessLogic.html">ProcessLogic</a>}</span></h4>
-
-    
-
-
-
-
-<dl class="details">
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_index.mjs.html">process/index.mjs</a>, <a href="process_index.mjs.html#line544">line 544</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    <p>Creates a <a href="ProcessLogic.html">ProcessLogic</a> instance that can be passed to the process
-method. When started, the process will use the transition criteria to determine which <a href="Action.html">actions</a>
-can be invoked based on the current set of <a href="ProcessContext.html#conditions">conditions</a> as passed to
-the <a href="global.html#ProcessStart">start</a> method <em>or</em> through calls to update.</p>
-<p><strong>NOTE:</strong> A process using transitions logic will not stop until and unless one of the following occurs:</p>
-<ul>
-<li>someone invokes the <code>stop()</code> method</li>
-<li>someone invokes the <code>cancel()</code> method</li>
-<li>a <a href="Action.html">Action</a> method throws an Error or returns a rejected Promise</li>
-</ul>
-<p>This method results in the process running like a <em>state machine</em>, with one action allowed to run at any
-time and the next action determined using the current conditions and the given transition logic.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>const states = models.collection();states.add(process.action('start', () => console.log('start')));states.add(process.action('next',  () => console.log('next')));states.add(process.action('stop',  function() {  this.stop();}));const criteria = process.transitions([  ['start', 'next'],  ['next', 'stop']]);export const start = process('my machine', states, criteria);// USAGE:start();start('next');start('stop', { initial: 'conditions' });// you can also just provide initial conditions;// the first action will still be used as the start actionstart({ initial: 'conditions' });</code></pre>
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>criteria</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="ProcessTransitions.html">ProcessTransitions</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <code>[]</code>
-                
-                </td>
-            
-
-            <td class="description last"><p>The transitions that should be used
-to determine the initial and follow-up <a href="Action.html">actions</a> to invoke in this
-process.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>A ProcessLogic instance that process
-can use to determine how to run the ModelList <a href="Action.html">actions</a> it was provided.</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="ProcessLogic.html">ProcessLogic</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
-
-
-
-
-    
-    
-</div>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.7</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
-</footer>
-
-<script>prettyPrint();</script>
-<script src="scripts/polyfill.js"></script>
-<script src="scripts/linenumber.js"></script>
-
-<script src="scripts/search.js" defer></script>
-
-
-
-</body>
-</html>

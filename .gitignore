@@ -1,5 +1,7 @@
 coverage/
 dist/
+test/
+types/
 node_modules/
 .vscode/
 .idea/
