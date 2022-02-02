@@ -141,7 +141,7 @@ export interface EventBus {
     * await bus2.fire('event'); // [1, 2]
     * ```
     */
-    fire(event: string, ...args: any[]): Promise<any[]>
+    fire(event: string|Symbol, ...args: any[]): Promise<any[]>
 
     /**
      * Registers a subscriber for the given event. The subscriber will be invoked
@@ -168,7 +168,7 @@ export interface EventBus {
      * });
     * ```
      */
-    on(event: string, subscriber: Function): VoidFunction
+    on(event: string|Symbol, subscriber: Function): VoidFunction
 
     /**
      * Similar to {@link on on}, except the subscriber
@@ -178,7 +178,7 @@ export interface EventBus {
      * @param subscriber The subscriber to invoke when the event is fired.
      * @returns Method to invoke to remove the subscriber.
      */
-    one(event: string, subscriber: Function): VoidFunction
+    one(event: string|Symbol, subscriber: Function): VoidFunction
 
     /**
      * Resumes notifying subscribers after {@link stop stop} was called. Any
@@ -342,9 +342,9 @@ const stubPromise = () => Promise.resolve();
 export function bus(context?: any, mode: ModeFunction = parallel): EventBus {
 
     let stopped = false;
-    const subscribers = new Map<string, GroupedFunction<any>>();
+    const subscribers = new Map<string|Symbol, GroupedFunction<any>>();
 
-    function on(event: string, subscriber: Function): VoidFunction {
+    function on(event: string|Symbol, subscriber: Function): VoidFunction {
         const handler = subscriber.bind(context);
         const handlers = subscribers.get(event) || mode();
         handlers.add(handler);
@@ -354,7 +354,7 @@ export function bus(context?: any, mode: ModeFunction = parallel): EventBus {
         };
     }
 
-    function one(event: string, subscriber: Function): VoidFunction {
+    function one(event: string|Symbol, subscriber: Function): VoidFunction {
         function handler(...args: any[]) {
             off();
             subscriber.apply(this, args);
@@ -371,7 +371,7 @@ export function bus(context?: any, mode: ModeFunction = parallel): EventBus {
         stopped = false;
     }
 
-    function fire(event: string, ...args: any[]): Promise<any[]> {
+    function fire(event: string|Symbol, ...args: any[]): Promise<any[]> {
         const handlers = subscribers.get(event) || stubPromise;
         return !stopped && handlers(...args).catch(rethrow({ event, args }));
     }
