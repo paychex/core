@@ -377,25 +377,39 @@ describe('data', () => {
                 };
             }
 
-            it('rejects if no request provided', (done) => {
-                dataLayer.fetch.call(dataLayer).catch(catchHandler(done));
+            it('throws if no request provided', () => {
+                try {
+                    dataLayer.fetch.call(dataLayer);
+                    (expect as any).fail('should not be reached');
+                } catch(e) {
+                    expect(e.severity).toBe(FATAL);
+                    expect(e.message).toBe(invalid);
+                }
             });
 
-            it('rejects if invalid request provided', (done) => {
-                dataLayer.fetch.call(dataLayer, { method: 123, url: '' }).catch(catchHandler(done));
+            it('throws if invalid request provided', () => {
+                try {
+                    dataLayer.fetch.call(dataLayer, { method: 123, url: '' });
+                    (expect as any).fail('should not be reached');
+                } catch (e) {
+                    expect(e.severity).toBe(FATAL);
+                    expect(e.message).toBe(invalid);
+                }
             });
 
-            it('rejects if adapter not found', (done) => {
-                dataLayer.fetch({
-                    method: 'GET',
-                    adapter: 'dne',
-                    url: 'www.test.com',
-                }).catch(e => {
+            it('throws if adapter not found', () => {
+                try {
+                    dataLayer.fetch({
+                        method: 'GET',
+                        adapter: 'dne',
+                        url: 'www.test.com',
+                    });
+                    (expect as any).fail('should not be reached');
+                } catch (e) {
                     expect(e.severity).toBe(FATAL);
                     expect(e.adapter).toBe('dne');
                     expect(e.message).toBe('Adapter not found.');
-                    done();
-                });
+                }
             });
 
             it('returns successful response', async () => {

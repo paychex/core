@@ -110,7 +110,7 @@ export interface SpyBehavior extends SpyBase {
      */
     invokes(fn: Function): Spy
 
-};
+}
 
 /**
  * @example
@@ -250,6 +250,11 @@ export interface Spy extends SpyBehavior, SpyCall {
     * ```
     */
     onCall(index: number): SpyBehavior
+
+    /**
+     * Returns all calls to their default behaviors and clears call history.
+     */
+    reset(): void
 
 }
 

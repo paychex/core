@@ -151,6 +151,10 @@ export * as utils from './utils';
 /**
  * Processes a Request and returns a Promise resolving to a Response object.
  *
+ * **IMPORTANT:** An adapter should _never_ throw an Error or return a
+ * rejected promise. Instead, set the {@link Response.meta.error} property
+ * to `true` or else return a status code outside of the 200-299 range.
+ *
  * @param request The data operation request to fulfill.
  * @returns A Promise resolved with a Response instance.
  */
@@ -397,6 +401,21 @@ export interface Response {
 }
 
 /**
+ * Adds {@link Response} information to a failed {@link Fetch} operation.
+ */
+export interface DataError extends Error {
+    response?: Response
+}
+
+/**
+ * Represents the results of a call to the DataLayer's {@link DataLayer.fetch fetch} method.
+ */
+export interface DataPromise extends Promise<Response> {
+    catch(onrejected: (error: DataError) => void): Promise<void>
+    catch(onrejected: (error: DataError) => never | PromiseLike<never> | undefined | null): Promise<Response|never>
+}
+
+/**
  * Contains the minimum functionality necessary to convert a
  * {@link DataDefinition} object into a {@link Request} and to
  * execute that Request against an {@link Adapter}, returning
@@ -440,12 +459,12 @@ export interface DataLayer {
     *   .catch(tracker.error);
     * ```
     */
-    fetch(request: Request): Promise<Response>
+    fetch(request: Request): DataPromise
 
     /**
      * Converts a {@link DataDefinition} object into a {@link Request} object that can be
-     * passed to {@link DataLayer.fetch fetch}. The {@link Proxy} passed to
-     * {@link module:data.createDataLayer createDataLayer} will be used to fill out the
+     * passed to {@link DataLayer.fetch fetch}. The {@link DataProxy proxy} passed to
+     * {@link createDataLayer} will be used to fill out the
      * Request using any configured {@link ProxyRule ProxyRules}.
      *
      * Keeping your data definition objects separate from request objects enables us to
@@ -1052,7 +1071,7 @@ export function createDataLayer(proxy: DataProxy, adapter: Adapter): DataLayer {
 
     const adapters: Map<string, Adapter> = arguments[2] || new Map<string, Adapter>()
 
-    async function fetch(request: Request): Promise<Response> {
+    function fetch(request: Request): DataPromise {
 
         if (!isRequest(request as any))
             throw error('Invalid request passed to fetch.', fatal());
@@ -1061,11 +1080,12 @@ export function createDataLayer(proxy: DataProxy, adapter: Adapter): DataLayer {
         if (!isFunction(requestedAdapter))
             throw error('Adapter not found.', fatal({ adapter: request.adapter }));
 
-        const response = await requestedAdapter(request);
-        if (isErrorResponse(response))
-            throw error(getErrorMessage(response), { response });
-
-        return response;
+        return Promise.resolve(requestedAdapter(request))
+            .then((response: Response) => {
+                if (isErrorResponse(response))
+                    throw error(getErrorMessage(response), { response });
+                return response;
+            }) as DataPromise;
 
     }
 
