@@ -102,7 +102,7 @@ export interface AggregateValidationError extends ValidationError {
  * }, 'signup information is invalid');
  * ```
  */
-export interface Validator<T extends ValidationError> { (proposed: any, current?: any, source?: Record<any, any>): ValidationPromise<T> }
+export interface Validator<T extends ValidationError = ValidationError> { (proposed: any, current?: any, source?: Record<any, any>): ValidationPromise<T> }
 
 export interface ValidationPromise<T extends ValidationError> extends Promise<void> {
     catch(onrejected?: ((reason: T) => never | PromiseLike<never>) | undefined | null): ValidationPromise<T>
