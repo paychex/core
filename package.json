@@ -1,6 +1,6 @@
 {
     "name": "@paychex/core",
-    "version": "3.0.2",
+    "version": "3.0.3",
     "description": "Provides framework-agnostic functionality for use in applications.",
     "main": "dist/cjs/index.js",
     "module": "dist/esm/index.mjs",
